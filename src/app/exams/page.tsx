@@ -1,0 +1,92 @@
+'use client'
+
+import { AgTableFull } from '@/components/AgTable'
+import Page from '@/components/Page'
+import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
+import { useIsMobile } from '@/hooks/use-mobile'
+import jutge from '@/lib/jutge'
+import { InstructorBriefExam } from '@/lib/jutge_api_client'
+import { SquarePlusIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
+export default function ExamsListPage() {
+    return (
+        <Page
+            pageContext={{
+                title: 'Exams',
+                menu: 'user',
+                current: 'exams',
+                subTitle: 'Exams',
+                subMenu: 'main',
+            }}
+        >
+            <ExamsListView />
+        </Page>
+    )
+}
+
+function ExamsListView() {
+    const isMobile = useIsMobile()
+    const [exams, setExams] = useState<InstructorBriefExam[]>([])
+    const [rows, setRows] = useState<InstructorBriefExam[]>([])
+    const [archived, setArchived] = useState<string[]>([])
+    const [showArchived, setShowArchived] = useState(false)
+
+    const [colDefs, setColDefs] = useState([
+        {
+            field: 'exam_nm',
+            headerName: 'Id',
+            cellRenderer: (p: any) => (
+                <Link href={`exams/${p.data.exam_nm}/properties`}>{p.data.exam_nm}</Link>
+            ),
+            flex: 1,
+            filter: true,
+        },
+        { field: 'title', flex: 2, filter: true },
+        { field: 'annotation', flex: 2, filter: true },
+    ])
+
+    useEffect(() => {
+        if (isMobile) setColDefs((colDefs) => colDefs.filter((c) => c.field !== 'annotation'))
+    }, [isMobile])
+
+    useEffect(() => {
+        async function fetchExams() {
+            const archived = await jutge.instructor.exams.getArchived()
+            const dict = await jutge.instructor.exams.index()
+            const array = Object.values(dict).sort((a, b) => a.exam_nm.localeCompare(b.exam_nm))
+            setRows(array.filter((exam) => !archived.includes(exam.exam_nm)))
+            setExams(array)
+            setArchived(archived)
+        }
+
+        fetchExams()
+    }, [])
+
+    function showArchivedChange(checked: boolean) {
+        setShowArchived(checked)
+        if (checked) {
+            setRows(exams.filter((exam) => archived.includes(exam.exam_nm)))
+        } else {
+            setRows(exams.filter((exam) => !archived.includes(exam.exam_nm)))
+        }
+    }
+
+    return (
+        <>
+            <AgTableFull rowData={rows} columnDefs={colDefs} />
+            <div className="mt-4 flex flex-row gap-2">
+                <Switch checked={showArchived} onCheckedChange={showArchivedChange} />
+                <div className="text-sm">Archived exams</div>
+                <div className="flex-grow" />
+                <Link href="/exams/new">
+                    <Button>
+                        <SquarePlusIcon /> New exam
+                    </Button>
+                </Link>
+            </div>
+        </>
+    )
+}
