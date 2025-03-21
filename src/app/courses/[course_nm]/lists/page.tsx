@@ -289,7 +289,7 @@ function DialogToShowList({
                 {
                     field: 'Items',
                     flex: 1,
-                    sortable: true,
+                    sortable: false,
                     cellRenderer: (p: any) =>
                         p.data.problem_nm ? (
                             <div className="flex flex-row">
