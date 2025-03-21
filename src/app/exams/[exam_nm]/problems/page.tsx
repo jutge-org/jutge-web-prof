@@ -44,6 +44,7 @@ import {
     Check,
     CircleMinusIcon,
     EditIcon,
+    PaintbrushIcon,
     PlusCircleIcon,
     SaveIcon,
     XCircleIcon,
@@ -229,6 +230,16 @@ function ExamProblemsView() {
         }
     }
 
+    async function decorateAction() {
+        const newRows = rows.map((row, index) => ({
+            ...row,
+            caption: row.caption || `P${index + 1}`,
+            icon: row.icon || `numbers/${index + 1}`,
+            weight: row.weight || 1,
+        }))
+        setRows(newRows)
+    }
+
     if (auth.user === null || exam === null || usedAbstractProblems === null) return <Spinner />
 
     return (
@@ -260,6 +271,13 @@ function ExamProblemsView() {
                     title="Remove all selected problems"
                 >
                     <CircleMinusIcon /> Remove
+                </Button>
+                <Button
+                    className="w-28 justify-start"
+                    onClick={decorateAction}
+                    title="Add captions, wieghts and icons to all problems"
+                >
+                    <PaintbrushIcon /> Decorate
                 </Button>
                 <Button
                     className="w-28 justify-start"
