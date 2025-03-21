@@ -160,3 +160,7 @@ a {
 .myprose {
     @apply prose dark:prose-invert;
 }
+
+.ag-row-hover .my-action-button {
+    @apply text-primary;
+}
