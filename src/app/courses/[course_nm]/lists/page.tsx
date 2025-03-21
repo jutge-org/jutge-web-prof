@@ -17,6 +17,7 @@ import { InstructorBriefList, InstructorCourse } from '@/lib/jutge_api_client'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { CircleMinusIcon, PlusCircleIcon, SaveIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -57,6 +58,16 @@ function CourseListView() {
             flex: 2,
             sortable: false,
             //filter: true,
+        },
+        {
+            field: 'actions',
+            headerName: '',
+            width: 100,
+            cellRenderer: (p: any) => (
+                <Link href={`/lists/${p.data.list_nm}/items`}>
+                    <span className="text-xs">show</span>
+                </Link>
+            ),
         },
     ])
 
