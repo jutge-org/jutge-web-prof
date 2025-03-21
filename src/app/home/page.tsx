@@ -21,7 +21,7 @@ export default function HomePage() {
         return (
             <Page pageContext={{ menu: 'user', current: 'home', title: 'Home' }}>
                 <div className="w-full pt-8 sm:pt-32 flex flex-row justify-center">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-16">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
                         {Object.entries(menu).map(([key, item]) => (
                             <Option
                                 key={key}
@@ -30,6 +30,12 @@ export default function HomePage() {
                                 href={item.href}
                             />
                         ))}
+                    </div>
+                </div>
+                <div className="hidden sm:block">
+                    <div className="text-center text-xs text-gray-500">
+                        Use <span className="border rounded-md p-1 mx-1">⌘K</span> for command
+                        palette
                     </div>
                 </div>
             </Page>

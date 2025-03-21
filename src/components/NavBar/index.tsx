@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import * as React from 'react'
 import { PageContext } from '../Page'
+import CommandKToggle from './CommandKToggle'
 import ModeToggle from './ModeToggle'
 import ProfileToggle from './ProfileToggle'
 import SignInButton from './SignInButton'
@@ -24,6 +25,9 @@ export default function NavBar({ pageContext }: { pageContext: PageContext }) {
                 <div className="border-b bg-neutral-100 dark:bg-neutral-800">
                     <div className="container mx-auto max-w-[1000px] h-12 flex flex-row items-center">
                         <div className="size-2" />
+                        <div className="hidden sm:block">
+                            <CommandKToggle />
+                        </div>
                         <div className="hidden sm:block">
                             <MainMenu pageContext={pageContext} />
                         </div>

@@ -9,10 +9,10 @@ export default function CommandKToggle() {
 
     return (
         <Button
-            title="Menu (⌘K)"
             variant="ghost"
             size="icon"
             onClick={() => commandK.setOpen(true)}
+            title="Command palette (⌘K)"
         >
             <MenuIcon />
             <span className="sr-only">Menu</span>

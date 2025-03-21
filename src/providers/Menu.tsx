@@ -18,6 +18,7 @@ export interface MenuItem {
     href: string
     icon?: React.ReactElement
     icon2xl?: React.ReactElement
+    shortcut?: string
 }
 
 export type Menu = Record<string, MenuItem>
@@ -44,42 +45,49 @@ export const menus: Record<string, Menu> = {
             name: 'Home',
             icon: <HouseIcon />,
             icon2xl: <HouseIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'H',
         },
         courses: {
             href: '/courses',
             name: 'Courses',
             icon: <TableIcon />,
             icon2xl: <TableIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'C',
         },
         lists: {
             href: '/lists',
             name: 'Lists',
             icon: <ListIcon />,
             icon2xl: <ListIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'L',
         },
         exams: {
             href: '/exams',
             name: 'Exams',
             icon: <FilePenIcon />,
             icon2xl: <FilePenIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'E',
         },
         documents: {
             href: '/documents',
             name: 'Documents',
             icon: <FileIcon />,
             icon2xl: <FileIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'D',
         },
         problems: {
             href: '/problems',
             name: 'Problems',
             icon: <PuzzleIcon />,
             icon2xl: <PuzzleIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'P',
         },
         tags: {
             href: '/tags',
             name: 'Tags',
             icon: <TagsIcon />,
             icon2xl: <TagsIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'T',
         },
         about: {
             href: '/about',
