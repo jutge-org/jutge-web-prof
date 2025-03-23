@@ -102,13 +102,16 @@ function ExamStatisticsView() {
                             />
                         }
                     >
-                        <MyPieChart data={statistics.submissions[problem.problem_nm]} />
+                        <MyPieChart
+                            data={statistics.submissions[problem.problem_nm]}
+                            cathegory="submissions"
+                        />
                     </MyCard>
                 </div>
             ))}
             <div className="col-span-2">
                 <MyCard title="Summary">
-                    <MySummaryChart data={statistics.submissions} />
+                    <MySummaryChart data={statistics.submissions} cathegory="submissions" />
                 </MyCard>
             </div>
         </div>
@@ -127,13 +130,16 @@ function ExamStatisticsView() {
                             />
                         }
                     >
-                        <MyPieChart data={statistics.statuses[problem.problem_nm]} />
+                        <MyPieChart
+                            data={statistics.statuses[problem.problem_nm]}
+                            cathegory="statuses"
+                        />
                     </MyCard>
                 </div>
             ))}
             <div className="col-span-2">
                 <MyCard title="Summary">
-                    <MySummaryChart data={statistics.statuses} />
+                    <MySummaryChart data={statistics.statuses} cathegory="statuses" />
                 </MyCard>
             </div>
         </div>
@@ -158,10 +164,18 @@ function ExamStatisticsView() {
                             />
                         }
                     >
-                        <MyPieChart data={statistics.compilers[problem.problem_nm]} />
+                        <MyPieChart
+                            data={statistics.compilers[problem.problem_nm]}
+                            cathegory="compilers"
+                        />
                     </MyCard>
                 </div>
             ))}
+            <div className="col-span-2">
+                <MyCard title="Summary">
+                    <MySummaryChart data={statistics.compilers} cathegory="compilers" />
+                </MyCard>
+            </div>
         </div>
     )
 
@@ -178,10 +192,18 @@ function ExamStatisticsView() {
                             />
                         }
                     >
-                        <MyPieChart data={statistics.proglangs[problem.problem_nm]} />
+                        <MyPieChart
+                            data={statistics.proglangs[problem.problem_nm]}
+                            cathegory="proglangs"
+                        />
                     </MyCard>
                 </div>
             ))}
+            <div className="col-span-2">
+                <MyCard title="Summary">
+                    <MySummaryChart data={statistics.proglangs} cathegory="proglangs" />
+                </MyCard>
+            </div>
         </div>
     )
 
@@ -203,7 +225,7 @@ function ExamStatisticsView() {
     )
 }
 
-function MySummaryChart({ data }: { data: Dict<Distribution> }) {
+function MySummaryChart({ data, cathegory }: { data: Dict<Distribution>; cathegory: string }) {
     //
 
     const chartData: Dict<string | number>[] = []
@@ -222,7 +244,7 @@ function MySummaryChart({ data }: { data: Dict<Distribution> }) {
     }
 
     return (
-        <ChartContainer config={chartConfig} className="h-[150px] w-full">
+        <ChartContainer config={chartConfig} className="h-[372px] w-full">
             <BarChart data={chartData} layout="vertical">
                 <CartesianGrid horizontal={false} vertical={false} />
                 <YAxis dataKey="problem_nm" type="category" tickLine={false} axisLine={false} />
@@ -233,15 +255,7 @@ function MySummaryChart({ data }: { data: Dict<Distribution> }) {
                         key={index}
                         dataKey={key}
                         layout="vertical"
-                        fill={myColor(key)}
-                        radius={
-                            index == 0
-                                ? [4, 0, 0, 4]
-                                : index == Object.keys(chartConfig).length - 1
-                                  ? [0, 4, 4, 0]
-                                  : [0, 0, 0, 0]
-                            /* some items at the right do not get rounded corners because items of size exist. */
-                        }
+                        fill={color(key, cathegory)}
                         stackId="a"
                     >
                         <LabelList
@@ -282,11 +296,11 @@ function MyTimelineChart(props: MyTimelineChartProps) {
     const chartConfig = {
         ok: {
             label: 'OK',
-            color: myColor('OK'),
+            color: color('OK', 'statuses'),
         },
         ko: {
             label: 'KO',
-            color: myColor('KO'),
+            color: color('KO', 'statuses'),
         },
     } satisfies ChartConfig
 
@@ -312,7 +326,7 @@ function MyTimelineChart(props: MyTimelineChartProps) {
     )
 }
 
-function MyPieChart({ data }: { data: Distribution }) {
+function MyPieChart({ data, cathegory }: { data: Distribution; cathegory: string }) {
     //
 
     // data is fooly modified, so we need to clone it
@@ -348,7 +362,7 @@ function MyPieChart({ data }: { data: Distribution }) {
         } else {
             chartConfig[key] = {
                 label: key,
-                color: myColor(key),
+                color: color(key, cathegory),
             }
         }
     }
@@ -517,25 +531,128 @@ function ProblemTitle({
     )
 }
 
-function myColor(key: string) {
-    // see https://github.com/timoxley/colornames
+const colorMappings: Dict<Dict<string>> = {
+    statuses: {
+        OK: 'cobaltgreen',
+        KO: 'tomato 3',
+        NT: 'gray',
+    },
+    submissions: {
+        AC: 'cobaltgreen',
+        WA: 'tomato 3',
+        PE: 'darkorange 1',
+        SC: 'darkorange 1',
+        IC: 'darkorange',
+        CE: 'purple',
+        EE: 'darkgray',
+        IE: 'red',
+        SE: 'red',
+    },
+    compilers: {
+        // most frequent
+        'Clang++17': 'goldenrod',
+        'G++': 'goldenrod 1',
+        'G++11': 'goldenrod 2',
+        'G++17': 'goldenrod 3',
+        'P1++': 'goldenrod 4',
+        Python: 'sienna',
+        Python3: 'sienna',
+        RunPython: 'sienna 2',
+        Make: 'lavenderblush',
+        MakePRO2: 'lavenderblush',
+        PRO2: 'lavenderblush',
+        Quiz: 'melon',
+        Haskell: 'palevioletred',
+        RunHaskell: 'palevioletred 1',
+        Java: 'lightsteelblue',
 
-    // statuses
-    if (key === 'OK') return toHex('cobaltgreen')
-    if (key === 'KO') return toHex('tomato 3')
-    if (key === 'NT') return toHex('gray')
+        // others
+        BEEF: 'indian red',
+        CLISP: 'crimson',
+        Chicken: 'lightpink',
+        Circuits: 'lightpink 1',
+        Clang: 'lightpink 2',
+        Clojure: 'lightpink 4',
+        Codon: 'pink',
+        Crystal: 'pink 1',
+        Erlang: 'pink 2',
+        F2C: 'pink 3',
+        FBC: 'pink 4',
+        FPC: 'palevioletred',
+        GCC: 'palevioletred 4',
+        GCJ: 'lavenderblush 1',
+        GDC: 'lavenderblush',
+        GFortran: 'lavenderblush 2',
+        GHC: 'lavenderblush 3',
+        GNAT: 'lavenderblush 4',
+        GObjC: 'violetred 1',
+        GPC: 'violetred 2',
+        Go: 'violetred 3',
+        Guile: 'violetred 4',
+        IVL08: 'hotpink',
+        JDK: 'hotpink 1',
+        Julia: 'hotpink 2',
+        Kotlin: 'hotpink 3',
+        Lua: 'hotpink 4',
+        MonoCS: 'deeppink 1',
+        MyPy: 'deeppink',
+        Nim: 'deeppink 2',
+        P2C: 'deeppink 4',
+        PHP: 'maroon 1',
+        Perl: 'maroon 3',
+        R: 'orchid',
+        Ruby: 'orchid 1',
+        RunClojure: 'orchid 2',
+        Rust: 'thistle',
+        Stalin: 'thistle 1',
+        WS: 'thistle 2',
+        Zig: 'thistle 3',
+        nodejs: 'thistle 4',
+    },
+    proglangs: {
+        // most frequent
+        'C++': 'goldenrod',
+        Python: 'sienna',
+        Make: 'lavenderblush',
+        Quiz: 'melon',
+        Haskell: 'palevioletred',
+        Java: 'lightsteelblue',
 
-    // submissions
-    if (key === 'AC') return toHex('cobaltgreen')
-    if (key === 'WA') return toHex('tomato 3')
-    if (key === 'PE') return toHex('darkorange 1')
-    if (key === 'SC') return toHex('darkorange 1')
-    if (key === 'IC') return toHex('darkorange')
-    if (key === 'CE') return toHex('purple')
-    if (key === 'EE') return toHex('darkgray')
-    if (key === 'IE') return toHex('red')
-    if (key === 'SE') return toHex('red')
+        // others
+        Ada: 'indian red',
+        BASIC: 'crimson',
+        Brainfuck: 'lightpink',
+        C: 'lightpink 1',
+        'C#': 'lightpink 2',
+        Clojure: 'lightpink 4',
+        Crystal: 'pink',
+        D: 'pink 1',
+        Erlang: 'pink 2',
+        Fortran: 'pink 3',
+        Go: 'pink 4',
+        JavaScript: 'palevioletred 2',
+        Julia: 'palevioletred 3',
+        Kotlin: 'palevioletred 4',
+        Lisp: 'lavenderblush 1',
+        Lua: 'lavenderblush',
+        Nim: 'lavenderblush 3',
+        'Objective-C': 'lavenderblush 4',
+        PHP: 'violetred 1',
+        Pascal: 'violetred 2',
+        Perl: 'violetred 3',
+        R: 'hotpink 1',
+        Ruby: 'hotpink 2',
+        Rust: 'hotpink 3',
+        Scheme: 'hotpink 4',
+        Verilog: 'raspberry',
+        Whitespace: 'deeppink 1',
+        Zig: 'deeppink',
+    },
+}
 
-    console.log('Unknown key to get color', key)
+function color(key: string, category: keyof typeof colorMappings) {
+    const colors = colorMappings[category]
+    if (key in colors) return toHex(colors[key])!
+    console.log(`Unknown key to get color for ${key} in category ${category}`)
     return 'blue'
 }
