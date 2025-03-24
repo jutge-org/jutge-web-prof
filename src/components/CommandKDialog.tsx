@@ -9,10 +9,10 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-    CommandShortcut,
 } from '@/components/ui/command'
 import jutge from '@/lib/jutge'
 import {
+    AbstractProblem,
     Document,
     InstructorBriefCourse,
     InstructorBriefExam,
@@ -22,6 +22,7 @@ import { mapmap } from '@/lib/utils'
 import { useCommandK } from '@/providers/CommandK'
 import { menus } from '@/providers/Menu'
 import { Description, DialogTitle } from '@radix-ui/react-dialog'
+import { FileIcon, FilePenIcon, ListIcon, PuzzleIcon, TableIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { all } from 'radash'
 import { useEffect, useState } from 'react'
@@ -35,7 +36,11 @@ export function CommandKDialog() {
     const [lists, setLists] = useState<Record<string, InstructorBriefList>>({})
     const [exams, setExams] = useState<Record<string, InstructorBriefExam>>({})
     const [documents, setDocuments] = useState<Record<string, Document>>({})
-    const [problems, setProblems] = useState<string[]>([])
+    const [problems, setProblems] = useState<Record<string, AbstractProblem>>({})
+
+    const [archivedCourses, setArchivedCourses] = useState<string[]>([])
+    const [archivedLists, setArchivedLists] = useState<string[]>([])
+    const [archivedExams, setArchivedExams] = useState<string[]>([])
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -55,18 +60,33 @@ export function CommandKDialog() {
                 lists: jutge.instructor.lists.index(),
                 exams: jutge.instructor.exams.index(),
                 documents: jutge.instructor.documents.index(),
-                problems: jutge.instructor.problems.getOwnProblems(),
+                ownProblems: jutge.instructor.problems.getOwnProblems(),
+
+                archivedCourses: jutge.instructor.courses.getArchived(),
+                archivedLists: jutge.instructor.lists.getArchived(),
+                archivedExams: jutge.instructor.exams.getArchived(),
             })
+
+            const problems = await jutge.problems.getAbstractProblems(data.ownProblems.join(','))
 
             setCourses(data.courses)
             setLists(data.lists)
             setExams(data.exams)
             setDocuments(data.documents)
-            setProblems(data.problems)
+            setProblems(problems)
+            setArchivedCourses(data.archivedCourses)
+            setArchivedLists(data.archivedLists)
+            setArchivedExams(data.archivedExams)
+            console.log('archivedCourses', data.archivedCourses)
         }
 
         getExams()
     })
+
+    function buildTitle(problem_nm: string) {
+        const pbms = Object.values(problems[problem_nm].problems)
+        return pbms.map((pbm) => pbm.title).join(' / ')
+    }
 
     function select(href: string) {
         commandK.setOpen(false)
@@ -86,69 +106,95 @@ export function CommandKDialog() {
                         <CommandItem key={key} onSelect={() => select(item.href)}>
                             {item.icon}
                             {item.name}
-                            {item.shortcut && <CommandShortcut>{item.shortcut}</CommandShortcut>}
                         </CommandItem>
                     ))}
                 </CommandGroup>
 
                 <CommandGroup heading="Courses">
-                    {mapmap(courses, (key, course) => (
-                        <CommandItem
-                            key={key}
-                            onSelect={() => select(`/courses/${key}/properties`)}
-                        >
-                            <div className="w-full flex flex-row">
-                                <div className="">{course.title}</div>
-                                <div className="flex-grow" />
-                                <div className="text-xs text-gray-500">{key}</div>
-                            </div>
-                        </CommandItem>
-                    ))}
+                    {mapmap(courses, (key, course) =>
+                        archivedCourses.includes(key) ? null : (
+                            <CommandItem
+                                key={key}
+                                onSelect={() => select(`/courses/${key}/properties`)}
+                            >
+                                <div className="w-full flex flex-row">
+                                    <div className="text-gray-400 mr-2 scale-75">
+                                        <TableIcon />
+                                    </div>
+                                    <div className="">{course.title}</div>
+                                    <div className="flex-grow" />
+                                    <div className="text-xs text-gray-400">{key}</div>
+                                </div>
+                            </CommandItem>
+                        ),
+                    )}
                 </CommandGroup>
 
                 <CommandGroup heading="Lists">
-                    {mapmap(lists, (key, list) => (
-                        <CommandItem key={key} onSelect={() => select(`/lists/${key}/properties`)}>
-                            <div className="w-full flex flex-row">
-                                <div className="">{list.title}</div>
-                                <div className="flex-grow" />
-                                <div className="text-xs text-gray-500">{key}</div>
-                            </div>
-                        </CommandItem>
-                    ))}
+                    {mapmap(lists, (key, list) =>
+                        archivedLists.includes(key) ? null : (
+                            <CommandItem
+                                key={key}
+                                onSelect={() => select(`/lists/${key}/properties`)}
+                            >
+                                <div className="w-full flex flex-row">
+                                    <div className="text-gray-400 mr-2 scale-75">
+                                        <ListIcon />
+                                    </div>
+                                    <div className="">{list.title}</div>
+                                    <div className="flex-grow" />
+                                    <div className="text-xs text-gray-400">{key}</div>
+                                </div>
+                            </CommandItem>
+                        ),
+                    )}
                 </CommandGroup>
 
                 <CommandGroup heading="Exams">
-                    {mapmap(exams, (key, exam) => (
-                        <CommandItem key={key} onSelect={() => select(`/exams/${key}/properties`)}>
-                            <div className="w-full flex flex-row">
-                                <div className="">{exam.title}</div>
-                                <div className="flex-grow" />
-                                <div className="text-xs text-gray-500">{key}</div>
-                            </div>
-                        </CommandItem>
-                    ))}
+                    {mapmap(exams, (key, exam) =>
+                        archivedExams.includes(key) ? null : (
+                            <CommandItem
+                                key={key}
+                                onSelect={() => select(`/exams/${key}/properties`)}
+                            >
+                                <div className="w-full flex flex-row">
+                                    <div className="text-gray-400 mr-2 scale-75">
+                                        <FilePenIcon />
+                                    </div>
+                                    <div className="">{exam.title}</div>
+                                    <div className="flex-grow" />
+                                    <div className="text-xs text-gray-400">{key}</div>
+                                </div>
+                            </CommandItem>
+                        ),
+                    )}
                 </CommandGroup>
 
                 <CommandGroup heading="Documents">
                     {mapmap(documents, (key, document) => (
                         <CommandItem key={key} onSelect={() => select(`/documents/${key}`)}>
                             <div className="w-full flex flex-row">
+                                <div className="text-gray-400 mr-2 scale-75">
+                                    <FileIcon />
+                                </div>
                                 <div className="">{document.title}</div>
                                 <div className="flex-grow" />
-                                <div className="text-xs text-gray-500">{key}</div>
+                                <div className="text-xs text-gray-400">{key}</div>
                             </div>
                         </CommandItem>
                     ))}
                 </CommandGroup>
 
                 <CommandGroup heading="Problems">
-                    {problems.map((key, problem) => (
+                    {mapmap(problems, (key, problem) => (
                         <CommandItem key={key} onSelect={() => select(`/problems/${key}`)}>
                             <div className="w-full flex flex-row">
-                                <div className="">TODO:TITLE</div>
+                                <div className="text-gray-400 mr-2 scale-75">
+                                    <PuzzleIcon />
+                                </div>
+                                <div className="">{buildTitle(key)}</div>
                                 <div className="flex-grow" />
-                                <div className="text-xs text-gray-500">{key}</div>
+                                <div className="text-xs text-gray-400">{key}</div>
                             </div>
                         </CommandItem>
                     ))}
