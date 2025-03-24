@@ -13,7 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import jutge from '@/lib/jutge'
+import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
     ColorMapping,
@@ -498,29 +498,6 @@ function MyCard(props: MyCardProps) {
     )
 }
 
-function getTitle(user: Profile, problem_nm: string, abstractProblems: Dict<AbstractProblem>) {
-    try {
-        const abstractProblem = abstractProblems[problem_nm]
-        const prefLanguageId = user.language_id
-        const problem_id = abstractProblem.problem_nm + '_' + prefLanguageId
-        if (problem_id in abstractProblem.problems) {
-            return abstractProblem.problems[problem_id].title
-        } else {
-            for (const problem of Object.values(abstractProblem.problems)) {
-                if (problem.translator === null) {
-                    return problem.title
-                }
-            }
-            for (const problem of Object.values(abstractProblem.problems)) {
-                return problem.title
-            }
-            return problem_nm
-        }
-    } catch {
-        return problem_nm
-    }
-}
-
 type SectionProps = {
     children: React.ReactNode
     className?: string
@@ -562,7 +539,7 @@ function ProblemTitle(props: ProblemTitleProps) {
                     {props.problem.problem_nm}
                 </div>
                 <div className="font-normal text-sm text-gray-500">
-                    {getTitle(props.user, props.problem.problem_nm, props.abstractProblems)}
+                    {getProblemTitle(props.user, props.problem.problem_nm, props.abstractProblems)}
                 </div>
             </div>
         </div>
@@ -570,7 +547,9 @@ function ProblemTitle(props: ProblemTitleProps) {
 }
 
 function color(key: string, cathegory: string, colors: ColorMapping) {
-    if (!(cathegory in colors)) return 'blue'
-    if (!(key in colors[cathegory])) return 'blue'
+    if (!(cathegory in colors) || !(key in colors[cathegory])) {
+        console.error(`color for key '${key}' not found in cathegory '${cathegory}', using blue`)
+        return 'blue'
+    }
     return colors[cathegory][key]
 }

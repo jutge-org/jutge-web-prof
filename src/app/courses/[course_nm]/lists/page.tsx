@@ -12,13 +12,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import jutge from '@/lib/jutge'
+import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
     InstructorBriefList,
     InstructorCourse,
     InstructorListItem,
-    Profile,
 } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'
 import { useAuth } from '@/providers/Auth'
@@ -300,7 +299,11 @@ function DialogToShowList({
                                 >
                                     {p.data.problem_nm}↗
                                 </a>
-                                {getTitle(auth.user!, p.data.problem_nm, allAbstractProblems)}
+                                {getProblemTitle(
+                                    auth.user!,
+                                    p.data.problem_nm,
+                                    allAbstractProblems,
+                                )}
                             </div>
                         ) : (
                             <div className="italic">{p.data.description}</div>
@@ -353,32 +356,4 @@ function DialogToShowList({
             </DialogContent>
         </Dialog>
     )
-}
-
-function getTitle(
-    user: Profile,
-    problem_nm: string,
-    abstractProblems: Dict<AbstractProblem> | null,
-) {
-    if (abstractProblems === null) return problem_nm
-    try {
-        const abstractProblem = abstractProblems[problem_nm]
-        const prefLanguageId = user.language_id
-        const problem_id = abstractProblem.problem_nm + '_' + prefLanguageId
-        if (problem_id in abstractProblem.problems) {
-            return abstractProblem.problems[problem_id].title
-        } else {
-            for (const problem of Object.values(abstractProblem.problems)) {
-                if (problem.translator === null) {
-                    return problem.title
-                }
-            }
-            for (const problem of Object.values(abstractProblem.problems)) {
-                return problem.title
-            }
-            return problem_nm
-        }
-    } catch {
-        return problem_nm
-    }
 }

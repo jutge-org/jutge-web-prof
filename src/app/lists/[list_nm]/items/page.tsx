@@ -7,14 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import jutge from '@/lib/jutge'
-import {
-    AbstractProblem,
-    InstructorList,
-    InstructorListItem,
-    Profile,
-} from '@/lib/jutge_api_client'
-import { Dict } from '@/lib/utils'
+import jutge, { getProblemTitle } from '@/lib/jutge'
+import { AbstractProblem, InstructorList, InstructorListItem } from '@/lib/jutge_api_client'
 import { useAuth } from '@/providers/Auth'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
@@ -22,29 +16,6 @@ import { CircleMinusIcon, PlusCircleIcon, SaveIcon } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-function getTitle(user: Profile, problem_nm: string, abstractProblems: Dict<AbstractProblem>) {
-    try {
-        const abstractProblem = abstractProblems[problem_nm]
-        const prefLanguageId = user.language_id
-        const problem_id = abstractProblem.problem_nm + '_' + prefLanguageId
-        if (problem_id in abstractProblem.problems) {
-            return abstractProblem.problems[problem_id].title
-        } else {
-            for (const problem of Object.values(abstractProblem.problems)) {
-                if (problem.translator === null) {
-                    return problem.title
-                }
-            }
-            for (const problem of Object.values(abstractProblem.problems)) {
-                return problem.title
-            }
-            return problem_nm
-        }
-    } catch {
-        return problem_nm
-    }
-}
 
 type Item = { description: string | null; problem_nm: string | null; title: string | null }
 type ProblemItem = { problem_nm: string; title: string }
@@ -108,7 +79,9 @@ function ListProblemView() {
             const items = list.items.map((item) => ({
                 problem_nm: item.problem_nm,
                 description: item.description,
-                title: item.problem_nm ? getTitle(auth.user!, item.problem_nm, problems) : null,
+                title: item.problem_nm
+                    ? getProblemTitle(auth.user!, item.problem_nm, problems)
+                    : null,
             }))
             setProblems(problems)
             setList(list)
@@ -149,7 +122,7 @@ function ListProblemView() {
         const grid = gridRef.current!.api
         const itemsToAdd: Item[] = problemsToAdd.map((problem_nm) => ({
             problem_nm,
-            title: getTitle(auth.user!, problem_nm, problems),
+            title: getProblemTitle(auth.user!, problem_nm, problems),
             description: null,
         }))
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
@@ -240,7 +213,7 @@ function DialogToAddProblems({
         Object.entries(problems)
             .map(([problem_nm, problem]) => ({
                 problem_nm,
-                title: getTitle(auth.user!, problem_nm, problems),
+                title: getProblemTitle(auth.user!, problem_nm, problems),
             }))
             .sort((a, b) => a.problem_nm.localeCompare(b.problem_nm)),
     )

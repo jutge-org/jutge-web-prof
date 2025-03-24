@@ -29,7 +29,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import jutge from '@/lib/jutge'
+import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
     InstructorExam,
@@ -129,7 +129,7 @@ function ExamProblemsView() {
                 flex: 1,
                 sortable: false,
                 cellRenderer: (p: any) =>
-                    getTitle(
+                    getProblemTitle(
                         auth.user!,
                         p.data.problem_nm,
                         allAbstractProblems !== null ? allAbstractProblems : usedAbstractProblems,
@@ -544,7 +544,10 @@ function ProblemsCombobox(props: ProblemsComboboxProps) {
     const allItems: Item[] = // all items that can be shown
         mapmap(props.allAbstractProblems, (problem_nm, problem) => ({
             key: problem_nm,
-            value: problem_nm + ' · ' + getTitle(props.user, problem_nm, props.allAbstractProblems),
+            value:
+                problem_nm +
+                ' · ' +
+                getProblemTitle(props.user, problem_nm, props.allAbstractProblems),
             titles:
                 problem_nm.toLowerCase() +
                 ' ' +
@@ -625,32 +628,4 @@ function ProblemsCombobox(props: ProblemsComboboxProps) {
             </Popover>
         </div>
     )
-}
-
-function getTitle(
-    user: Profile,
-    problem_nm: string,
-    abstractProblems: Dict<AbstractProblem> | null,
-) {
-    if (abstractProblems === null) return problem_nm
-    try {
-        const abstractProblem = abstractProblems[problem_nm]
-        const prefLanguageId = user.language_id
-        const problem_id = abstractProblem.problem_nm + '_' + prefLanguageId
-        if (problem_id in abstractProblem.problems) {
-            return abstractProblem.problems[problem_id].title
-        } else {
-            for (const problem of Object.values(abstractProblem.problems)) {
-                if (problem.translator === null) {
-                    return problem.title
-                }
-            }
-            for (const problem of Object.values(abstractProblem.problems)) {
-                return problem.title
-            }
-            return problem_nm
-        }
-    } catch {
-        return problem_nm
-    }
 }
