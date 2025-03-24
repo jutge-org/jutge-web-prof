@@ -16,6 +16,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import jutge from '@/lib/jutge'
 import {
     AbstractProblem,
+    ColorMapping,
     Distribution,
     ExamStatistics,
     InstructorExam,
@@ -24,7 +25,6 @@ import {
 } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'
 import { useAuth } from '@/providers/Auth'
-import toHex from 'colornames'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { ChartPieIcon, TableIcon } from 'lucide-react'
@@ -66,16 +66,20 @@ function ExamStatisticsView() {
 
     const [abstractProblems, setAbstractProblems] = useState<Dict<AbstractProblem> | null>(null)
 
+    const [colors, setColors] = useState<ColorMapping | null>(null)
+
     useEffect(() => {
         async function fetchData() {
             const exam = await jutge.instructor.exams.get(exam_nm)
             const statistics = await jutge.instructor.exams.getStatistics(exam_nm)
             const problem_nms = exam.problems.map((problem) => problem.problem_nm).join(',')
             const allAbstractProblems = await jutge.problems.getAbstractProblems(problem_nms)
+            const colors = await jutge.misc.getHexColors()
 
             setExam(exam)
             setStatistics(statistics)
             setAbstractProblems(allAbstractProblems)
+            setColors(colors)
         }
         fetchData()
     }, [exam_nm])
@@ -85,7 +89,8 @@ function ExamStatisticsView() {
         auth.user === null ||
         exam === null ||
         statistics === null ||
-        abstractProblems === null
+        abstractProblems === null ||
+        colors === null
     )
         return <Spinner />
 
@@ -105,13 +110,18 @@ function ExamStatisticsView() {
                         <MyPieChart
                             data={statistics.submissions[problem.problem_nm]}
                             cathegory="submissions"
+                            colors={colors}
                         />
                     </MyCard>
                 </div>
             ))}
             <div className="col-span-2">
                 <MyCard title="Summary">
-                    <MySummaryChart data={statistics.submissions} cathegory="submissions" />
+                    <MySummaryChart
+                        data={statistics.submissions}
+                        cathegory="submissions"
+                        colors={colors}
+                    />
                 </MyCard>
             </div>
         </div>
@@ -133,13 +143,18 @@ function ExamStatisticsView() {
                         <MyPieChart
                             data={statistics.statuses[problem.problem_nm]}
                             cathegory="statuses"
+                            colors={colors}
                         />
                     </MyCard>
                 </div>
             ))}
             <div className="col-span-2">
                 <MyCard title="Summary">
-                    <MySummaryChart data={statistics.statuses} cathegory="statuses" />
+                    <MySummaryChart
+                        data={statistics.statuses}
+                        cathegory="statuses"
+                        colors={colors}
+                    />
                 </MyCard>
             </div>
         </div>
@@ -147,7 +162,7 @@ function ExamStatisticsView() {
 
     const timeline = (
         <MyCard title={<></>}>
-            <MyTimelineChart data={statistics.timeline} />
+            <MyTimelineChart data={statistics.timeline} colors={colors} />
         </MyCard>
     )
 
@@ -167,13 +182,18 @@ function ExamStatisticsView() {
                         <MyPieChart
                             data={statistics.compilers[problem.problem_nm]}
                             cathegory="compilers"
+                            colors={colors}
                         />
                     </MyCard>
                 </div>
             ))}
             <div className="col-span-2">
                 <MyCard title="Summary">
-                    <MySummaryChart data={statistics.compilers} cathegory="compilers" />
+                    <MySummaryChart
+                        data={statistics.compilers}
+                        cathegory="compilers"
+                        colors={colors}
+                    />
                 </MyCard>
             </div>
         </div>
@@ -195,13 +215,18 @@ function ExamStatisticsView() {
                         <MyPieChart
                             data={statistics.proglangs[problem.problem_nm]}
                             cathegory="proglangs"
+                            colors={colors}
                         />
                     </MyCard>
                 </div>
             ))}
             <div className="col-span-2">
                 <MyCard title="Summary">
-                    <MySummaryChart data={statistics.proglangs} cathegory="proglangs" />
+                    <MySummaryChart
+                        data={statistics.proglangs}
+                        cathegory="proglangs"
+                        colors={colors}
+                    />
                 </MyCard>
             </div>
         </div>
@@ -225,13 +250,19 @@ function ExamStatisticsView() {
     )
 }
 
-function MySummaryChart({ data, cathegory }: { data: Dict<Distribution>; cathegory: string }) {
+type MySummaryChartProps = {
+    data: Dict<Distribution>
+    cathegory: string
+    colors: ColorMapping
+}
+
+function MySummaryChart(props: MySummaryChartProps) {
     //
 
     const chartData: Dict<string | number>[] = []
     const chartConfig: Dict<any> = {}
 
-    for (const [problem_nm, distribution] of Object.entries(data)) {
+    for (const [problem_nm, distribution] of Object.entries(props.data)) {
         const item: Dict<string | number> = { problem_nm }
         for (const [key, value] of Object.entries(distribution)) {
             if (!(key in chartData)) item[key] = 0
@@ -255,7 +286,7 @@ function MySummaryChart({ data, cathegory }: { data: Dict<Distribution>; cathego
                         key={index}
                         dataKey={key}
                         layout="vertical"
-                        fill={color(key, cathegory)}
+                        fill={color(key, props.cathegory, props.colors)}
                         stackId="a"
                     >
                         <LabelList
@@ -273,8 +304,6 @@ function MySummaryChart({ data, cathegory }: { data: Dict<Distribution>; cathego
     )
 }
 
-//
-
 type Bucket = {
     minute: number | string
     ok: number
@@ -283,6 +312,7 @@ type Bucket = {
 
 type MyTimelineChartProps = {
     data: Bucket[]
+    colors: ColorMapping
 }
 
 function MyTimelineChart(props: MyTimelineChartProps) {
@@ -296,11 +326,11 @@ function MyTimelineChart(props: MyTimelineChartProps) {
     const chartConfig = {
         ok: {
             label: 'OK',
-            color: color('OK', 'statuses'),
+            color: color('OK', 'statuses', props.colors),
         },
         ko: {
             label: 'KO',
-            color: color('KO', 'statuses'),
+            color: color('KO', 'statuses', props.colors),
         },
     } satisfies ChartConfig
 
@@ -326,12 +356,17 @@ function MyTimelineChart(props: MyTimelineChartProps) {
     )
 }
 
-function MyPieChart({ data, cathegory }: { data: Distribution; cathegory: string }) {
+type MyPieChartProps = {
+    data: Distribution
+    cathegory: string
+    colors: ColorMapping
+}
+
+function MyPieChart(props: MyPieChartProps) {
     //
 
-    // data is fooly modified, so we need to clone it
-    const originalData = data
-    data = structuredClone(data)
+    // data is fully modified, so we need to clone it
+    const data = structuredClone(props.data)
 
     const [chartVisible, setChartVisible] = useState(true)
 
@@ -362,7 +397,7 @@ function MyPieChart({ data, cathegory }: { data: Distribution; cathegory: string
         } else {
             chartConfig[key] = {
                 label: key,
-                color: color(key, cathegory),
+                color: color(key, props.cathegory, props.colors),
             }
         }
     }
@@ -416,7 +451,7 @@ function MyPieChart({ data, cathegory }: { data: Distribution; cathegory: string
                         .map(([key, value]) => (
                             <TableRow key={key}>
                                 <TableCell>{key}</TableCell>
-                                <TableCell className="text-end">{originalData[key]}</TableCell>
+                                <TableCell className="text-end">{props.data[key]}</TableCell>
                                 <TableCell className="text-end">{value.toFixed(1)}%</TableCell>
                             </TableRow>
                         ))}
@@ -445,22 +480,20 @@ function MyPieChart({ data, cathegory }: { data: Distribution; cathegory: string
     )
 }
 
-function MyCard({
-    title,
-    subtitle,
-    children,
-}: {
+type MyCardProps = {
     title: string | JSX.Element
     subtitle?: string | JSX.Element
     children: React.ReactNode
-}) {
+}
+
+function MyCard(props: MyCardProps) {
     return (
         <Card>
             <CardHeader className="p-4">
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>{subtitle}</CardDescription>
+                <CardTitle>{props.title}</CardTitle>
+                <CardDescription>{props.subtitle}</CardDescription>
             </CardHeader>
-            <CardContent className="px-2 py-0">{children}</CardContent>
+            <CardContent className="px-2 py-0">{props.children}</CardContent>
         </Card>
     )
 }
@@ -488,31 +521,34 @@ function getTitle(user: Profile, problem_nm: string, abstractProblems: Dict<Abst
     }
 }
 
-function Section({ children, className }: { children: React.ReactNode; className?: string }) {
+type SectionProps = {
+    children: React.ReactNode
+    className?: string
+}
+
+function Section(props: SectionProps) {
     return (
-        <div className={`mt-8 mb-4 text-xl font-bold ${className}`}>
+        <div className={`mt-8 mb-4 text-xl font-bold ${props.className}`}>
             <div className="flex items-center gap-2">
-                <div className="flex-grow">{children}</div>
+                <div className="flex-grow">{props.children}</div>
             </div>
         </div>
     )
 }
 
-function ProblemTitle({
-    user,
-    problem,
-    abstractProblems,
-}: {
+type ProblemTitleProps = {
     user: Profile
     problem: InstructorExamProblem
     abstractProblems: Dict<AbstractProblem>
-}) {
+}
+
+function ProblemTitle(props: ProblemTitleProps) {
     return (
         <div className="flex flex-row gap-2">
-            {problem.icon && (
+            {props.problem.icon && (
                 <Image
-                    src={`https://jutge.org/img/examicons/${problem.icon}.svg`}
-                    alt={problem.icon}
+                    src={`https://jutge.org/img/examicons/${props.problem.icon}.svg`}
+                    alt={props.problem.icon}
                     width={32}
                     height={32}
                     className=""
@@ -520,139 +556,21 @@ function ProblemTitle({
             )}
             <div className="flex flex-col gap-1">
                 <div className="flex flex-row">
-                    {problem.caption && <div className="">{problem.caption}&nbsp;·&nbsp;</div>}
-                    {problem.problem_nm}
+                    {props.problem.caption && (
+                        <div className="">{props.problem.caption}&nbsp;·&nbsp;</div>
+                    )}
+                    {props.problem.problem_nm}
                 </div>
                 <div className="font-normal text-sm text-gray-500">
-                    {getTitle(user!, problem.problem_nm, abstractProblems)}
+                    {getTitle(props.user, props.problem.problem_nm, props.abstractProblems)}
                 </div>
             </div>
         </div>
     )
 }
 
-const colorMappings: Dict<Dict<string>> = {
-    statuses: {
-        OK: 'cobaltgreen',
-        KO: 'tomato 3',
-        NT: 'gray',
-    },
-    submissions: {
-        AC: 'cobaltgreen',
-        WA: 'tomato 3',
-        PE: 'darkorange 1',
-        SC: 'darkorange 1',
-        IC: 'darkorange',
-        CE: 'purple',
-        EE: 'darkgray',
-        IE: 'red',
-        SE: 'red',
-    },
-    compilers: {
-        // most frequent
-        'Clang++17': 'goldenrod',
-        'G++': 'goldenrod 1',
-        'G++11': 'goldenrod 2',
-        'G++17': 'goldenrod 3',
-        'P1++': 'goldenrod 4',
-        Python: 'sienna',
-        Python3: 'sienna',
-        RunPython: 'sienna 2',
-        Make: 'lavenderblush',
-        MakePRO2: 'lavenderblush',
-        PRO2: 'lavenderblush',
-        Quiz: 'melon',
-        Haskell: 'palevioletred',
-        RunHaskell: 'palevioletred 1',
-        Java: 'lightsteelblue',
-
-        // others
-        BEEF: 'indian red',
-        CLISP: 'crimson',
-        Chicken: 'lightpink',
-        Circuits: 'lightpink 1',
-        Clang: 'lightpink 2',
-        Clojure: 'lightpink 4',
-        Codon: 'pink',
-        Crystal: 'pink 1',
-        Erlang: 'pink 2',
-        F2C: 'pink 3',
-        FBC: 'pink 4',
-        FPC: 'palevioletred',
-        GCC: 'palevioletred 4',
-        GCJ: 'lavenderblush 1',
-        GDC: 'lavenderblush',
-        GFortran: 'lavenderblush 2',
-        GHC: 'lavenderblush 3',
-        GNAT: 'lavenderblush 4',
-        GObjC: 'violetred 1',
-        GPC: 'violetred 2',
-        Go: 'violetred 3',
-        Guile: 'violetred 4',
-        IVL08: 'hotpink',
-        JDK: 'hotpink 1',
-        Julia: 'hotpink 2',
-        Kotlin: 'hotpink 3',
-        Lua: 'hotpink 4',
-        MonoCS: 'deeppink 1',
-        MyPy: 'deeppink',
-        Nim: 'deeppink 2',
-        P2C: 'deeppink 4',
-        PHP: 'maroon 1',
-        Perl: 'maroon 3',
-        R: 'orchid',
-        Ruby: 'orchid 1',
-        RunClojure: 'orchid 2',
-        Rust: 'thistle',
-        Stalin: 'thistle 1',
-        WS: 'thistle 2',
-        Zig: 'thistle 3',
-        nodejs: 'thistle 4',
-    },
-    proglangs: {
-        // most frequent
-        'C++': 'goldenrod',
-        Python: 'sienna',
-        Make: 'lavenderblush',
-        Quiz: 'melon',
-        Haskell: 'palevioletred',
-        Java: 'lightsteelblue',
-
-        // others
-        Ada: 'indian red',
-        BASIC: 'crimson',
-        Brainfuck: 'lightpink',
-        C: 'lightpink 1',
-        'C#': 'lightpink 2',
-        Clojure: 'lightpink 4',
-        Crystal: 'pink',
-        D: 'pink 1',
-        Erlang: 'pink 2',
-        Fortran: 'pink 3',
-        Go: 'pink 4',
-        JavaScript: 'palevioletred 2',
-        Julia: 'palevioletred 3',
-        Kotlin: 'palevioletred 4',
-        Lisp: 'lavenderblush 1',
-        Lua: 'lavenderblush',
-        Nim: 'lavenderblush 3',
-        'Objective-C': 'lavenderblush 4',
-        PHP: 'violetred 1',
-        Pascal: 'violetred 2',
-        Perl: 'violetred 3',
-        R: 'hotpink 1',
-        Ruby: 'hotpink 2',
-        Rust: 'hotpink 3',
-        Scheme: 'hotpink 4',
-        Verilog: 'raspberry',
-        Whitespace: 'deeppink 1',
-        Zig: 'deeppink',
-    },
-}
-
-function color(key: string, category: keyof typeof colorMappings) {
-    const colors = colorMappings[category]
-    if (key in colors) return toHex(colors[key])!
-    console.log(`Unknown key to get color for ${key} in category ${category}`)
-    return 'blue'
+function color(key: string, cathegory: string, colors: ColorMapping) {
+    if (!(cathegory in colors)) return 'blue'
+    if (!(key in colors[cathegory])) return 'blue'
+    return colors[cathegory][key]
 }
