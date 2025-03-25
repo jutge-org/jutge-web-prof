@@ -9,6 +9,7 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
+    CommandSeparator,
 } from '@/components/ui/command'
 import jutge from '@/lib/jutge'
 import {
@@ -18,7 +19,7 @@ import {
     InstructorBriefExam,
     InstructorBriefList,
 } from '@/lib/jutge_api_client'
-import { mapmap } from '@/lib/utils'
+import { mapmap, showError } from '@/lib/utils'
 import { useCommandK } from '@/providers/CommandK'
 import { menus } from '@/providers/Menu'
 import { Description, DialogTitle } from '@radix-ui/react-dialog'
@@ -55,29 +56,35 @@ export function CommandKDialog() {
 
     useEffect(() => {
         async function getExams() {
-            const data = await all({
-                courses: jutge.instructor.courses.index(),
-                lists: jutge.instructor.lists.index(),
-                exams: jutge.instructor.exams.index(),
-                documents: jutge.instructor.documents.index(),
-                ownProblems: jutge.instructor.problems.getOwnProblems(),
+            try {
+                const data = await all({
+                    courses: jutge.instructor.courses.index(),
+                    lists: jutge.instructor.lists.index(),
+                    exams: jutge.instructor.exams.index(),
+                    documents: jutge.instructor.documents.index(),
+                    ownProblems: jutge.instructor.problems.getOwnProblems(),
 
-                archivedCourses: jutge.instructor.courses.getArchived(),
-                archivedLists: jutge.instructor.lists.getArchived(),
-                archivedExams: jutge.instructor.exams.getArchived(),
-            })
+                    archivedCourses: jutge.instructor.courses.getArchived(),
+                    archivedLists: jutge.instructor.lists.getArchived(),
+                    archivedExams: jutge.instructor.exams.getArchived(),
+                })
 
-            const problems = await jutge.problems.getAbstractProblems(data.ownProblems.join(','))
+                const problems = await jutge.problems.getAbstractProblems(
+                    data.ownProblems.join(','),
+                )
 
-            setCourses(data.courses)
-            setLists(data.lists)
-            setExams(data.exams)
-            setDocuments(data.documents)
-            setProblems(problems)
-            setArchivedCourses(data.archivedCourses)
-            setArchivedLists(data.archivedLists)
-            setArchivedExams(data.archivedExams)
-            console.log('archivedCourses', data.archivedCourses)
+                setCourses(data.courses)
+                setLists(data.lists)
+                setExams(data.exams)
+                setDocuments(data.documents)
+                setProblems(problems)
+                setArchivedCourses(data.archivedCourses)
+                setArchivedLists(data.archivedLists)
+                setArchivedExams(data.archivedExams)
+                console.log('archivedCourses', data.archivedCourses)
+            } catch (error) {
+                showError(error)
+            }
         }
 
         getExams()
@@ -104,12 +111,13 @@ export function CommandKDialog() {
                 <CommandGroup heading="Sections">
                     {mapmap(menu, (key, item) => (
                         <CommandItem key={key} onSelect={() => select(item.href)}>
-                            {item.icon}
+                            <div className="opacity-40">{item.icon}</div>
                             {item.name}
                         </CommandItem>
                     ))}
                 </CommandGroup>
 
+                <CommandSeparator className="mb-2" />
                 <CommandGroup heading="Courses">
                     {mapmap(courses, (key, course) =>
                         archivedCourses.includes(key) ? null : (
@@ -118,18 +126,19 @@ export function CommandKDialog() {
                                 onSelect={() => select(`/courses/${key}/properties`)}
                             >
                                 <div className="w-full flex flex-row">
-                                    <div className="text-gray-400 mr-2 scale-75">
+                                    <div className="opacity-40 mr-2 scale-75">
                                         <TableIcon />
                                     </div>
                                     <div className="">{course.title}</div>
                                     <div className="flex-grow" />
-                                    <div className="text-xs text-gray-400">{key}</div>
+                                    <div className="text-xs opacity-40">{key}</div>
                                 </div>
                             </CommandItem>
                         ),
                     )}
                 </CommandGroup>
 
+                <CommandSeparator className="mb-2" />
                 <CommandGroup heading="Lists">
                     {mapmap(lists, (key, list) =>
                         archivedLists.includes(key) ? null : (
@@ -138,18 +147,19 @@ export function CommandKDialog() {
                                 onSelect={() => select(`/lists/${key}/properties`)}
                             >
                                 <div className="w-full flex flex-row">
-                                    <div className="text-gray-400 mr-2 scale-75">
+                                    <div className="opacity-40 mr-2 scale-75">
                                         <ListIcon />
                                     </div>
                                     <div className="">{list.title}</div>
                                     <div className="flex-grow" />
-                                    <div className="text-xs text-gray-400">{key}</div>
+                                    <div className="text-xs opacity-40">{key}</div>
                                 </div>
                             </CommandItem>
                         ),
                     )}
                 </CommandGroup>
 
+                <CommandSeparator className="mb-2" />
                 <CommandGroup heading="Exams">
                     {mapmap(exams, (key, exam) =>
                         archivedExams.includes(key) ? null : (
@@ -158,43 +168,45 @@ export function CommandKDialog() {
                                 onSelect={() => select(`/exams/${key}/properties`)}
                             >
                                 <div className="w-full flex flex-row">
-                                    <div className="text-gray-400 mr-2 scale-75">
+                                    <div className="opacity-40 mr-2 scale-75">
                                         <FilePenIcon />
                                     </div>
                                     <div className="">{exam.title}</div>
                                     <div className="flex-grow" />
-                                    <div className="text-xs text-gray-400">{key}</div>
+                                    <div className="text-xs opacity-40">{key}</div>
                                 </div>
                             </CommandItem>
                         ),
                     )}
                 </CommandGroup>
 
+                <CommandSeparator className="mb-2" />
                 <CommandGroup heading="Documents">
                     {mapmap(documents, (key, document) => (
                         <CommandItem key={key} onSelect={() => select(`/documents/${key}`)}>
                             <div className="w-full flex flex-row">
-                                <div className="text-gray-400 mr-2 scale-75">
+                                <div className="opacity-40 mr-2 scale-75">
                                     <FileIcon />
                                 </div>
                                 <div className="">{document.title}</div>
                                 <div className="flex-grow" />
-                                <div className="text-xs text-gray-400">{key}</div>
+                                <div className="text-xs opacity-40">{key}</div>
                             </div>
                         </CommandItem>
                     ))}
                 </CommandGroup>
 
+                <CommandSeparator className="mb-2" />
                 <CommandGroup heading="Problems">
                     {mapmap(problems, (key, problem) => (
                         <CommandItem key={key} onSelect={() => select(`/problems/${key}`)}>
                             <div className="w-full flex flex-row">
-                                <div className="text-gray-400 mr-2 scale-75">
+                                <div className="opacity-40 mr-2 scale-75">
                                     <PuzzleIcon />
                                 </div>
                                 <div className="">{buildTitle(key)}</div>
                                 <div className="flex-grow" />
-                                <div className="text-xs text-gray-400">{key}</div>
+                                <div className="text-xs opacity-40">{key}</div>
                             </div>
                         </CommandItem>
                     ))}
