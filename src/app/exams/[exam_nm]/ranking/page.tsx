@@ -62,26 +62,31 @@ function ExamRankingView() {
             <p>Under development</p>
             <table>
                 <tbody>
+                    {examProblems.length > 0 && examProblems[0].icon && (
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            {exam.avatars && <td></td>}
+                            {examProblems.map((problem, index) => (
+                                <td key={index} className="h-12 w-12">
+                                    <div className="flex flex-col justify-center items-center">
+                                        <Image
+                                            src={`https://jutge.org/img/examicons/${problem.icon}.svg`}
+                                            alt={problem.icon || 'icon'}
+                                            width={32}
+                                            height={32}
+                                        />
+                                    </div>
+                                </td>
+                            ))}
+                            <td></td>
+                        </tr>
+                    )}
                     <tr>
                         <td></td>
                         <td></td>
-                        <td></td>
-                        {examProblems.map((problem, index) => (
-                            <td key={index} className="w-40 text-center">
-                                <Image
-                                    src={`https://jutge.org/img/examicons/${problem.icon}.svg`}
-                                    alt={problem.icon || 'icon'}
-                                    width={48}
-                                    height={48}
-                                    className="h-12 w-12"
-                                />
-                            </td>
-                        ))}
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
+                        {exam.avatars && <td></td>}
                         <td className="bg-neutral-100 border-2 border-white rounded-lg px-4 text-center font-bold">
                             Score
                         </td>
@@ -119,6 +124,16 @@ function ExamRankingView() {
                             <td className="bg-neutral-100 border-2 border-white rounded-lg px-2 truncate">
                                 {row.name}
                             </td>
+                            {exam.avatars && (
+                                <td className="bg-neutral-100 border-2 border-white rounded-lg px-2 h-12 w-12">
+                                    <Image
+                                        src={`https://jutge.org/avatars/${exam.avatars!}/${row.avatar}`}
+                                        alt="Avatar"
+                                        width={32}
+                                        height={32}
+                                    />
+                                </td>
+                            )}
 
                             <td className="bg-neutral-100 border-2 border-white rounded-lg px-4">
                                 <div className="flex flex-col gap-0 items-center">
@@ -151,7 +166,7 @@ function ExamRankingView() {
 }
 
 function Score({ result, colors }: { result: RankingResult; colors: ColorMapping }) {
-    if (result.score === 100)
+    if (result.score === 1)
         return (
             <div className="" style={{ color: colors.verdicts.AC }}>
                 {Math.floor(result.firstACTime!)}
