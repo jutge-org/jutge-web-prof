@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch'
 import { useIsMobile } from '@/hooks/use-mobile'
 import jutge from '@/lib/jutge'
 import { InstructorBriefExam } from '@/lib/jutge_api_client'
+import dayjs from 'dayjs'
 import { SquarePlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -45,18 +46,26 @@ function ExamsListView() {
             filter: true,
         },
         { field: 'title', flex: 2, filter: true },
-        { field: 'annotation', flex: 2, filter: true },
+        {
+            field: 'exp_time_start',
+            width: 200,
+            filter: true,
+            headerName: 'Expected start',
+            cellRenderer: (p: any) => dayjs(p.data.exp_time_start).format('YYYY-MM-DD HH:mm'),
+        },
     ])
 
     useEffect(() => {
-        if (isMobile) setColDefs((colDefs) => colDefs.filter((c) => c.field !== 'annotation'))
+        if (isMobile) setColDefs((colDefs) => colDefs.filter((c) => c.field !== 'exp_time_start'))
     }, [isMobile])
 
     useEffect(() => {
         async function fetchExams() {
             const archived = await jutge.instructor.exams.getArchived()
             const dict = await jutge.instructor.exams.index()
-            const array = Object.values(dict).sort((a, b) => a.exam_nm.localeCompare(b.exam_nm))
+            const array = Object.values(dict).sort((a, b) =>
+                dayjs(b.exp_time_start).diff(dayjs(a.exp_time_start)),
+            )
             setRows(array.filter((exam) => !archived.includes(exam.exam_nm)))
             setExams(array)
             setArchived(archived)
