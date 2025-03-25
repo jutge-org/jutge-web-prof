@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-03-24T10:17:53.181Z
+ * This file has been automatically generated at 2025-03-25T14:27:21.736Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -561,6 +561,30 @@ export type ExamStatistics = {
     compilers: Record<string, Record<string, number>>
     proglangs: Record<string, Record<string, number>>
 }
+
+export type RankingResult = {
+    problem_nm: string
+    totalSubmissions: number
+    totalACs: number
+    firstACSubmission: number | null
+    firstACTime: number | null
+    score: number
+    timePenalty: number
+    lastSubmissionVerdict: string | null
+    lastSubmissionTime: number | null
+}
+
+export type RankingRow = {
+    position: number | null
+    name: string
+    avatar: string | null
+    totalScore: number
+    totalTime: number
+    invited: boolean
+    rankingResults: RankingResult[]
+}
+
+export type Ranking = RankingRow[]
 
 export type SubmissionQuery = {
     email: string
@@ -2738,6 +2762,18 @@ class Module_instructor_exams {
      */
     async unarchive(exam_nm: string): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.exams.unarchive", exam_nm)
+        return output
+    }
+
+    /**
+     * Get the ranking.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     * Under development.
+     */
+    async getRanking(exam_nm: string): Promise<Ranking> {
+        const [output, ofiles] = await this.root.execute("instructor.exams.getRanking", exam_nm)
         return output
     }
 }

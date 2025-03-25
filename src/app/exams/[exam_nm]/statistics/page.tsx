@@ -109,17 +109,17 @@ function ExamStatisticsView() {
                     >
                         <MyPieChart
                             data={statistics.submissions[problem.problem_nm]}
-                            cathegory="submissions"
+                            cathegory="verdicts"
                             colors={colors}
                         />
                     </MyCard>
                 </div>
             ))}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
                 <MyCard title="Summary">
                     <MySummaryChart
                         data={statistics.submissions}
-                        cathegory="submissions"
+                        cathegory="verdicts"
                         colors={colors}
                         exam={exam}
                     />
@@ -149,7 +149,7 @@ function ExamStatisticsView() {
                     </MyCard>
                 </div>
             ))}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
                 <MyCard title="Summary">
                     <MySummaryChart
                         data={statistics.statuses}
@@ -189,7 +189,7 @@ function ExamStatisticsView() {
                     </MyCard>
                 </div>
             ))}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
                 <MyCard title="Summary">
                     <MySummaryChart
                         data={statistics.compilers}
@@ -223,7 +223,7 @@ function ExamStatisticsView() {
                     </MyCard>
                 </div>
             ))}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
                 <MyCard title="Summary">
                     <MySummaryChart
                         data={statistics.proglangs}
