@@ -47,6 +47,11 @@ function ListPropertiesView() {
         fetchList()
     }, [list_nm])
 
+    useEffect(() => {
+        // launch this in the background to cache the problems
+        jutge.problems.getAllAbstractProblems()
+    }, [list_nm])
+
     if (list === null) return <Spinner />
 
     return <EditListForm list={list} archived={archived} setArchived={setArchived} />

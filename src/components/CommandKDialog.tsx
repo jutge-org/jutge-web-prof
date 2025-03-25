@@ -192,18 +192,20 @@ export function CommandKDialog(props: CommandKProps) {
 
                 <CommandSeparator className="mb-2" />
                 <CommandGroup heading="Problems">
-                    {mapmap(problems, (key, problem) => (
-                        <CommandItem key={key} onSelect={() => select(`/problems/${key}`)}>
-                            <div className="w-full flex flex-row">
-                                <div className="opacity-40 mr-2 scale-75">
-                                    <PuzzleIcon />
+                    {mapmap(problems, (key, problem) =>
+                        problem.deprecation ? null : (
+                            <CommandItem key={key} onSelect={() => select(`/problems/${key}`)}>
+                                <div className="w-full flex flex-row items-baseline">
+                                    <div className="opacity-40 mr-2 scale-75 translate-y-1">
+                                        <PuzzleIcon />
+                                    </div>
+                                    <div className="truncate mr-1">{buildTitle(key)}</div>
+                                    <div className="flex-grow" />
+                                    <div className="text-xs opacity-40">{key}</div>
                                 </div>
-                                <div className="">{buildTitle(key)}</div>
-                                <div className="flex-grow" />
-                                <div className="text-xs opacity-40">{key}</div>
-                            </div>
-                        </CommandItem>
-                    ))}
+                            </CommandItem>
+                        ),
+                    )}
                 </CommandGroup>
             </CommandList>
         </CommandDialog>

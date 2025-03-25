@@ -102,6 +102,11 @@ function CourseListView() {
         fetchCourse()
     }, [course_nm])
 
+    useEffect(() => {
+        // launch this in the background to cache the problems
+        jutge.problems.getAllAbstractProblems()
+    }, [course_nm])
+
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: false }
     }, [])

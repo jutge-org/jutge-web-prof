@@ -121,6 +121,7 @@ function ExamStatisticsView() {
                         data={statistics.submissions}
                         cathegory="submissions"
                         colors={colors}
+                        exam={exam}
                     />
                 </MyCard>
             </div>
@@ -154,6 +155,7 @@ function ExamStatisticsView() {
                         data={statistics.statuses}
                         cathegory="statuses"
                         colors={colors}
+                        exam={exam}
                     />
                 </MyCard>
             </div>
@@ -193,6 +195,7 @@ function ExamStatisticsView() {
                         data={statistics.compilers}
                         cathegory="compilers"
                         colors={colors}
+                        exam={exam}
                     />
                 </MyCard>
             </div>
@@ -226,6 +229,7 @@ function ExamStatisticsView() {
                         data={statistics.proglangs}
                         cathegory="proglangs"
                         colors={colors}
+                        exam={exam}
                     />
                 </MyCard>
             </div>
@@ -254,16 +258,22 @@ type MySummaryChartProps = {
     data: Dict<Distribution>
     cathegory: string
     colors: ColorMapping
+    exam: InstructorExam
 }
 
 function MySummaryChart(props: MySummaryChartProps) {
     //
 
+    const captions: Dict<string> = {}
+    for (const problem of props.exam.problems) {
+        captions[problem.problem_nm] = problem.caption || problem.problem_nm
+    }
+
     const chartData: Dict<string | number>[] = []
     const chartConfig: Dict<any> = {}
 
     for (const [problem_nm, distribution] of Object.entries(props.data)) {
-        const item: Dict<string | number> = { problem_nm }
+        const item: Dict<string | number> = { problem_nm: captions[problem_nm] }
         for (const [key, value] of Object.entries(distribution)) {
             if (!(key in chartData)) item[key] = 0
             item[key] = value
@@ -528,7 +538,7 @@ function ProblemTitle(props: ProblemTitleProps) {
                     alt={props.problem.icon}
                     width={32}
                     height={32}
-                    className=""
+                    className="h-9 w-9"
                 />
             )}
             <div className="flex flex-col gap-1">

@@ -622,6 +622,7 @@ function JMarkdownComponent(props: JMarkdownComponentProps) {
 
     const content = (
         <MDEditor
+            className="mx-[1px]"
             data-color-mode={theme.theme === 'dark' ? 'dark' : 'light'}
             height={200}
             value={props.field.value}

@@ -33,9 +33,9 @@ export default function HomePage() {
                     </div>
                 </div>
                 <div className="hidden sm:block">
-                    <div className="text-center text-xs text-gray-500">
-                        Use <span className="border rounded-md p-1 mx-1">⌘K</span> for command
-                        palette
+                    <div className="text-center text-xs opacity-50">
+                        Use <span className="border rounded-md p-1 mx-1">⌘K</span> to navigate and
+                        search
                     </div>
                 </div>
             </Page>
