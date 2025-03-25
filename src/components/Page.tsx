@@ -2,7 +2,7 @@
 
 import LoginForm from '@/components/LoginForm'
 import { useAuth } from '@/providers/Auth'
-import CommandKProvider from '@/providers/CommandK'
+import CommandKProvider, { useCommandK } from '@/providers/CommandK'
 import { ConfirmDialogProvider } from '@omit/react-confirm-dialog'
 import { JSX, ReactNode } from 'react'
 import { CommandKDialog } from './CommandKDialog'
@@ -25,6 +25,7 @@ export interface PageProps {
 
 export default function Page(props: PageProps) {
     const auth = useAuth()
+    const cmdK = useCommandK()
 
     if (props.public || auth.user) {
         return (
@@ -49,7 +50,7 @@ export default function Page(props: PageProps) {
                         <div className="mt-2 mb-16 sm:mt-8 px-2 container mx-auto max-w-[1000px]">
                             {props.children}
                         </div>
-                        <CommandKDialog />
+                        <CommandKDialog open={cmdK.open} setOpen={cmdK.setOpen} />
                     </ConfirmDialogProvider>
                 </CommandKProvider>
             </>

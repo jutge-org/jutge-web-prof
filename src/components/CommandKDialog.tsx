@@ -19,8 +19,8 @@ import {
     InstructorBriefExam,
     InstructorBriefList,
 } from '@/lib/jutge_api_client'
-import { mapmap, showError } from '@/lib/utils'
-import { useCommandK } from '@/providers/CommandK'
+import { mapmap } from '@/lib/utils'
+import { CommandKProps, useCommandK } from '@/providers/CommandK'
 import { menus } from '@/providers/Menu'
 import { Description, DialogTitle } from '@radix-ui/react-dialog'
 import { FileIcon, FilePenIcon, ListIcon, PuzzleIcon, TableIcon } from 'lucide-react'
@@ -28,11 +28,12 @@ import { redirect } from 'next/navigation'
 import { all } from 'radash'
 import { useEffect, useState } from 'react'
 
-export function CommandKDialog() {
+export function CommandKDialog(props: CommandKProps) {
     //
 
     const commandK = useCommandK()
     const menu = menus.user
+
     const [courses, setCourses] = useState<Record<string, InstructorBriefCourse>>({})
     const [lists, setLists] = useState<Record<string, InstructorBriefList>>({})
     const [exams, setExams] = useState<Record<string, InstructorBriefExam>>({})
@@ -55,40 +56,33 @@ export function CommandKDialog() {
     })
 
     useEffect(() => {
-        async function getExams() {
-            try {
-                const data = await all({
-                    courses: jutge.instructor.courses.index(),
-                    lists: jutge.instructor.lists.index(),
-                    exams: jutge.instructor.exams.index(),
-                    documents: jutge.instructor.documents.index(),
-                    ownProblems: jutge.instructor.problems.getOwnProblems(),
+        async function fetchData() {
+            const data = await all({
+                courses: jutge.instructor.courses.index(),
+                lists: jutge.instructor.lists.index(),
+                exams: jutge.instructor.exams.index(),
+                documents: jutge.instructor.documents.index(),
+                ownProblems: jutge.instructor.problems.getOwnProblems(),
 
-                    archivedCourses: jutge.instructor.courses.getArchived(),
-                    archivedLists: jutge.instructor.lists.getArchived(),
-                    archivedExams: jutge.instructor.exams.getArchived(),
-                })
+                archivedCourses: jutge.instructor.courses.getArchived(),
+                archivedLists: jutge.instructor.lists.getArchived(),
+                archivedExams: jutge.instructor.exams.getArchived(),
+            })
 
-                const problems = await jutge.problems.getAbstractProblems(
-                    data.ownProblems.join(','),
-                )
+            const problems = await jutge.problems.getAbstractProblems(data.ownProblems.join(','))
 
-                setCourses(data.courses)
-                setLists(data.lists)
-                setExams(data.exams)
-                setDocuments(data.documents)
-                setProblems(problems)
-                setArchivedCourses(data.archivedCourses)
-                setArchivedLists(data.archivedLists)
-                setArchivedExams(data.archivedExams)
-                console.log('archivedCourses', data.archivedCourses)
-            } catch (error) {
-                showError(error)
-            }
+            setCourses(data.courses)
+            setLists(data.lists)
+            setExams(data.exams)
+            setDocuments(data.documents)
+            setProblems(problems)
+            setArchivedCourses(data.archivedCourses)
+            setArchivedLists(data.archivedLists)
+            setArchivedExams(data.archivedExams)
         }
 
-        getExams()
-    })
+        fetchData()
+    }, [props.open])
 
     function buildTitle(problem_nm: string) {
         const pbms = Object.values(problems[problem_nm].problems)
