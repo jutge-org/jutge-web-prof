@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-03-25T14:27:21.736Z
+ * This file has been automatically generated at 2025-03-26T13:17:47.074Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -564,23 +564,23 @@ export type ExamStatistics = {
 
 export type RankingResult = {
     problem_nm: string
-    totalSubmissions: number
-    totalACs: number
-    firstACSubmission: number | null
-    firstACTime: number | null
+    historic: string
+    submissions: number
+    verdict: string | null
     score: number
-    timePenalty: number
-    lastSubmissionVerdict: string | null
-    lastSubmissionTime: number | null
+    time: number
+    penalty: number
+    wrongs: number
 }
 
 export type RankingRow = {
     position: number | null
     name: string
     avatar: string | null
-    totalScore: number
-    totalTime: number
+    score: number
+    time: number
     invited: boolean
+    submissions: number
     rankingResults: RankingResult[]
 }
 

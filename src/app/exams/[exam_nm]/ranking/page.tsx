@@ -137,8 +137,8 @@ function ExamRankingView() {
 
                             <td className="bg-neutral-100 border-2 border-white rounded-lg px-4">
                                 <div className="flex flex-col gap-0 items-center">
-                                    <div className="font-bold">{row.totalScore}</div>
-                                    <div className="text-xs">{Math.floor(row.totalTime)}</div>
+                                    <div className="font-bold">{row.score}</div>
+                                    <div className="text-xs">{Math.floor(row.time)}</div>
                                 </div>
                             </td>
 
@@ -153,8 +153,8 @@ function ExamRankingView() {
 
                             <td className="bg-neutral-100 border-2 border-white rounded-lg px-4">
                                 <div className="flex flex-col gap-0 items-center">
-                                    <div className="font-bold">{row.totalScore}</div>
-                                    <div className="text-xs">{Math.floor(row.totalTime)}</div>
+                                    <div className="font-bold">{row.score}</div>
+                                    <div className="text-xs">{Math.floor(row.time)}</div>
                                 </div>
                             </td>
                         </tr>
@@ -166,43 +166,24 @@ function ExamRankingView() {
 }
 
 function Score({ result, colors }: { result: RankingResult; colors: ColorMapping }) {
-    if (result.score === 1)
+    if (result.verdict === null) return null
+
+    if (result.verdict === 'AC')
         return (
             <div className="" style={{ color: colors.verdicts.AC }}>
-                {Math.floor(result.firstACTime!)}
-                {result.firstACSubmission !== 1 && (
-                    <span className="text-xs">&nbsp;({result.firstACSubmission! - 1})</span>
-                )}
+                {/*<span className="text-blue-700">{result.historic}</span>*/}
+                {Math.floor(result.time)}
+                {result.wrongs !== 0 && <span className="text-xs">&nbsp;({result.wrongs})</span>}
             </div>
         )
 
-    if (result.lastSubmissionVerdict === 'SC') {
-        return (
-            <div className="" style={{ color: colors.verdicts.SC }}>
-                {Math.floor(result.lastSubmissionTime!)}
-                {result.firstACSubmission !== 1 && (
-                    <span className="text-xs">&nbsp;({result.firstACSubmission! - 1})</span>
-                )}
-                <br />
-                <span className="">
-                    {result.lastSubmissionVerdict} {result.score}
-                </span>
-            </div>
-        )
-    }
-
-    if (result.lastSubmissionVerdict !== null) {
-        return (
-            <div className="" style={{ color: colors.verdicts.WA }}>
-                {Math.floor(result.lastSubmissionTime!)}
-                {result.firstACSubmission !== 1 && (
-                    <span className="text-xs">&nbsp;({result.firstACSubmission! - 1})</span>
-                )}
-                <br />
-                <span className="">{result.lastSubmissionVerdict}</span>
-            </div>
-        )
-    }
-
-    return null
+    return (
+        <div className="" style={{ color: colors.verdicts.WA }}>
+            {/*<span className="text-blue-700">{result.historic}</span>*/}
+            {Math.floor(result.time)}
+            {result.wrongs !== 0 && <span className="text-xs">&nbsp;({result.wrongs})</span>}
+            <br />
+            <span className="">{result.verdict}</span>
+        </div>
+    )
 }
