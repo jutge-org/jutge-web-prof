@@ -69,7 +69,10 @@ function ExamRankingView() {
                             <td></td>
                             {exam.avatars && <td></td>}
                             {examProblems.map((problem, index) => (
-                                <td key={index} className="h-12 w-12">
+                                <td
+                                    key={index}
+                                    className="bg-neutral-100 border-2 border-white rounded-lg h-12 w-12"
+                                >
                                     <div className="flex flex-col justify-center items-center">
                                         <Image
                                             src={`https://jutge.org/img/examicons/${problem.icon}.svg`}
@@ -87,13 +90,13 @@ function ExamRankingView() {
                         <td></td>
                         <td></td>
                         {exam.avatars && <td></td>}
-                        <td className="bg-neutral-100 border-2 border-white rounded-lg px-4 text-center font-bold">
+                        <td className="bg-neutral-100 border-2 border-white rounded-lg h-12 px-4 text-center font-bold">
                             Score
                         </td>
                         {examProblems.map((problem, index) => (
                             <td
                                 key={index}
-                                className="bg-neutral-100 border-2 border-white rounded-lg w-40 px-4 text-center "
+                                className="bg-neutral-100 border-2 border-white rounded-lg w-40 h-12 px-4 text-center "
                             >
                                 <a
                                     href={`https://jutge.org/problems/${problem.problem_nm}`}
