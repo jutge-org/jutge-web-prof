@@ -1,6 +1,9 @@
 'use client'
 
 import Page from '@/components/Page'
+import { Button } from '@/components/ui/button'
+import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useXTerm } from 'react-xtermjs'
@@ -25,7 +28,8 @@ function ProblemsNewTerminalView() {
 
     const { terminal_id } = useParams<{ terminal_id: string }>()
     const { instance, ref } = useXTerm()
-    const [problemName, setProblemName] = useState<string | null>()
+    const [loading, setLoading] = useState(true)
+    const [problemName, setProblemName] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,26 +44,32 @@ function ProblemsNewTerminalView() {
                 instance.write(text.replaceAll(/\n/g, '\r\n'))
 
                 const match = text.match(/Problem ([A-Z]\d{5}) created/)
-                if (match) {
-                    setProblemName(match[1])
-                }
+                if (match) setProblemName(match[1])
             }
+            setLoading(false)
         }
 
         fetchData()
     }, [instance, ref, terminal_id])
 
     return (
-        <>
-            {problemName && (
-                <div className="text-sm space-y-2 border rounded-lg p-4 mb-8">
-                    <p>Problem name: {problemName}</p> foo
-                </div>
-            )}
-            <h1>Problem creation output</h1>
-            <div className="w-full h-[400px] border-8 border-black rounded-lg">
+        <div className="mb-8">
+            <div className="w-full h-[400px] border-8 border-black rounded-lg mb-8">
                 <div ref={ref} style={{ width: '100%', height: '100%' }} />
             </div>
-        </>
+            {loading && (
+                <div className="border rounded-lg p-4 mb-8 text-sm text-center animate-pulse">
+                    Please wait while the problem is being created.
+                </div>
+            )}
+            {!loading && problemName && (
+                <Link href={`/problems/${problemName}`}>
+                    <Button className="w-full text-center">
+                        <ArrowRight />
+                        View problem {problemName}
+                    </Button>
+                </Link>
+            )}
+        </div>
     )
 }

@@ -3027,7 +3027,7 @@ class Module_instructor_problems {
         return output
     }
 
-    async legacyCreateWithTerminal(passcode: string, ifile: File): Promise<string> {
+    async legacyCreateWithTerminal(passcode: string, ifile: File): Promise<{ id: string }> {
         const [output, ofiles] = await this.root.execute(
             'instructor.problems.legacyCreateWithTerminal',
             passcode,

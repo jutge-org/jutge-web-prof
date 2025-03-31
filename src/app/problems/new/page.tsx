@@ -78,8 +78,8 @@ function ProblemsNewView() {
             return
         }
 
-        const terminal_id = await jutge.instructor.problems.legacyCreateWithTerminal(passcode, file)
-        redirect(`/problems/new/${terminal_id}`)
+        const { id } = await jutge.instructor.problems.legacyCreateWithTerminal(passcode, file)
+        redirect(`/problems/new/${id}`)
     }
 
     return <JForm fields={fields} />
