@@ -5,6 +5,8 @@ import { Dict } from './utils'
 
 const jutge = new JutgeApiClient()
 
+jutge.JUTGE_API_URL = 'https://new.jutge.org/api'
+
 jutge.clientTTLs.set('problems.getAllAbstractProblems', 300)
 jutge.clientTTLs.set('problems.getAllProblems', 300)
 

@@ -2,12 +2,8 @@
 
 import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import jutge from '@/lib/jutge'
-import { showError } from '@/lib/utils'
-import { LoaderIcon, PlusCircleIcon } from 'lucide-react'
-import Link from 'next/link'
+import { PlusCircleIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -31,9 +27,6 @@ export default function ProblemsNewPage() {
 function ProblemsNewView() {
     //
 
-    const [isWaitDialogOopen, setIsWaitDialogOpen] = useState(false)
-    const [problemNm, setProblemNm] = useState('')
-
     const [file, setFile] = useState<File | null>(null)
     const [passcode, setPasscode] = useState<string>(Math.random().toString(36).substring(2, 12))
 
@@ -45,8 +38,6 @@ function ProblemsNewView() {
                 <div className="text-sm space-y-2 border rounded-lg p-4 mb-8">
                     <p>Create a new problem by uploading a ZIP archive with its content.</p>
                     <p>Passcode is mandatory to create a new problem, you can remove it latter.</p>
-                    <p>TODO: add some link to the problemation.</p>
-                    <p>TODO: add feedback.</p>
                 </div>
             ),
         },
@@ -87,68 +78,9 @@ function ProblemsNewView() {
             return
         }
 
-        try {
-            setIsWaitDialogOpen(true)
-            const problem_nm = await jutge.instructor.problems.legacyCreate(passcode, file)
-            toast.success(`Problem '${problem_nm}' added.`)
-            console.log(`Problem '${problem_nm}' added.`)
-            setProblemNm(problem_nm)
-            await new Promise((resolve) => setTimeout(resolve, 100)) // wait for the dialog to close and then redirect
-            redirect(`/problems/${problem_nm}`)
-        } catch (error) {
-            return showError(error)
-        }
+        const terminal_id = await jutge.instructor.problems.legacyCreateWithTerminal(passcode, file)
+        redirect(`/problems/new/${terminal_id}`)
     }
 
-    return (
-        <>
-            <JForm fields={fields} />
-            <WaitDialog
-                isOpen={isWaitDialogOopen}
-                setIsOpen={setIsWaitDialogOpen}
-                problemNm={problemNm}
-                setProblemNm={setProblemNm}
-            />
-        </>
-    )
-}
-
-function WaitDialog({
-    isOpen,
-    setIsOpen,
-    problemNm,
-    setProblemNm,
-}: {
-    isOpen: boolean
-    setIsOpen: (b: boolean) => void
-    problemNm: string
-    setProblemNm: (s: string) => void
-}) {
-    return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>
-                        {problemNm.length > 0 ? 'Problem added' : 'Adding problem...'}
-                    </DialogTitle>
-                </DialogHeader>
-                <div className="h-64 flex flex-col justify-center items-center gap-8">
-                    {problemNm.length > 0 ? (
-                        <>
-                            <p>Problem added successfully.</p>
-                            <Link href={`/problems/${problemNm}`}>
-                                <Button className="w-96">{problemNm}</Button>
-                            </Link>
-                        </>
-                    ) : (
-                        <>
-                            <LoaderIcon className="animate-spin" size={96} />
-                            <p>Please wait until the problem is added, it takes some time.</p>
-                            <p>Do not close this window.</p>
-                        </>
-                    )}
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
+    return <JForm fields={fields} />
 }
