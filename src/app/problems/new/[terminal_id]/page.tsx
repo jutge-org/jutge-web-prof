@@ -43,7 +43,7 @@ function ProblemsNewTerminalView() {
                 const text = new TextDecoder().decode(value)
                 instance.write(text.replaceAll(/\n/g, '\r\n'))
 
-                const match = text.match(/Problem ([A-Z]\d{5}) created/)
+                const match = text.match(/Problem ([A-Z]\d{5}) created./)
                 if (match) setProblemName(match[1])
             }
             setLoading(false)
@@ -66,7 +66,7 @@ function ProblemsNewTerminalView() {
                 <Link href={`/problems/${problemName}`}>
                     <Button className="w-full text-center">
                         <ArrowRight />
-                        View problem {problemName}
+                        Go to problem {problemName}
                     </Button>
                 </Link>
             )}

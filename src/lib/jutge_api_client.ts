@@ -3036,6 +3036,15 @@ class Module_instructor_problems {
         return output
     }
 
+    async legacyUpdateWithTerminal(problem_nm: string, ifile: File): Promise<{ id: string }> {
+        const [output, ofiles] = await this.root.execute(
+            'instructor.problems.legacyUpdateWithTerminal',
+            problem_nm,
+            [ifile],
+        )
+        return output
+    }
+
     /**
      * Update a problem from a ZIP archive using old PHP code.
      *
