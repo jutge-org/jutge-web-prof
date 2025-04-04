@@ -20,6 +20,7 @@ import {
     InstructorBriefList,
 } from '@/lib/jutge_api_client'
 import { mapmap } from '@/lib/utils'
+import { useAuth } from '@/providers/Auth'
 import { CommandKProps, useCommandK } from '@/providers/CommandK'
 import { menus } from '@/providers/Menu'
 import { Description, DialogTitle } from '@radix-ui/react-dialog'
@@ -33,6 +34,7 @@ export function CommandKDialog(props: CommandKProps) {
 
     const commandK = useCommandK()
     const menu = menus.user
+    const auth = useAuth()
 
     const [courses, setCourses] = useState<Record<string, InstructorBriefCourse>>({})
     const [lists, setLists] = useState<Record<string, InstructorBriefList>>({})
@@ -57,6 +59,7 @@ export function CommandKDialog(props: CommandKProps) {
 
     useEffect(() => {
         async function fetchData() {
+            if (!auth.user) return
             const data = await all({
                 courses: jutge.instructor.courses.index(),
                 lists: jutge.instructor.lists.index(),
@@ -82,7 +85,7 @@ export function CommandKDialog(props: CommandKProps) {
         }
 
         fetchData()
-    }, [props.open])
+    }, [props.open, auth.user])
 
     function buildTitle(problem_nm: string) {
         const pbms = Object.values(problems[problem_nm].problems)
