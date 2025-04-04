@@ -36,7 +36,14 @@ function ProblemsNewView() {
             label: '',
             content: (
                 <div className="text-sm space-y-2 border rounded-lg p-4 mb-8">
-                    <p>Create a new problem by uploading a ZIP archive with its content.</p>
+                    <p>
+                        Create a new problem by uploading a ZIP archive with its content. Please
+                        read the documentation in the{' '}
+                        <a href="https://github.com/jutge-org/jutge-toolkit" target="_blank">
+                            Jutge Toolkit
+                        </a>{' '}
+                        for more information about the format of the ZIP archive.
+                    </p>
                     <p>Passcode is mandatory to create a new problem, you can remove it latter.</p>
                 </div>
             ),

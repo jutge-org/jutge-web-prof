@@ -80,7 +80,6 @@
         "react-hook-form": "^7.54.2",
         "react-pdf": "^9.2.1",
         "react-resizable-panels": "^2.1.7",
-        "react-xtermjs": "^1.0.9",
         "recharts": "^2.15.1",
         "remark-gfm": "^4.0.1",
         "remark-html": "^16.0.1",

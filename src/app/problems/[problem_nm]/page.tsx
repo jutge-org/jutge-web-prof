@@ -99,7 +99,7 @@ interface ProblemFormProps {
 }
 
 function EditProblemForm({ info }: ProblemFormProps) {
-    console.log(info)
+    //
 
     const [problem_nm, setProblem_nm] = useState(info.abstractProblem.problem_nm)
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)

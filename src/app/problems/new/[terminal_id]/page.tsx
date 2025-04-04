@@ -2,11 +2,11 @@
 
 import Page from '@/components/Page'
 import { Button } from '@/components/ui/button'
+import { useXTerm } from '@/components/XTerm'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useXTerm } from 'react-xtermjs'
 
 export default function ProblemsNewTerminalPage() {
     return (
@@ -29,7 +29,7 @@ function ProblemsNewTerminalView() {
     const { terminal_id } = useParams<{ terminal_id: string }>()
     const { instance, ref } = useXTerm()
     const [loading, setLoading] = useState(true)
-    const [problemName, setProblemName] = useState<string | null>(null)
+    const [problem_nm, setProblem_nm] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,29 +44,41 @@ function ProblemsNewTerminalView() {
                 instance.write(text.replaceAll(/\n/g, '\r\n'))
 
                 const match = text.match(/Problem ([A-Z]\d{5}) created./)
-                if (match) setProblemName(match[1])
+                if (match) setProblem_nm(match[1])
             }
             setLoading(false)
         }
 
         fetchData()
-    }, [instance, ref, terminal_id])
+    }, [instance, ref, terminal_id, problem_nm])
 
     return (
         <div className="mb-8">
+            {loading && (
+                <div className="border rounded-lg p-4 mb-8 text-sm text-center">
+                    <div className="animate-pulse">
+                        Please wait while the problem is being created.
+                    </div>
+                </div>
+            )}
+            {!loading && problem_nm && (
+                <div className="border-green-800 border text-green-800 rounded-lg p-4 mb-8 text-sm text-center">
+                    Problem {problem_nm} updated successfully.
+                </div>
+            )}
+            {!loading && !problem_nm && (
+                <div className="border border-red-800 text-red-800 rounded-lg p-4 mb-8 text-sm text-center">
+                    Problem could not be created. Please check the terminal for more information.
+                </div>
+            )}
             <div className="w-full h-[400px] border-8 border-black rounded-lg mb-8">
                 <div ref={ref} style={{ width: '100%', height: '100%' }} />
             </div>
-            {loading && (
-                <div className="border rounded-lg p-4 mb-8 text-sm text-center animate-pulse">
-                    Please wait while the problem is being created.
-                </div>
-            )}
-            {!loading && problemName && (
-                <Link href={`/problems/${problemName}`}>
+            {!loading && problem_nm && (
+                <Link href={`/problems/${problem_nm}`}>
                     <Button className="w-full text-center">
                         <ArrowRight />
-                        Go to problem {problemName}
+                        Go to problem {problem_nm}
                     </Button>
                 </Link>
             )}

@@ -1,12 +1,12 @@
 'use client'
 
 import Page from '@/components/Page'
+import { useXTerm } from '@/components/XTerm'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useXTerm } from 'react-xtermjs'
 
 export default function ProblemUpdateTerminalPage() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
