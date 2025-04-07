@@ -3,12 +3,15 @@
 import {
     FileIcon,
     FilePenIcon,
+    FileTextIcon,
     FolderUpIcon,
+    GavelIcon,
     HomeIcon,
     HouseIcon,
     InfoIcon,
     ListIcon,
     PuzzleIcon,
+    SquareCodeIcon,
     TableIcon,
     TagsIcon,
 } from 'lucide-react'
@@ -30,6 +33,12 @@ export const menus: Record<string, Menu> = {
             name: 'Home',
             icon: <HouseIcon />,
             icon2xl: <HouseIcon size={52} strokeWidth={0.8} />,
+        },
+        docs: {
+            href: '/docs',
+            name: 'Docs',
+            icon: <FileTextIcon />,
+            icon2xl: <FileTextIcon size={52} strokeWidth={0.8} />,
         },
         about: {
             href: '/about',
@@ -87,6 +96,13 @@ export const menus: Record<string, Menu> = {
             name: 'Tags',
             icon: <TagsIcon />,
             icon2xl: <TagsIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'T',
+        },
+        docs: {
+            href: '/docs',
+            name: 'Docs',
+            icon: <FileTextIcon />,
+            icon2xl: <FileTextIcon size={52} strokeWidth={0.8} />,
             shortcut: 'T',
         },
         about: {
@@ -201,11 +217,34 @@ export const menus: Record<string, Menu> = {
         },
     },
 
+    up: {
+        up: {
+            href: '.',
+            name: 'Up',
+            icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
+        },
+    },
+
     main: {
         home: {
             href: '/home',
             name: 'Home',
             icon: <HomeIcon strokeWidth={1.5} size="1.5em" />,
+        },
+    },
+
+    docs: {
+        compilers: {
+            href: '/docs/compilers',
+            name: 'Compilers',
+            icon: <SquareCodeIcon />,
+            icon2xl: <SquareCodeIcon size={52} strokeWidth={0.8} />,
+        },
+        verdicts: {
+            href: '/docs/verdicts',
+            name: 'Verdicts',
+            icon: <GavelIcon />,
+            icon2xl: <GavelIcon size={52} strokeWidth={0.8} />,
         },
     },
 }
