@@ -30,7 +30,7 @@ function DocsCompilersView() {
 
     const [compilers, setCompilers] = useState<Dict<Compiler>>({})
     const [rows, setRows] = useState<Compiler[]>([])
-    const [showDefuncts, setShowDefuncts] = useState(false)
+    const [showBrokens, setShowBrokens] = useState(false)
 
     const [colDefs, setColDefs] = useState([
         {
@@ -59,8 +59,8 @@ function DocsCompilersView() {
         fetchData()
     }, [])
 
-    function showDefunctsChange(checked: boolean) {
-        setShowDefuncts(checked)
+    function showBrokensChange(checked: boolean) {
+        setShowBrokens(checked)
         const array = Object.values(compilers).sort((a, b) =>
             a.compiler_id.localeCompare(b.compiler_id),
         )
@@ -75,8 +75,8 @@ function DocsCompilersView() {
         <>
             <AgTableFull rowData={rows} columnDefs={colDefs as any} />
             <div className="mt-4 flex flex-row gap-2">
-                <Switch checked={showDefuncts} onCheckedChange={showDefunctsChange} />
-                <div className="text-sm">Defunct compilers</div>
+                <Switch checked={showBrokens} onCheckedChange={showBrokensChange} />
+                <div className="text-sm">Defunct and broken compilers</div>
                 <div className="flex-grow" />
             </div>
         </>

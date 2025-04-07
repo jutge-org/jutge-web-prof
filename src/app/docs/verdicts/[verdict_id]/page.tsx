@@ -1,9 +1,12 @@
 'use client'
 
+import { JTable, JTableRows } from '@/components/JTable'
 import Page from '@/components/Page'
 import Spinner from '@/components/Spinner'
 import jutge from '@/lib/jutge'
 import { Verdict } from '@/lib/jutge_api_client'
+import 'highlight.js/styles/default.css'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -14,7 +17,7 @@ export default function VerdictPage() {
             pageContext={{
                 title: `Verdict ${verdict_id}`,
                 menu: 'user',
-                current: 'Verdicts',
+                current: 'docs',
                 subTitle: `Verdicts ❯ ${verdict_id}`,
                 subMenu: 'up',
             }}
@@ -31,7 +34,9 @@ function VerdictView() {
     useEffect(() => {
         async function fetchData() {
             const verdicts = await jutge.tables.getVerdicts()
+            console.log('verdicts', verdicts)
             const verdict = verdicts[verdict_id]
+
             setVerdict(verdict)
         }
 
@@ -40,11 +45,22 @@ function VerdictView() {
 
     if (verdict === null) return <Spinner />
 
-    return (
-        <>
-            TODO
-            {verdict.name}
-            {verdict.description}
-        </>
-    )
+    const table: JTableRows = [
+        {
+            label: 'TODO',
+            value: (
+                <Image
+                    src={`https://jutge.org/ico/sign-green.png`}
+                    height={80}
+                    width={80}
+                    alt={verdict_id}
+                />
+            ),
+        },
+        { label: 'Verdict', value: verdict.name },
+        { label: 'Acronym', value: <>{verdict.verdict_id} (🟢 TODO)</> },
+        { label: 'Description', value: verdict.description },
+    ]
+
+    return <JTable infos={table} />
 }

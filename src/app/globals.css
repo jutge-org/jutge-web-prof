@@ -116,6 +116,10 @@ a {
     @apply text-primary hover:underline;
 }
 
+code {
+    @apply bg-secondary p-1 rounded text-sm;
+}
+
 .ag-center-cols-viewport {
     min-height: unset !important;
 }
