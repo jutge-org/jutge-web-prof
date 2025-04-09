@@ -152,13 +152,11 @@ function EditExamForm(props: ExamFormProps) {
             only_last: onlyLast === '1',
             problems: selectedProblems.join(','),
         }
-        const pack = await jutge.instructor.exams.getSubmissions({
+        const webstream = await jutge.instructor.exams.getSubmissions({
             exam_nm: props.exam.exam_nm,
             options: options,
         })
-        setReady(false)
-        setHref(pack.href)
-        setIsWaitDialogOpen(true)
+        redirect(`/exams/${props.exam.exam_nm}/submissions/${webstream.id}`)
     }
     return (
         <>

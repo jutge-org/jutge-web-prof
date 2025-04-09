@@ -3,6 +3,7 @@
 import Page from '@/components/Page'
 import { useXTerm } from '@/components/XTerm'
 import { Button } from '@/components/ui/button'
+import jutge from '@/lib/jutge'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -29,7 +30,7 @@ function ProblemUpdateTerminalView() {
     //
 
     const { problem_nm } = useParams<{ problem_nm: string }>()
-    const { terminal_id } = useParams<{ terminal_id: string }>()
+    const { webstream_id } = useParams<{ webstream_id: string }>()
     const { instance, ref } = useXTerm()
     const [loading, setLoading] = useState(true)
     const [success, setSuccess] = useState(false)
@@ -37,7 +38,7 @@ function ProblemUpdateTerminalView() {
     useEffect(() => {
         const fetchData = async () => {
             if (!instance || !ref || !ref.current) return
-            const response = await fetch(`https://new.jutge.org/terminals/${terminal_id}`)
+            const response = await fetch(`${jutge.JUTGE_API_URL}/webstreams/${webstream_id}`)
             if (response.body === null) return
             const reader = response.body.getReader()
             while (true) {
@@ -53,7 +54,7 @@ function ProblemUpdateTerminalView() {
         }
 
         fetchData()
-    }, [instance, ref, terminal_id, problem_nm])
+    }, [instance, ref, webstream_id, problem_nm])
 
     return (
         <div className="mb-8">

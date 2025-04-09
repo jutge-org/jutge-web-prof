@@ -3,6 +3,7 @@
 import Page from '@/components/Page'
 import { Button } from '@/components/ui/button'
 import { useXTerm } from '@/components/XTerm'
+import jutge from '@/lib/jutge'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -26,7 +27,7 @@ export default function ProblemsNewTerminalPage() {
 function ProblemsNewTerminalView() {
     //
 
-    const { terminal_id } = useParams<{ terminal_id: string }>()
+    const { webstream_id } = useParams<{ webstream_id: string }>()
     const { instance, ref } = useXTerm()
     const [loading, setLoading] = useState(true)
     const [problem_nm, setProblem_nm] = useState<string | null>(null)
@@ -34,7 +35,7 @@ function ProblemsNewTerminalView() {
     useEffect(() => {
         const fetchData = async () => {
             if (!instance || !ref || !ref.current) return
-            const response = await fetch(`https://new.jutge.org/terminals/${terminal_id}`)
+            const response = await fetch(`${jutge.JUTGE_API_URL}/webstreams/${webstream_id}`)
             if (response.body === null) return
             const reader = response.body.getReader()
             while (true) {
@@ -50,7 +51,7 @@ function ProblemsNewTerminalView() {
         }
 
         fetchData()
-    }, [instance, ref, terminal_id, problem_nm])
+    }, [instance, ref, webstream_id, problem_nm])
 
     return (
         <div className="mb-8">
@@ -63,7 +64,7 @@ function ProblemsNewTerminalView() {
             )}
             {!loading && problem_nm && (
                 <div className="border-green-800 border text-green-800 rounded-lg p-4 mb-8 text-sm text-center">
-                    Problem {problem_nm} updated successfully.
+                    Problem {problem_nm} created successfully.
                 </div>
             )}
             {!loading && !problem_nm && (
