@@ -22,14 +22,16 @@ export default function HomePage() {
             <Page pageContext={{ menu: 'user', current: 'home', title: 'Home' }}>
                 <div className="w-full pt-8 sm:pt-32 flex flex-row justify-center">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
-                        {Object.entries(menu).map(([key, item]) => (
-                            <Option
-                                key={key}
-                                icon={item.icon2xl}
-                                title={item.name}
-                                href={item.href}
-                            />
-                        ))}
+                        {Object.entries(menu)
+                            .filter(([key, item]) => key != 'home')
+                            .map(([key, item]) => (
+                                <Option
+                                    key={key}
+                                    icon={item.icon2xl}
+                                    title={item.name}
+                                    href={item.href}
+                                />
+                            ))}
                     </div>
                 </div>
                 <div className="hidden sm:block">

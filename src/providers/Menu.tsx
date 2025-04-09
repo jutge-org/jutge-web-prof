@@ -1,6 +1,8 @@
 'use client'
 
 import {
+    BoxesIcon,
+    CableIcon,
     FileIcon,
     FilePenIcon,
     FileTextIcon,
@@ -33,12 +35,6 @@ export const menus: Record<string, Menu> = {
             name: 'Home',
             icon: <HouseIcon />,
             icon2xl: <HouseIcon size={52} strokeWidth={0.8} />,
-        },
-        docs: {
-            href: '/docs',
-            name: 'Docs',
-            icon: <FileTextIcon />,
-            icon2xl: <FileTextIcon size={52} strokeWidth={0.8} />,
         },
         about: {
             href: '/about',
@@ -245,6 +241,18 @@ export const menus: Record<string, Menu> = {
             name: 'Verdicts',
             icon: <GavelIcon />,
             icon2xl: <GavelIcon size={52} strokeWidth={0.8} />,
+        },
+        pylibs: {
+            href: '/docs/pylibs',
+            name: 'Python Libs',
+            icon: <BoxesIcon />,
+            icon2xl: <BoxesIcon size={52} strokeWidth={0.8} />,
+        },
+        api: {
+            href: 'https://api.jutge.org',
+            name: 'API',
+            icon: <CableIcon />,
+            icon2xl: <CableIcon size={52} strokeWidth={0.8} />,
         },
     },
 }

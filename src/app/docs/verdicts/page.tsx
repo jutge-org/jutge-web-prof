@@ -5,6 +5,7 @@ import Page from '@/components/Page'
 import jutge from '@/lib/jutge'
 import { Verdict } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -37,15 +38,35 @@ function DocsVerdictsView() {
             cellRenderer: (p: any) => (
                 <Link href={`verdicts/${p.data.verdict_id}`}>{p.data.verdict_id}</Link>
             ),
-            width: 150,
+            width: 100,
             filter: true,
         },
         { field: 'name', flex: 1, filter: true },
+        {
+            field: 'icon',
+            width: 100,
+            filter: false,
+            cellRenderer: (p: any) => (
+                <Image
+                    className="mt-1"
+                    src={`https://jutge.org/ico/verdicts/${p.data.verdict_id}.png`}
+                    alt={p.data.verdict_id}
+                    height={32}
+                    width={32}
+                />
+            ),
+        },
+        {
+            field: 'emoji',
+            width: 100,
+            filter: false,
+        },
     ])
 
     useEffect(() => {
         async function fetchData() {
             const verdicts = await jutge.tables.getVerdicts()
+            console.log('verdicts', verdicts.AC)
             const array = Object.values(verdicts).sort((a, b) =>
                 a.verdict_id.localeCompare(b.verdict_id),
             )

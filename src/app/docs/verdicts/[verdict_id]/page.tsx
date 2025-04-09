@@ -47,18 +47,26 @@ function VerdictView() {
 
     const table: JTableRows = [
         {
-            label: 'TODO',
+            label: '',
             value: (
                 <Image
-                    src={`https://jutge.org/ico/sign-green.png`}
+                    className="mt-1"
+                    src={`https://jutge.org/ico/verdicts/${verdict.verdict_id}.png`}
+                    alt={verdict.verdict_id}
                     height={80}
                     width={80}
-                    alt={verdict_id}
                 />
             ),
         },
         { label: 'Verdict', value: verdict.name },
-        { label: 'Acronym', value: <>{verdict.verdict_id} (🟢 TODO)</> },
+        {
+            label: 'Acronym',
+            value: (
+                <>
+                    {verdict.verdict_id} ({verdict.emoji})
+                </>
+            ),
+        },
         { label: 'Description', value: verdict.description },
     ]
 

@@ -12,7 +12,9 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function CompilerPage() {
-    const { compiler_id } = useParams<{ compiler_id: string }>()
+    const { compiler_id: encoded_compiler_id } = useParams<{ compiler_id: string }>()
+    const compiler_id = decodeURIComponent(encoded_compiler_id)
+
     return (
         <Page
             pageContext={{
@@ -29,7 +31,9 @@ export default function CompilerPage() {
 }
 
 function CompilerView() {
-    const { compiler_id } = useParams<{ compiler_id: string }>()
+    const { compiler_id: encoded_compiler_id } = useParams<{ compiler_id: string }>()
+    const compiler_id = decodeURIComponent(encoded_compiler_id)
+
     const [compiler, setCompiler] = useState<Compiler | null>(null)
     const [demos, setDemos] = useState<Dict<string>>({})
 
