@@ -18,7 +18,7 @@ export type JTableProps = {
 export function JTable({ infos }: JTableProps) {
     console.log('JTable', infos)
     return (
-        <div className={cn('w-full border rounded-lg p-4')}>
+        <div className={cn('w-full sm:border sm:rounded-lg sm:p-4')}>
             <div className={cn('w-full flex flex-row justify-center')}>
                 <div className="w-full md:w-5/6 space-y-1">
                     {infos.map((info, index) => (

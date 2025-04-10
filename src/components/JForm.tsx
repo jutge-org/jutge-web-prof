@@ -220,7 +220,7 @@ export function JForm(props: JFormProps) {
 
     return (
         <div className={cn('w-full mb-4', props.className)}>
-            <div className="w-full border rounded-lg p-4">
+            <div className="w-full sm:border sm:rounded-lg sm:p-4">
                 <div className={cn('w-full flex flex-row justify-center')}>
                     <div className="w-full md:w-5/6 space-y-3">
                         {Object.entries(props.fields).map(([fieldKey, field]) => (
