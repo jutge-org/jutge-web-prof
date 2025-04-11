@@ -7,11 +7,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Moon, Sun } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { availableModes, useTheme } from '@/providers/Theme'
+import { CheckIcon, Moon, Sun } from 'lucide-react'
+import { capitalize } from 'radash'
 
 export default function ModeToggle() {
-    const { theme, setTheme } = useTheme()
+    const { mode, setMode } = useTheme()
 
     return (
         <DropdownMenu>
@@ -23,9 +24,16 @@ export default function ModeToggle() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
+                {availableModes.map((m) => (
+                    <DropdownMenuItem key={m} onClick={() => setMode(m)}>
+                        {mode === m ? (
+                            <CheckIcon className="mr-2 h-4 w-4" />
+                        ) : (
+                            <div className="mr-2 h-4 w-4" />
+                        )}
+                        {capitalize(m)}
+                    </DropdownMenuItem>
+                ))}
             </DropdownMenuContent>
         </DropdownMenu>
     )

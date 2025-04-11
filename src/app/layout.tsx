@@ -19,7 +19,7 @@ export default function RootLayout(props: RootLayoutProps): ReactNode {
         <html lang="en" suppressHydrationWarning>
             <head />
             <body>
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                <ThemeProvider>
                     <AuthProvider>
                         {props.children}
                         <Toaster richColors expand={true} />
