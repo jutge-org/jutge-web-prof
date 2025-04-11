@@ -30,7 +30,7 @@ export function PaletteToggle() {
                         ) : (
                             <div className="mr-2 h-4 w-4" />
                         )}
-                        {capitalize(p)}
+                        <div className={palette === p ? 'font-bold' : ''}>{capitalize(p)}</div>
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

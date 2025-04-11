@@ -31,7 +31,7 @@ export default function ModeToggle() {
                         ) : (
                             <div className="mr-2 h-4 w-4" />
                         )}
-                        {capitalize(m)}
+                        <div className={mode == m ? 'font-bold' : ''}>{capitalize(m)}</div>
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

@@ -137,8 +137,8 @@ function HamburgerMenu({ pageContext }: { pageContext: PageContext }) {
                 <div className="flex flex-row">
                     <div className="w-2" />
                     <MenuIcon size={24} />
-                    <div className="w-2" />
-                    <div className="text-primary font-bold">Jutge.org</div>
+                    <div className="w-4" />
+                    <div className="font-bold">Prof.Jutge.org</div>
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48 shadow-lg">
