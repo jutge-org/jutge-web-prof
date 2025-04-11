@@ -15,6 +15,7 @@ import * as React from 'react'
 import { PageContext } from '../Page'
 import CommandKToggle from './CommandKToggle'
 import ModeToggle from './ModeToggle'
+import { PaletteToggle } from './PaletteToggle'
 import ProfileToggle from './ProfileToggle'
 import SignInButton from './SignInButton'
 
@@ -39,6 +40,7 @@ export default function NavBar({ pageContext }: { pageContext: PageContext }) {
                             <SignInButton />
                         )}
                         <ModeToggle />
+                        <PaletteToggle />
                         <ProfileToggle />
                     </div>
                 </div>
