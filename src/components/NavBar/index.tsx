@@ -102,13 +102,14 @@ function SubMenu({ pageContext }: { pageContext: PageContext }) {
     if (!pageContext.subMenu) return null
     const menu = menus[pageContext.subMenu]
     const current = pageContext.subCurrent
+    console.log('SubMenu', pageContext)
 
     return (
         <div className="ml-8 mr-2 flex flex-row gap-4 text-sm">
             {Object.entries(menu).map(([key, item]) => (
                 <Link
                     key={key}
-                    href={item.href}
+                    href={pageContext.subPrefix ? pageContext.subPrefix + item.href : item.href}
                     className="text-black dark:text-white hover:no-underline"
                 >
                     <span

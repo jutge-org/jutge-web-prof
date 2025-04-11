@@ -148,7 +148,7 @@ export type JRadioField = {
     label: string
     value: string
     setValue: (value: string) => void
-    options: { value: string; label: string }[]
+    options: { value: string; label: string | JSX.Element }[]
     disabled?: boolean
 }
 

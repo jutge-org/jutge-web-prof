@@ -21,6 +21,7 @@ export default function ExamSubmissionsWebStreamPage() {
                 subTitle: `Exams ❯ ${exam_nm}`,
                 subMenu: 'exams',
                 subCurrent: 'submissions',
+                subPrefix: '../',
             }}
         >
             <ExamSubmissionsWebStreamView />

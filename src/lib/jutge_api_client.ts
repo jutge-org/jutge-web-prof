@@ -521,6 +521,7 @@ export type InstructorExamSubmissionsOptions = {
     include_metadata: boolean
     only_last: boolean
     font_size: number
+    layout: string
 }
 
 export type Pack = {

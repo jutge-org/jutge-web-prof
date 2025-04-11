@@ -13,6 +13,7 @@ export type PageContext = {
     current?: string
     subMenu?: string
     subCurrent?: string
+    subPrefix?: string
     title?: string
     subTitle?: JSX.Element | string
 }

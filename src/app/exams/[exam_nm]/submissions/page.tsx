@@ -5,7 +5,12 @@ import Page from '@/components/Page'
 import Spinner from '@/components/Spinner'
 import jutge from '@/lib/jutge'
 import { InstructorExam, InstructorExamSubmissionsOptions } from '@/lib/jutge_api_client'
-import { CloudDownloadIcon } from 'lucide-react'
+import {
+    CloudDownloadIcon,
+    Columns2Icon,
+    RectangleHorizontalIcon,
+    RectangleVerticalIcon,
+} from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -59,6 +64,7 @@ function EditExamForm(props: ExamFormProps) {
     const [includePDF, setIncludePDF] = useState(true)
     const [includeMetadata, setIncludeMetadata] = useState(true)
     const [onlyLast, setOnlyLast] = useState('1')
+    const [layout, setLayout] = useState('vertical')
     const [fontSize, setFontSize] = useState('10')
 
     const fields: JFormFields = {
@@ -79,24 +85,6 @@ function EditExamForm(props: ExamFormProps) {
             setValue: setSelectedProblems,
             options: props.exam.problems.map((p) => ({ label: p.problem_nm, value: p.problem_nm })),
         },
-        includeSource: {
-            type: 'switch',
-            label: 'Source code',
-            value: includeSource,
-            setValue: setIncludeSource,
-        },
-        includePDF: {
-            type: 'switch',
-            label: 'PDF',
-            value: includePDF,
-            setValue: setIncludePDF,
-        },
-        includeMetadata: {
-            type: 'switch',
-            label: 'Add metadata in code',
-            value: includeMetadata,
-            setValue: setIncludeMetadata,
-        },
         onlyLast: {
             type: 'radio',
             label: 'Submissions',
@@ -106,6 +94,56 @@ function EditExamForm(props: ExamFormProps) {
                 { label: 'All submissions', value: '2' },
             ],
             setValue: setOnlyLast,
+        },
+        includeSource: {
+            type: 'switch',
+            label: 'Source code',
+            value: includeSource,
+            setValue: setIncludeSource,
+        },
+        includeMetadata: {
+            type: 'switch',
+            label: 'Embed metadata in code',
+            value: includeMetadata,
+            setValue: setIncludeMetadata,
+        },
+        includePDF: {
+            type: 'switch',
+            label: 'PDF',
+            value: includePDF,
+            setValue: setIncludePDF,
+        },
+        layout: {
+            type: 'radio',
+            label: 'Layout',
+            value: 'vertical',
+            options: [
+                {
+                    label: (
+                        <div className="flex flex-row gap-2 items-center">
+                            <RectangleVerticalIcon /> vertical
+                        </div>
+                    ),
+                    value: 'vertical',
+                },
+                {
+                    label: (
+                        <div className="flex flex-row gap-2 items-center">
+                            <RectangleHorizontalIcon /> horizontal
+                        </div>
+                    ),
+                    value: 'horizontal',
+                },
+                {
+                    label: (
+                        <div className="flex flex-row gap-2 items-center">
+                            <Columns2Icon /> double
+                        </div>
+                    ),
+                    value: 'double',
+                },
+            ],
+            setValue: setLayout,
         },
         fontSize: {
             type: 'radio',
@@ -138,8 +176,11 @@ function EditExamForm(props: ExamFormProps) {
             include_metadata: includeMetadata,
             only_last: onlyLast === '1',
             problems: selectedProblems.join(','),
-            font_size: Number(fontSize),
+            font_size: parseInt(fontSize, 10),
+            layout: layout,
         }
+        console.log('options', options)
+        console.log('font_size', fontSize)
         const webstream = await jutge.instructor.exams.getSubmissions({
             exam_nm: props.exam.exam_nm,
             options: options,
