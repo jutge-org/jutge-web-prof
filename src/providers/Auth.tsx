@@ -29,8 +29,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     async function checkLogin() {
         try {
-            const token = sessionStorage.getItem('token')
-            const expiration = sessionStorage.getItem('expiration')
+            const token = localStorage.getItem('token')
+            const expiration = localStorage.getItem('expiration')
             if (!token || !expiration) return false
 
             const now = dayjs()
@@ -71,8 +71,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             } catch (error) {
                 // ignore
             }
-            sessionStorage.setItem('token', credentialsOut.token)
-            sessionStorage.setItem('expiration', credentialsOut.expiration.toString())
+            localStorage.setItem('token', credentialsOut.token)
+            localStorage.setItem('expiration', credentialsOut.expiration.toString())
             return true
         } catch (error) {
             console.log(error)
@@ -82,8 +82,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     async function logout() {
         try {
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('expiration')
+            localStorage.removeItem('token')
+            localStorage.removeItem('expiration')
             setUser(null)
             setAvatar(null)
             await jutge.logout()
