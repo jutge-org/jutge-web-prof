@@ -15,7 +15,9 @@ export default function AboutPage() {
             public={true}
             pageContext={{ menu: auth.user ? 'user' : 'public', current: 'about', title: 'About' }}
         >
-            <p className="text-2xl font-bold pb-4">Credits</p>
+            <p className="text-2xl font-bold pb-4">About</p>
+            <p>This is the instructors web page of Jutge.org.</p>
+            <p className="text-2xl font-bold pt-8 pb-4">Credits</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ProfileCard
                     name="Pau Fernández"
