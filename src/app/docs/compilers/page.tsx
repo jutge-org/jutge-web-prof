@@ -1,6 +1,7 @@
 'use client'
 
 import { AgTableFull } from '@/components/AgTable'
+import { DevIcon } from '@/components/DevIcon'
 import Page from '@/components/Page'
 import { Switch } from '@/components/ui/switch'
 import jutge from '@/lib/jutge'
@@ -32,7 +33,7 @@ function DocsCompilersView() {
     const [rows, setRows] = useState<Compiler[]>([])
     const [showBrokens, setShowBrokens] = useState(false)
 
-    const [colDefs, setColDefs] = useState([
+    const colDefs = [
         {
             field: 'compiler_id',
             headerName: 'Id',
@@ -43,8 +44,18 @@ function DocsCompilersView() {
             filter: true,
         },
         { field: 'name', flex: 1, filter: true },
-        { field: 'language', width: 150, filter: true },
-    ])
+        {
+            field: 'language',
+            width: 180,
+            filter: true,
+            cellRenderer: (p: any) => (
+                <div className="flex flex-row items-center gap-2">
+                    {devIcon(p.data.compiler_id, compilers)}
+                    {compilers[p.data.compiler_id].language}
+                </div>
+            ),
+        },
+    ]
 
     useEffect(() => {
         async function fetchData() {
@@ -52,8 +63,8 @@ function DocsCompilersView() {
             const array = Object.values(compilers).sort((a, b) =>
                 a.compiler_id.localeCompare(b.compiler_id),
             )
-            setRows(array.filter((compiler) => compiler.status === null))
-            setCompilers(compilers)
+            setCompilers((old) => compilers)
+            setRows((old) => array.filter((compiler) => compiler.status === null))
         }
 
         fetchData()
@@ -71,6 +82,12 @@ function DocsCompilersView() {
         }
     }
 
+    if (Object.keys(compilers).length === 0) {
+        return <div className="text-center">Loading...</div>
+    }
+
+    console.log('compilers', compilers)
+
     return (
         <>
             <AgTableFull rowData={rows} columnDefs={colDefs as any} />
@@ -81,4 +98,13 @@ function DocsCompilersView() {
             </div>
         </>
     )
+}
+
+function devIcon(compiler_id: string, compilers: Record<string, Compiler>) {
+    console.log('devIcon', compiler_id, compilers)
+    if (compiler_id in compilers) {
+        return <DevIcon proglang={compilers[compiler_id].language} size={14} />
+    }
+    //return Object.keys(compilers).length.toString()
+    return <DevIcon proglang="Unknown" size={14} />
 }

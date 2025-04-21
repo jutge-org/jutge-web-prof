@@ -1,6 +1,7 @@
 'use client'
 
 import { Code } from '@/components/Code'
+import { DevIcon } from '@/components/DevIcon'
 import { JTable, JTableRows } from '@/components/JTable'
 import Page from '@/components/Page'
 import Spinner from '@/components/Spinner'
@@ -56,6 +57,7 @@ function CompilerView() {
         { label: 'Compiler', value: compiler.compiler_id },
         { label: 'Name', value: compiler.name },
         { label: 'Language', value: compiler.language },
+        { label: 'Language Icon', value: <DevIcon proglang={compiler.language} size={24} /> },
         { label: 'Program and version', value: compiler.version },
         { label: 'Description', value: compiler.description },
         { label: 'Type', value: compiler.type },
