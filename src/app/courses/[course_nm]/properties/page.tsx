@@ -2,7 +2,7 @@
 
 import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { InstructorCourse } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
@@ -47,7 +47,7 @@ function CoursePropertiesView() {
         fetchCourse()
     }, [course_nm])
 
-    if (course === null) return <Spinner />
+    if (course === null) return <SimpleSpinner />
 
     return <EditCourseForm course={course} archived={archived} setArchived={setArchived} />
 }

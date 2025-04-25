@@ -2,8 +2,8 @@
 
 import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Button } from '@/components/ui/button'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Document } from '@/lib/jutge_api_client'
 import { offerDownloadFile, showError } from '@/lib/utils'
@@ -45,7 +45,7 @@ function DocumentPropertiesView() {
         fetchDocument()
     }, [document_nm])
 
-    if (!document) return <Spinner />
+    if (!document) return <SimpleSpinner />
 
     return <EditDocumentForm document={document} />
 }

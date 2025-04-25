@@ -2,7 +2,7 @@
 
 import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { InstructorList } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
@@ -43,7 +43,7 @@ function ListDuplicateView() {
         fetchList()
     }, [list_nm])
 
-    if (list === null) return <Spinner />
+    if (list === null) return <SimpleSpinner />
 
     return <ListDuplicateForm list={list} />
 }

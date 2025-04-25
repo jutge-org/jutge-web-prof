@@ -537,10 +537,6 @@ body {
     border-radius: inherit;
 }
 
-.myprose {
-    @apply prose dark:prose-invert;
-}
-
 h1 {
     @apply text-2xl font-bold pb-4;
 }

@@ -2,7 +2,7 @@
 
 import { JTable, JTableRows } from '@/components/JTable'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Verdict } from '@/lib/jutge_api_client'
 import 'highlight.js/styles/default.css'
@@ -43,7 +43,7 @@ function VerdictView() {
         fetchData()
     }, [verdict_id])
 
-    if (verdict === null) return <Spinner />
+    if (verdict === null) return <SimpleSpinner />
 
     const table: JTableRows = [
         {

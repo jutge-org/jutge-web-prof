@@ -1,10 +1,10 @@
 'use client'
 
-import { Code } from '@/components/Code'
-import { DevIcon } from '@/components/DevIcon'
 import { JTable, JTableRows } from '@/components/JTable'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
+import { Code } from '@/jutge-components/misc/Code'
+import { DevIcon } from '@/jutge-components/misc/DevIcon'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Compiler } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'
@@ -51,7 +51,7 @@ function CompilerView() {
         fetchData()
     }, [compiler_id])
 
-    if (compiler === null) return <Spinner />
+    if (compiler === null) return <SimpleSpinner />
 
     const table: JTableRows = [
         { label: 'Compiler', value: compiler.compiler_id },

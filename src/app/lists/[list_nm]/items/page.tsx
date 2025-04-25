@@ -2,11 +2,11 @@
 
 import { AgTable, AgTableFull } from '@/components/AgTable'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import { AbstractProblem, InstructorList, InstructorListItem } from '@/lib/jutge_api_client'
 import { useAuth } from '@/providers/Auth'
@@ -157,7 +157,7 @@ function ListProblemView() {
         setItems(newItems)
     }
 
-    if (list === null) return <Spinner />
+    if (list === null) return <SimpleSpinner />
 
     return (
         <>

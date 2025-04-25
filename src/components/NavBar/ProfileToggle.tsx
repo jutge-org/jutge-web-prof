@@ -12,8 +12,8 @@ import {
 import { download2src } from '@/lib/utils'
 import { LogOutIcon, UserIcon } from 'lucide-react'
 import Image from 'next/image'
+import Markdown from '../../jutge-components/misc/Markdown'
 import { useAuth } from '../../providers/Auth'
-import Markdown from '../Markdown'
 
 export default function ProfileToggle() {
     const auth = useAuth()

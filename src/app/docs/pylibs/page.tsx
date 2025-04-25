@@ -1,7 +1,7 @@
 'use client'
 
-import Markdown from '@/components/Markdown'
 import Page from '@/components/Page'
+import Markdown from '@/jutge-components/misc/Markdown'
 
 export default function DocsPyLibsPage() {
     return (

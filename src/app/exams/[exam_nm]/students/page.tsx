@@ -1,10 +1,10 @@
 'use client'
 
 import { AgTableFull } from '@/components/AgTable'
-import { useEmailsDialog } from '@/components/EmailsDialog'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Button } from '@/components/ui/button'
+import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { InstructorExam, InstructorExamStudent } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
@@ -174,7 +174,7 @@ function ExamStudentsView() {
         }
     }
 
-    if (!exam) return <Spinner />
+    if (!exam) return <SimpleSpinner />
 
     return (
         <>

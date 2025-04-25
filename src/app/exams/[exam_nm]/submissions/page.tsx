@@ -2,7 +2,7 @@
 
 import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { InstructorExam, InstructorExamSubmissionsOptions } from '@/lib/jutge_api_client'
 import {
@@ -45,7 +45,7 @@ function ExamSubmissionsView() {
         fetchData()
     }, [exam_nm])
 
-    if (exam === null) return <Spinner />
+    if (exam === null) return <SimpleSpinner />
 
     return <EditExamForm exam={exam} />
 }

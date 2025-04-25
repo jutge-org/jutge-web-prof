@@ -1,7 +1,6 @@
 'use client'
 
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     ChartConfig,
@@ -13,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
@@ -92,7 +92,7 @@ function ExamStatisticsView() {
         abstractProblems === null ||
         colors === null
     )
-        return <Spinner />
+        return <SimpleSpinner />
 
     const submissions = (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">

@@ -1,10 +1,10 @@
 'use client'
 
 import { AgTableFull } from '@/components/AgTable'
-import { useEmailsDialog } from '@/components/EmailsDialog'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Button } from '@/components/ui/button'
+import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/jutge_api_client'
 import { Dict, showError } from '@/lib/utils'
@@ -52,7 +52,7 @@ function CourseTutorsView() {
         fetchData()
     }, [course_nm])
 
-    if (auth.user === null || course === null || profiles === null) return <Spinner />
+    if (auth.user === null || course === null || profiles === null) return <SimpleSpinner />
 
     return <CourseTutorsForm user={auth.user} course={course} profiles={profiles} />
 }

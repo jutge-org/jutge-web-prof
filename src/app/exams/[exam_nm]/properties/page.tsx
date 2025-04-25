@@ -2,7 +2,7 @@
 
 import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Compiler, Document, InstructorExam, InstructorExamUpdate } from '@/lib/jutge_api_client'
 import { Dict, mapmap, showError } from '@/lib/utils'
@@ -52,7 +52,7 @@ function ExamPropertiesView() {
         fetchData()
     }, [exam_nm])
 
-    if (!exam || !compilers || !documents) return <Spinner />
+    if (!exam || !compilers || !documents) return <SimpleSpinner />
 
     return (
         <EditExamForm

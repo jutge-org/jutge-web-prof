@@ -1,5 +1,4 @@
-// based on
-// https://github.com/damithadev/shadcn-rich-text-editor-with-tiptap
+// based on https://github.com/damithadev/shadcn-rich-text-editor-with-tiptap
 
 'use client'
 import { Separator } from '@/components/ui/separator'

@@ -2,7 +2,6 @@
 
 import { AgTableFull } from '@/components/AgTable'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Button } from '@/components/ui/button'
 import {
     Command,
@@ -29,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
@@ -240,7 +240,8 @@ function ExamProblemsView() {
         setRows(newRows)
     }
 
-    if (auth.user === null || exam === null || usedAbstractProblems === null) return <Spinner />
+    if (auth.user === null || exam === null || usedAbstractProblems === null)
+        return <SimpleSpinner />
 
     return (
         <>
@@ -362,7 +363,7 @@ function ProblemDialog(props: ProblemDialogProps) {
                     <DialogHeader>
                         <DialogTitle>Loading problems...</DialogTitle>
                     </DialogHeader>
-                    <Spinner />
+                    <SimpleSpinner />
                 </DialogContent>
             </Dialog>
         )

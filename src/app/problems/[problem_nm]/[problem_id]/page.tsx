@@ -1,9 +1,7 @@
 'use client'
 
 import { JForm, JFormFields } from '@/components/JForm'
-import Markdown from '@/components/Markdown'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +12,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
+import Markdown from '@/jutge-components/misc/Markdown'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { BriefAbstractProblem, Problem, ProblemSuppl } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'
@@ -66,7 +66,8 @@ function ProblemPropertiesView() {
         fetchProblemInfo()
     }, [problem_id, problem_nm])
 
-    if (abstractProblem === null || problem === null || problemSuppl === null) return <Spinner />
+    if (abstractProblem === null || problem === null || problemSuppl === null)
+        return <SimpleSpinner />
 
     return (
         <EditProblemForm

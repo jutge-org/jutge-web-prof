@@ -2,7 +2,6 @@
 
 import { AgTable, AgTableFull } from '@/components/AgTable'
 import Page from '@/components/Page'
-import Spinner from '@/components/Spinner'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -12,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
@@ -149,7 +149,7 @@ function CourseListView() {
         setIsShowListDialogOpen(true)
     }
 
-    if (course === null) return <Spinner />
+    if (course === null) return <SimpleSpinner />
 
     return (
         <>
