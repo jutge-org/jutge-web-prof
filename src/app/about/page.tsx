@@ -1,7 +1,7 @@
 'use client'
 
-import { Prose } from '@/components/Prose'
 import { Card, CardContent } from '@/components/ui/card'
+import { Prose } from '@/jutge-components/misc/Prose'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import { GithubIcon, GripIcon } from 'lucide-react'
 

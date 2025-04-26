@@ -1,7 +1,7 @@
 'use client'
 
-import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
+import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import jutge from '@/lib/jutge'
 import { PlusCircleIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'

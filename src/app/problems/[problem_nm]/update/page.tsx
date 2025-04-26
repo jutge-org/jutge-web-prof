@@ -1,7 +1,7 @@
 'use client'
 
-import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
+import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import jutge from '@/lib/jutge'
 import { CloudUploadIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'

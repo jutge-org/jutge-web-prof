@@ -1,7 +1,7 @@
 'use client'
 
-import { JTable, JTableRows } from '@/components/JTable'
 import Page from '@/components/Page'
+import { JTable, JTableItems } from '@/jutge-components/formatters/JTable'
 import { Code } from '@/jutge-components/misc/Code'
 import { DevIcon } from '@/jutge-components/misc/DevIcon'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
@@ -53,7 +53,7 @@ function CompilerView() {
 
     if (compiler === null) return <SimpleSpinner />
 
-    const table: JTableRows = [
+    const table: JTableItems = [
         { label: 'Compiler', value: compiler.compiler_id },
         { label: 'Name', value: compiler.name },
         { label: 'Language', value: compiler.language },
@@ -82,5 +82,5 @@ function CompilerView() {
         })
     }
 
-    return <JTable infos={table} />
+    return <JTable items={table} />
 }

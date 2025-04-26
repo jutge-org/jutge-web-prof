@@ -1,7 +1,7 @@
 'use client'
 
-import { JTable, JTableRows } from '@/components/JTable'
 import Page from '@/components/Page'
+import { JTable, JTableItems } from '@/jutge-components/formatters/JTable'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Verdict } from '@/lib/jutge_api_client'
@@ -45,7 +45,7 @@ function VerdictView() {
 
     if (verdict === null) return <SimpleSpinner />
 
-    const table: JTableRows = [
+    const table: JTableItems = [
         {
             label: '',
             value: (
@@ -70,5 +70,5 @@ function VerdictView() {
         { label: 'Description', value: verdict.description },
     ]
 
-    return <JTable infos={table} />
+    return <JTable items={table} />
 }

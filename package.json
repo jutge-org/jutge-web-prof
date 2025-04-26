@@ -9,7 +9,7 @@
         "format": "bun prettier src --write",
         "lint": "next lint",
         "update-client": "(cd src/lib ; rm -f jutge_api_client.ts ; https --download https://api.jutge.org/clients/download/typescript)",
-        "deploy": "ssh -t jutge@jutge.org 'cd git/jutge-web-prof ; git pull ; rm -rf .next ; bun install ; bun run build ; pm2 restart web-prof'"
+        "deploy": "ssh -t jutge@jutge.org 'cd git/jutge-web-prof ; git pull --recurse-submodules ; rm -rf .next ; bun install ; bun run build ; pm2 restart web-prof'"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.10.0",

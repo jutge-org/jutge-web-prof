@@ -1,6 +1,5 @@
 'use client'
 
-import { JForm, JFormFields } from '@/components/JForm'
 import Page from '@/components/Page'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -12,6 +11,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
+import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Markdown from '@/jutge-components/misc/Markdown'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
