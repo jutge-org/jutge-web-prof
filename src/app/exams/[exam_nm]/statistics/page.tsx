@@ -1,6 +1,5 @@
 'use client'
 
-import Page from '@/components/Page'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     ChartConfig,
@@ -12,6 +11,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
+import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
@@ -24,7 +25,6 @@ import {
     Profile,
 } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'
-import { useAuth } from '@/providers/Auth'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { ChartPieIcon, TableIcon } from 'lucide-react'

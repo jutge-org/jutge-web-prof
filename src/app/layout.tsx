@@ -1,6 +1,6 @@
 import { Toaster } from '@/components/ui/sonner'
-import AuthProvider from '@/providers/Auth'
-import { ThemeProvider } from '@/providers/Theme'
+import AuthProvider from '@/jutge-components/layouts/court/lib/Auth'
+import { ThemeProvider } from '@/jutge-components/layouts/court/lib/Theme'
 import type { Metadata } from 'next'
 import { ReactNode } from 'react'
 import './globals.css'

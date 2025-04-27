@@ -1,6 +1,6 @@
 'use client'
 
-import Page from '@/components/Page'
+import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
 import {
     ColorMapping,

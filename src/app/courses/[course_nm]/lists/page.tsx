@@ -1,7 +1,5 @@
 'use client'
 
-import { AgTable, AgTableFull } from '@/components/AgTable'
-import Page from '@/components/Page'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -11,7 +9,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
+import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
+import { AgTable, AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
@@ -20,7 +21,6 @@ import {
     InstructorListItem,
 } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'
-import { useAuth } from '@/providers/Auth'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import {

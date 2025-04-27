@@ -1,5 +1,3 @@
-// això està trencat
-
 'use client'
 
 import {
@@ -11,6 +9,8 @@ import {
     CommandList,
     CommandSeparator,
 } from '@/components/ui/command'
+import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
+import { CommandKProps, useCommandK } from '@/jutge-components/layouts/court/lib/CommandK'
 import jutge from '@/lib/jutge'
 import {
     AbstractProblem,
@@ -19,10 +19,8 @@ import {
     InstructorBriefExam,
     InstructorBriefList,
 } from '@/lib/jutge_api_client'
+import { menus } from '@/lib/menus'
 import { mapmap } from '@/lib/utils'
-import { useAuth } from '@/providers/Auth'
-import { CommandKProps, useCommandK } from '@/providers/CommandK'
-import { menus } from '@/providers/Menu'
 import { Description, DialogTitle } from '@radix-ui/react-dialog'
 import { FileIcon, FilePenIcon, ListIcon, PuzzleIcon, TableIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'

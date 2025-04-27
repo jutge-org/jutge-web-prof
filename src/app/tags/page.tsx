@@ -1,7 +1,7 @@
 'use client'
 
-import { AgTableFull } from '@/components/AgTable'
-import Page from '@/components/Page'
+import Page from '@/jutge-components/layouts/court/Page'
+import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'

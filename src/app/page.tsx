@@ -1,7 +1,7 @@
 'use client'
 
-import Page from '@/components/Page'
-import { useAuth } from '@/providers/Auth'
+import Page from '@/jutge-components/layouts/court/Page'
+import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import { redirect } from 'next/navigation'
 
 export default function HomePage() {

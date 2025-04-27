@@ -1,9 +1,9 @@
 'use client'
 
-import { AgTableFull } from '@/components/AgTable'
-import Page from '@/components/Page'
 import { Switch } from '@/components/ui/switch'
-import { DevIcon } from '@/jutge-components/misc/DevIcon'
+import Page from '@/jutge-components/layouts/court/Page'
+import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
+import { DevIcon } from '@/jutge-components/wrappers/DevIcon'
 import jutge from '@/lib/jutge'
 import { Compiler } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'

@@ -1,10 +1,10 @@
 'use client'
 
-import Page from '@/components/Page'
 import { JTable, JTableItems } from '@/jutge-components/formatters/JTable'
-import { Code } from '@/jutge-components/misc/Code'
-import { DevIcon } from '@/jutge-components/misc/DevIcon'
+import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
+import { Code } from '@/jutge-components/wrappers/Code'
+import { DevIcon } from '@/jutge-components/wrappers/DevIcon'
 import jutge from '@/lib/jutge'
 import { Compiler } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'

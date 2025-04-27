@@ -1,7 +1,7 @@
 'use client'
 
-import Page from '@/components/Page'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
+import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
 import { InstructorList } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'

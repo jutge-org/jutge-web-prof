@@ -1,12 +1,12 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { Prose } from '@/jutge-components/misc/Prose'
+import { Prose } from '@/jutge-components/wrappers/Prose'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import { GithubIcon, GripIcon } from 'lucide-react'
 
-import Page from '@/components/Page'
-import { useAuth } from '@/providers/Auth'
+import Page from '@/jutge-components/layouts/court/Page'
+import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 
 export default function AboutPage() {
     const auth = useAuth()

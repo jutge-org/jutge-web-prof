@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Loader2Icon, LogInIcon, SquareXIcon } from 'lucide-react'
 import Image from 'next/image'
 import { FormEvent, useState } from 'react'
-import { useAuth } from '../providers/Auth'
+import { useAuth } from '../jutge-components/layouts/court/lib/Auth'
 
 export default function LoginForm() {
     //

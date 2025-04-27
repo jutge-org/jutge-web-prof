@@ -1,7 +1,7 @@
 'use client'
 
-import { AgTableFull } from '@/components/AgTable'
-import Page from '@/components/Page'
+import Page from '@/jutge-components/layouts/court/Page'
+import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { Verdict } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'

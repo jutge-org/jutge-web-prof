@@ -1,9 +1,9 @@
 'use client'
 
-import { AgTableFull } from '@/components/AgTable'
-import Page from '@/components/Page'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/hooks/use-mobile'
+import Page from '@/jutge-components/layouts/court/Page'
+import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { Document } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'

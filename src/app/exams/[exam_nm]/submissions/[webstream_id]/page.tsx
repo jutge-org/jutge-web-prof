@@ -1,8 +1,8 @@
 'use client'
 
-import Page from '@/components/Page'
 import { Button } from '@/components/ui/button'
-import { useXTerm } from '@/components/XTerm'
+import Page from '@/jutge-components/layouts/court/Page'
+import { useXTerm } from '@/jutge-components/wrappers/XTerm'
 import jutge from '@/lib/jutge'
 import { CloudDownloadIcon } from 'lucide-react'
 import Link from 'next/link'

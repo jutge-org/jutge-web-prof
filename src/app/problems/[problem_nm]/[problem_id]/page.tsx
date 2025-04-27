@@ -1,6 +1,5 @@
 'use client'
 
-import Page from '@/components/Page'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,8 +11,9 @@ import {
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
-import Markdown from '@/jutge-components/misc/Markdown'
+import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
+import Markdown from '@/jutge-components/wrappers/Markdown'
 import jutge from '@/lib/jutge'
 import { BriefAbstractProblem, Problem, ProblemSuppl } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'

@@ -1,8 +1,8 @@
 'use client'
 
-import Page from '@/components/Page'
-import { useXTerm } from '@/components/XTerm'
 import { Button } from '@/components/ui/button'
+import Page from '@/jutge-components/layouts/court/Page'
+import { useXTerm } from '@/jutge-components/wrappers/XTerm'
 import jutge from '@/lib/jutge'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'

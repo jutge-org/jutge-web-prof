@@ -1,5 +1,6 @@
 'use client'
 
+import { Menu } from '@/jutge-components/layouts/court/lib/Menu'
 import {
     BoxesIcon,
     CableIcon,
@@ -17,16 +18,6 @@ import {
     TableIcon,
     TagsIcon,
 } from 'lucide-react'
-
-export interface MenuItem {
-    name: string
-    href: string
-    icon?: React.ReactElement
-    icon2xl?: React.ReactElement
-    shortcut?: string
-}
-
-export type Menu = Record<string, MenuItem>
 
 export const menus: Record<string, Menu> = {
     public: {
