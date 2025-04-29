@@ -1,12 +1,12 @@
 'use client'
 
+import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Compiler, Document, InstructorExam, InstructorExamUpdate } from '@/lib/jutge_api_client'
 import { Dict, mapmap, showError } from '@/lib/utils'
-import { useConfirm } from '@omit/react-confirm-dialog'
 import { CalendarPlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { capitalize } from 'radash'
@@ -77,7 +77,14 @@ interface ExamFormProps {
 }
 
 function EditExamForm(props: ExamFormProps) {
-    const confirm = useConfirm()
+    //
+
+    const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
+        title: 'Delete exam',
+        acceptIcon: <TrashIcon />,
+        acceptLabel: 'Yes, delete',
+        cancelLabel: 'No',
+    })
 
     const [exam_nm, setExam_nm] = useState(props.exam.exam_nm)
     const [title, setTitle] = useState(props.exam.title)
@@ -270,14 +277,9 @@ function EditExamForm(props: ExamFormProps) {
     }
 
     async function deleteAction() {
-        if (
-            !(await confirm({
-                title: 'Delete exam',
-                description: `Are you sure you want to delete exam '${props.exam.exam_nm}'?`,
-            }))
-        ) {
-            return
-        }
+        const message = `Are you sure you want to delete exam '${props.exam.exam_nm}'?`
+        if (!(await runConfirmDialog(message))) return
+
         try {
             await jutge.instructor.exams.remove(props.exam.exam_nm)
         } catch (error) {
@@ -290,6 +292,7 @@ function EditExamForm(props: ExamFormProps) {
     return (
         <>
             <JForm fields={fields} />
+            <ConfirmDialogComponent />
         </>
     )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import Page from '@/jutge-components/layouts/court/Page'
@@ -9,7 +10,6 @@ import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/jutge_api_client'
 import { Dict, showError } from '@/lib/utils'
-import { useConfirm } from '@omit/react-confirm-dialog'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { CircleMinusIcon, PlusCircleIcon, SaveIcon, SendHorizonalIcon } from 'lucide-react'
@@ -68,7 +68,12 @@ function CourseTutorsForm(props: CourseStudentProps) {
 
     type Row = { email: string; name: string; state: string }
 
-    const confirm = useConfirm()
+    const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
+        title: 'Invite',
+        acceptLabel: 'Yes, send',
+        acceptIcon: <SendHorizonalIcon />,
+        cancelLabel: 'No',
+    })
 
     const { course_nm } = useParams<{ course_nm: string }>()
     const [rows, setRows] = useState<Row[]>(getRows())
@@ -176,14 +181,10 @@ function CourseTutorsForm(props: CourseStudentProps) {
     }
 
     async function inviteAction() {
-        if (
-            !(await confirm({
-                title: 'Send invitation',
-                description:
-                    'Are you sure you want to send an invitation to the pending tutors? (Please do not abuse this feature.)',
-            }))
-        )
-            return
+        const message =
+            'Are you sure you want to send an invitation to the pending tutors? (Please do not abuse this feature.)'
+        if (!(await runConfirmDialog(message))) return
+
         try {
             await jutge.instructor.courses.sendInviteToTutors(course_nm)
             toast.success(`An email has been sent to the pending tutors.`)
@@ -191,6 +192,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
             showError(error)
         }
     }
+
     return (
         <>
             <AgTableFull
@@ -225,6 +227,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
 
             <AddEmailsDialog />
             <RemoveEmailsDialog />
+            <ConfirmDialogComponent />
         </>
     )
 }

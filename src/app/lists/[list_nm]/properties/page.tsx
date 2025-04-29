@@ -1,12 +1,12 @@
 'use client'
 
+import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { InstructorList } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
-import { useConfirm } from '@omit/react-confirm-dialog'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -64,7 +64,14 @@ interface ListFormProps {
 }
 
 function EditListForm(props: ListFormProps) {
-    const confirm = useConfirm()
+    //
+
+    const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
+        title: 'Delete list',
+        acceptIcon: <TrashIcon />,
+        acceptLabel: 'Yes, delete',
+        cancelLabel: 'No',
+    })
 
     const [list_nm, setList_nm] = useState(props.list.list_nm)
     const [title, setTitle] = useState(props.list.title)
@@ -152,14 +159,9 @@ function EditListForm(props: ListFormProps) {
     }
 
     async function deleteAction() {
-        if (
-            !(await confirm({
-                title: 'Delete list',
-                description: `Are you sure you want to delete list '${props.list.list_nm}'?`,
-            }))
-        ) {
-            return
-        }
+        const message = `Are you sure you want to delete list '${props.list.list_nm}'?`
+        if (!(await runConfirmDialog(message))) return
+
         try {
             await jutge.instructor.lists.remove(props.list.list_nm)
         } catch (error) {
@@ -169,5 +171,10 @@ function EditListForm(props: ListFormProps) {
         redirect('/lists')
     }
 
-    return <JForm fields={fields} />
+    return (
+        <>
+            <JForm fields={fields} />
+            <ConfirmDialogComponent />
+        </>
+    )
 }

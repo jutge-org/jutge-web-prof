@@ -1,13 +1,13 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Document } from '@/lib/jutge_api_client'
 import { offerDownloadFile, showError } from '@/lib/utils'
-import { useConfirm } from '@omit/react-confirm-dialog'
 import { FileIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -57,7 +57,12 @@ interface DocumentFormProps {
 function EditDocumentForm(props: DocumentFormProps) {
     //
 
-    const confirm = useConfirm()
+    const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
+        title: 'Delete document',
+        acceptIcon: <TrashIcon />,
+        acceptLabel: 'Yes, delete',
+        cancelLabel: 'No',
+    })
 
     const [document_nm, setDocument_nm] = useState(props.document.document_nm)
     const [title, setTitle] = useState(props.document.title)
@@ -145,14 +150,9 @@ function EditDocumentForm(props: DocumentFormProps) {
     }
 
     async function deleteAction() {
-        if (
-            !(await confirm({
-                title: 'Delete document',
-                description: `Are you sure you want to delete document ${props.document.document_nm}?`,
-            }))
-        ) {
-            return
-        }
+        const message = `Are you sure you want to delete document '${props.document.document_nm}'?`
+        if (!(await runConfirmDialog(message))) return
+
         try {
             await jutge.instructor.documents.remove(props.document.document_nm)
         } catch (error) {
@@ -162,5 +162,10 @@ function EditDocumentForm(props: DocumentFormProps) {
         redirect('/documents')
     }
 
-    return <JForm fields={fields} />
+    return (
+        <>
+            <JForm fields={fields} />
+            <ConfirmDialogComponent />
+        </>
+    )
 }
