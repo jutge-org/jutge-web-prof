@@ -4,10 +4,7 @@ import animate from 'tailwindcss-animate'
 
 export default {
     darkMode: ['class'],
-    content: [
-        './src/**/*.{js,ts,jsx,tsx,mdx}',
-        './node_modules/@omit/react-confirm-dialog/dist/index.js',
-    ],
+    content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
     theme: {
         extend: {
             colors: {

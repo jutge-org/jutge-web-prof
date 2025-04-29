@@ -7,11 +7,9 @@ const nextConfig: NextConfig = {
 export default nextConfig
 
 module.exports = {
-    experimental: {
-        turbo: {
-            resolveAlias: {
-                canvas: './empty-module.ts',
-            },
+    turbopack: {
+        resolveAlias: {
+            canvas: './empty-module.ts',
         },
     },
 
