@@ -3,6 +3,8 @@ import AuthProvider from '@/jutge-components/layouts/court/lib/Auth'
 import { ThemeProvider } from '@/jutge-components/layouts/court/lib/Theme'
 import type { Metadata } from 'next'
 import { ReactNode } from 'react'
+
+import '@/jutge-components/layouts/court/themes.css'
 import './globals.css'
 
 export const metadata: Metadata = {

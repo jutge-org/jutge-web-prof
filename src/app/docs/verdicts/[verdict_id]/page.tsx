@@ -34,7 +34,6 @@ function VerdictView() {
     useEffect(() => {
         async function fetchData() {
             const verdicts = await jutge.tables.getVerdicts()
-            console.log('verdicts', verdicts)
             const verdict = verdicts[verdict_id]
 
             setVerdict(verdict)

@@ -66,7 +66,6 @@ function DocsVerdictsView() {
     useEffect(() => {
         async function fetchData() {
             const verdicts = await jutge.tables.getVerdicts()
-            console.log('verdicts', verdicts.AC)
             const array = Object.values(verdicts).sort((a, b) =>
                 a.verdict_id.localeCompare(b.verdict_id),
             )

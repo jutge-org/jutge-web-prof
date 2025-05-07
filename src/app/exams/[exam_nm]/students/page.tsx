@@ -62,7 +62,7 @@ function ExamStudentsView() {
         { field: 'name', flex: 3, filter: true },
         {
             field: 'code',
-            width: 90,
+            width: 100,
             cellRenderer: (p: any) => <code className="text-xs">{p.data.code}</code>,
         },
         {
@@ -145,7 +145,6 @@ function ExamStudentsView() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const selectedEmails = selectedRows.map((index) => rows[index].email)
-        console.log(selectedEmails)
 
         const result = await runRemoveEmailsDialog(selectedEmails)
         if (!result) return

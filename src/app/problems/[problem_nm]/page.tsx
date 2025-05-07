@@ -350,6 +350,9 @@ function DeprecationDialog({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent>
+                <DialogDescription className="hidden">
+                    Set deprecation for problem {problem_nm}
+                </DialogDescription>
                 <DialogHeader>
                     <DialogTitle>Set deprecation for problem {problem_nm}</DialogTitle>
                     <DialogDescription className="flex flex-col gap-4">

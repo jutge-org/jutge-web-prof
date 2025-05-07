@@ -558,7 +558,6 @@ function ProblemTitle(props: ProblemTitleProps) {
 
 function color(key: string, cathegory: string, colors: ColorMapping) {
     if (!(cathegory in colors) || !(key in colors[cathegory])) {
-        console.error(`color for key '${key}' not found in cathegory '${cathegory}', using blue`)
         return 'blue'
     }
     return colors[cathegory][key]

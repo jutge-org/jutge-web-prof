@@ -179,8 +179,6 @@ function EditExamForm(props: ExamFormProps) {
             font_size: parseInt(fontSize, 10),
             layout: layout,
         }
-        console.log('options', options)
-        console.log('font_size', fontSize)
         const webstream = await jutge.instructor.exams.getSubmissions({
             exam_nm: props.exam.exam_nm,
             options: options,

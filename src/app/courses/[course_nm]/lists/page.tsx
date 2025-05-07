@@ -112,7 +112,6 @@ function CourseListView() {
     }, [])
 
     async function saveAction() {
-        console.log('saveAction')
         const lists: string[] = []
         gridRef.current!.api.forEachNode((rowNode, index) => {
             if (rowNode.data?.list_nm) lists.push(rowNode.data?.list_nm)
@@ -231,6 +230,7 @@ function DialogToAddLists({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent>
+                <DialogDescription className="hidden">Add lists to course</DialogDescription>
                 <DialogHeader>
                     <DialogTitle>Add lists to course</DialogTitle>
                     <DialogDescription>

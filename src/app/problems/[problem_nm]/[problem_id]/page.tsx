@@ -246,6 +246,7 @@ function StatementDialog({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent>
+                <DialogDescription className="hidden">Statement for {problem_id}</DialogDescription>
                 <DialogHeader>
                     <DialogTitle>Statement for {problem_id}</DialogTitle>
                     <DialogDescription className="flex flex-col gap-4">

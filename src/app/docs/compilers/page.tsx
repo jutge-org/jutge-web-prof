@@ -86,8 +86,6 @@ function DocsCompilersView() {
         return <div className="text-center">Loading...</div>
     }
 
-    console.log('compilers', compilers)
-
     return (
         <>
             <AgTableFull rowData={rows} columnDefs={colDefs as any} />
@@ -101,10 +99,8 @@ function DocsCompilersView() {
 }
 
 function devIcon(compiler_id: string, compilers: Record<string, Compiler>) {
-    console.log('devIcon', compiler_id, compilers)
     if (compiler_id in compilers) {
         return <DevIcon proglang={compilers[compiler_id].language} size={14} />
     }
-    //return Object.keys(compilers).length.toString()
     return <DevIcon proglang="Unknown" size={14} />
 }

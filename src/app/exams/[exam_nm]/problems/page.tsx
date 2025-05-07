@@ -12,6 +12,7 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -211,7 +212,6 @@ function ExamProblemsView() {
         }
         const problem = selectedRows.map((index) => rows[index])[0]
         setProblemToEdit(problem)
-        console.log('editAction', problem)
         setIsDialogOpen(true)
         setDialogKey(Math.random())
     }
@@ -360,6 +360,7 @@ function ProblemDialog(props: ProblemDialogProps) {
         return (
             <Dialog open={props.isOpen} onOpenChange={props.setIsOpen}>
                 <DialogContent className="pb-32">
+                    <DialogDescription className="hidden">Loading problems</DialogDescription>
                     <DialogHeader>
                         <DialogTitle>Loading problems...</DialogTitle>
                     </DialogHeader>
@@ -404,7 +405,6 @@ function ProblemDialog(props: ProblemDialogProps) {
                                 if (weightString === '') setWeight(null)
                                 else {
                                     const weight = Number(weightString)
-                                    console.log('weight', weight)
                                     if (isNaN(weight)) setWeight(null)
                                     else setWeight(weight)
                                     setWeightString(isNaN(weight) ? '' : weight.toString())
