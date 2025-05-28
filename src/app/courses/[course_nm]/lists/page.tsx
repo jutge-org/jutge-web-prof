@@ -127,20 +127,19 @@ function CourseListView() {
         const itemsToAdd = listsToAdd.map((list_nm) => ({ list_nm, title: lists[list_nm].title }))
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const index = selectedRows.length > 0 ? Math.max(...selectedRows) : items.length
-        const newItems = [...items.slice(0, index + 1), ...itemsToAdd, ...items.slice(index + 1)]
-        setItems(newItems)
-        setTimeout(() => grid.ensureIndexVisible(index, 'middle'), 100) // wait for the new row to be rendered
+        grid.applyTransaction({
+            add: itemsToAdd,
+            addIndex: index,
+        })
     }
 
     async function deleteAction() {
         const grid = gridRef.current!.api
-        const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
-        if (selectedRows.length === 0) {
-            toast.info('Select rows to delete.')
-            return
-        }
-        const newItems = items.filter((_, index) => !selectedRows.includes(index))
-        setItems(newItems)
+        const selectedRows = grid.getSelectedRows()
+        if (selectedRows.length === 0) toast.warning('No lists selected to remove.')
+        grid.applyTransaction({
+            remove: selectedRows,
+        })
     }
 
     async function showListAction(list_nm: string) {

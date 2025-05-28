@@ -73,6 +73,8 @@ function ListProblemView() {
                 ) : (
                     <div className="italic">{p.data.description}</div>
                 ),
+            valueGetter: (p: any) =>
+                p.data.problem_nm ? p.data.problem_nm + ' · ' + p.data.title : p.data.description,
             flex: 1,
             sortable: false,
         },
@@ -89,8 +91,9 @@ function ListProblemView() {
                     ? getProblemTitle(auth.user!, item.problem_nm, problems)
                     : null,
             }))
-            setProblems(problems)
+
             setList(list)
+            setProblems(problems)
             setItems(items)
         }
 
@@ -103,7 +106,7 @@ function ListProblemView() {
 
     const onGridReady = useCallback(() => {}, [])
 
-    async function updateAction() {
+    async function saveAction() {
         const items: InstructorListItem[] = []
         gridRef.current!.api.forEachNode((rowNode, index) => {
             if (rowNode.data?.problem_nm) {
@@ -118,6 +121,10 @@ function ListProblemView() {
                 })
             }
         })
+        console.log(
+            'Saving items:',
+            items.map((item) => item.problem_nm || item.description),
+        )
         const list = await jutge.instructor.lists.get(list_nm)
         const newList = { ...list, items }
         await jutge.instructor.lists.update(newList)
@@ -133,9 +140,7 @@ function ListProblemView() {
         }))
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const index = selectedRows.length > 0 ? Math.max(...selectedRows) : items.length
-        const newItems = [...items.slice(0, index + 1), ...itemsToAdd, ...items.slice(index + 1)]
-        setItems(newItems)
-        setTimeout(() => grid.ensureIndexVisible(index, 'middle'), 100) // wait for the new row to be rendered
+        grid.applyTransaction({ add: itemsToAdd, addIndex: index })
     }
 
     async function addSeparatorCallback(separator: string) {
@@ -147,20 +152,14 @@ function ListProblemView() {
         }
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const index = selectedRows.length > 0 ? Math.max(...selectedRows) : items.length
-        const newItems = [...items.slice(0, index + 1), itemToAdd, ...items.slice(index + 1)]
-        setItems(newItems)
-        setTimeout(() => grid.ensureIndexVisible(index, 'middle'), 100) // wait for the new row to be rendered
+        grid.applyTransaction({ add: [itemToAdd], addIndex: index })
     }
 
     async function deleteAction() {
         const grid = gridRef.current!.api
-        const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
-        if (selectedRows.length === 0) {
-            toast.warning('Select the items to delete.')
-            return
-        }
-        const newItems = items.filter((_, index) => !selectedRows.includes(index))
-        setItems(newItems)
+        const selectedRows = grid.getSelectedRows()
+        if (selectedRows.length === 0) toast.warning('Select the items to delete.')
+        grid.applyTransaction({ remove: selectedRows })
     }
 
     if (list === null) return <SimpleSpinner />
@@ -179,7 +178,7 @@ function ListProblemView() {
                 />
             </div>
             <div className="mt-4 flex flex-row-reverse gap-2">
-                <Button className="w-28 justify-start" onClick={updateAction}>
+                <Button className="w-28 justify-start" onClick={saveAction}>
                     <SaveIcon /> Save
                 </Button>
                 <Button className="w-28 justify-start" onClick={deleteAction}>
@@ -280,6 +279,7 @@ function DialogToAddProblems({
                                     rowData={rows}
                                     columnDefs={colDefs}
                                     rowDragManaged={true}
+                                    rowDragEntireRow={true}
                                     rowDragMultiRow={true}
                                     rowSelection={rowSelection}
                                     ref={gridRef}

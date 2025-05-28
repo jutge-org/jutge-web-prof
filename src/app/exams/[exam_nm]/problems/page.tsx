@@ -124,6 +124,7 @@ function ExamProblemsView() {
                         {p.data.problem_nm}↗
                     </a>
                 ),
+                valueGetter: (p: any) => p.data.problem_nm,
             },
             {
                 field: 'title',
