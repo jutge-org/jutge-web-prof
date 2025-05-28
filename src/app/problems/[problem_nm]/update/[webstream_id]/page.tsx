@@ -38,7 +38,9 @@ function ProblemUpdateTerminalView() {
     useEffect(() => {
         const fetchData = async () => {
             if (!instance || !ref || !ref.current) return
-            const response = await fetch(`${jutge.JUTGE_API_URL}/webstreams/${webstream_id}`)
+            const response = await fetch(`${jutge.JUTGE_API_URL}/webstreams/${webstream_id}`, {
+                headers: { 'x-no-compression': 'true' },
+            })
             if (response.body === null) return
             const reader = response.body.getReader()
             while (true) {
