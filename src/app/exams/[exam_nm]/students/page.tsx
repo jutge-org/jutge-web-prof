@@ -1,5 +1,6 @@
 'use client'
 
+import { array2csv } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
 import Page from '@/jutge-components/layouts/court/Page'
@@ -10,7 +11,14 @@ import { InstructorExam, InstructorExamStudent } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { CircleMinusIcon, PlusCircleIcon, SaveIcon } from 'lucide-react'
+import FileSaver from 'file-saver'
+import {
+    CircleMinusIcon,
+    CopyIcon,
+    DownloadCloudIcon,
+    PlusCircleIcon,
+    SaveIcon,
+} from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -111,7 +119,7 @@ function ExamStudentsView() {
         fetchData()
     }, [exam_nm, fetchData])
 
-    async function addAction() {
+    async function addHandle() {
         const result = await runAddEmailsDialog([])
         if (!result) return
         if (result.wrongEmails.length !== 0) {
@@ -141,7 +149,7 @@ function ExamStudentsView() {
         setRows([...rows, ...newRows])
     }
 
-    async function removeAction() {
+    async function removeHandle() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const selectedEmails = selectedRows.map((index) => rows[index].email)
@@ -160,7 +168,7 @@ function ExamStudentsView() {
         setRows((rows) => rows.filter((row) => !emailsToRemove.includes(row.email)))
     }
 
-    async function saveAction() {
+    async function saveHandle() {
         try {
             await jutge.instructor.exams.updateStudents({
                 exam_nm,
@@ -170,6 +178,43 @@ function ExamStudentsView() {
             await fetchData()
         } catch (error) {
             showError(error)
+        }
+    }
+
+    async function exportHandle() {
+        const data = rows.map((row) => ({
+            email: row.email,
+            name: row.name,
+            code: row.code,
+            taken_exam: row.taken_exam ? 'Yes' : 'No',
+            finished: row.finished ? 'Yes' : 'No',
+            banned: row.banned ? 'Yes' : 'No',
+            invited: row.invited ? 'Yes' : 'No',
+        }))
+        const csv = await array2csv(data)
+        if (!csv) {
+            toast.error('Error preparing CSV data')
+            return
+        }
+        const blob = new Blob([csv], { type: 'text/csv' })
+        FileSaver.saveAs(blob, 'students.csv')
+    }
+
+    async function copyEmailsHandle() {
+        const emails = rows
+            .map((row) => row.email)
+            .sort()
+            .join('\n')
+        if (!emails) {
+            toast.error('No emails to copy')
+            return
+        }
+        try {
+            await navigator.clipboard.writeText(emails)
+            toast.success('Emails copied to clipboard')
+        } catch (error) {
+            toast.error('Error copying emails to clipboard')
+            console.error('Error copying emails to clipboard:', error)
         }
     }
 
@@ -188,19 +233,38 @@ function ExamStudentsView() {
                 pagination={true}
                 paginationAutoPageSize={true}
             />
-            <div className="mt-4 flex flex-row-reverse gap-2">
-                <Button className="w-28 justify-start" onClick={saveAction} title="Save changes">
+            <div className="mt-4 flex flex-row-reverse gap-2 items-center">
+                <Button className="w-36 justify-start" onClick={saveHandle} title="Save changes">
                     <SaveIcon /> Save
                 </Button>
                 <Button
-                    className="w-28 justify-start"
-                    onClick={removeAction}
+                    className="w-36 justify-start"
+                    onClick={removeHandle}
                     title="Remove students"
                 >
                     <CircleMinusIcon /> Remove
                 </Button>
-                <Button className="w-28 justify-start" onClick={addAction} title="Add students">
+                <Button className="w-36 justify-start" onClick={addHandle} title="Add students">
                     <PlusCircleIcon /> Add
+                </Button>
+                <div className="flex-grow" />
+                <div className="text-xs text-gray-500">{rows.length} students</div>
+                <div className="flex-grow" />
+                <Button
+                    className="w-36 justify-start"
+                    onClick={copyEmailsHandle}
+                    title="Copy emails to clipboard"
+                    variant={'outline'}
+                >
+                    <CopyIcon /> Copy emails
+                </Button>
+                <Button
+                    className="w-36 justify-start"
+                    onClick={exportHandle}
+                    title="Export to CSV"
+                    variant={'outline'}
+                >
+                    <DownloadCloudIcon /> Export to CSV
                 </Button>
             </div>
             <AddEmailsDialog />
