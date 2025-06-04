@@ -103,7 +103,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
     const onGridReady = useCallback(() => {}, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-        return { mode: 'multiRow', headerCheckbox: false }
+        return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
     function getRows(): Row[] {

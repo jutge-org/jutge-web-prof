@@ -108,7 +108,7 @@ function CourseListView() {
     }, [course_nm])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-        return { mode: 'multiRow', headerCheckbox: false }
+        return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
     async function saveAction() {
@@ -214,7 +214,7 @@ function DialogToAddLists({
     }, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-        return { mode: 'multiRow', headerCheckbox: false }
+        return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
     async function addCallback() {

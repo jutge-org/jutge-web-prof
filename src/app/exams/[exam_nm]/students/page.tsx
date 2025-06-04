@@ -83,7 +83,7 @@ function ExamStudentsView() {
     const gridRef = useRef<AgGridReact<Item>>(null)
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-        return { mode: 'multiRow', headerCheckbox: false }
+        return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
     const [runAddEmailsDialog, AddEmailsDialog] = useEmailsDialog({
@@ -185,6 +185,8 @@ function ExamStudentsView() {
                 rowSelection={rowSelection}
                 ref={gridRef}
                 rowHeight={32}
+                pagination={true}
+                paginationAutoPageSize={true}
             />
             <div className="mt-4 flex flex-row-reverse gap-2">
                 <Button className="w-28 justify-start" onClick={saveAction} title="Save changes">

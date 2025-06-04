@@ -104,7 +104,7 @@ function ExamProblemsView() {
     const gridRef = useRef<AgGridReact<InstructorExamProblem>>(null)
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-        return { mode: 'multiRow', headerCheckbox: false }
+        return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
     const fetchData = useCallback(async () => {

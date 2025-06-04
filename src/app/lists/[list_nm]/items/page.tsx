@@ -101,7 +101,7 @@ function ListProblemView() {
     }, [list_nm, auth])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-        return { mode: 'multiRow', headerCheckbox: false }
+        return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
     const onGridReady = useCallback(() => {}, [])
@@ -242,7 +242,7 @@ function DialogToAddProblems({
     }, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
-        return { mode: 'multiRow', headerCheckbox: false }
+        return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
     async function addProblemsCallback() {
