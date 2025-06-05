@@ -1,5 +1,6 @@
 'use client'
 
+import { array2csv } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
@@ -12,7 +13,15 @@ import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/
 import { Dict, showError } from '@/lib/utils'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { CircleMinusIcon, PlusCircleIcon, SaveIcon, SendHorizonalIcon } from 'lucide-react'
+import FileSaver from 'file-saver'
+import {
+    CircleMinusIcon,
+    CopyIcon,
+    DownloadCloudIcon,
+    PlusCircleIcon,
+    SaveIcon,
+    SendHorizonalIcon,
+} from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -127,7 +136,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
         return rows
     }
 
-    async function addAction() {
+    async function add() {
         const result = await runAddEmailsDialog([])
         if (!result) return
         if (result.wrongEmails.length !== 0) {
@@ -148,7 +157,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
         toast.success(`Added ${newRows.length} tutors.`)
     }
 
-    async function removeAction() {
+    async function remove() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const selectedEmails = selectedRows.map((index) => rows[index].email)
@@ -169,7 +178,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
         toast.success(`Removed ${originalLength - newRows.length} tutors.`)
     }
 
-    async function saveAction() {
+    async function save() {
         const course = await jutge.instructor.courses.get(course_nm)
         course.tutors.invited = rows.map((row) => row.email)
         try {
@@ -180,7 +189,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
         }
     }
 
-    async function inviteAction() {
+    async function invite() {
         const message =
             'Are you sure you want to send an invitation to the pending tutors? (Please do not abuse this feature.)'
         if (!(await runConfirmDialog(message))) return
@@ -190,6 +199,39 @@ function CourseTutorsForm(props: CourseStudentProps) {
             toast.success(`An email has been sent to the pending tutors.`)
         } catch (error) {
             showError(error)
+        }
+    }
+
+    async function exportCsv() {
+        const data = rows.map((row) => ({
+            email: row.email,
+            name: row.name,
+            state: row.state,
+        }))
+        const csv = await array2csv(data)
+        if (!csv) {
+            toast.error('Error preparing CSV data')
+            return
+        }
+        const blob = new Blob([csv], { type: 'text/csv' })
+        FileSaver.saveAs(blob, 'students.csv')
+    }
+
+    async function copyEmails() {
+        const emails = rows
+            .map((row) => row.email)
+            .sort()
+            .join('\n')
+        if (!emails) {
+            toast.error('No emails to copy')
+            return
+        }
+        try {
+            await navigator.clipboard.writeText(emails)
+            toast.success('Emails copied to clipboard')
+        } catch (error) {
+            toast.error('Error copying emails to clipboard')
+            console.error('Error copying emails to clipboard:', error)
         }
     }
 
@@ -206,22 +248,41 @@ function CourseTutorsForm(props: CourseStudentProps) {
                 onGridReady={onGridReady}
             />
 
-            <div className="mt-4 flex flex-row-reverse gap-2">
-                <Button className="w-28 justify-start" onClick={saveAction} title="Save changes">
+            <div className="mt-4 flex flex-row-reverse gap-2 items-center">
+                <Button className="w-28 justify-start" onClick={save} title="Save changes">
                     <SaveIcon /> Save
                 </Button>
                 <Button
                     className="w-28 justify-start"
-                    onClick={inviteAction}
+                    onClick={invite}
                     title="Send invite to pending tutors"
                 >
                     <SendHorizonalIcon /> Invite
                 </Button>
-                <Button className="w-28 justify-start" onClick={removeAction} title="Remove tutors">
+                <Button className="w-28 justify-start" onClick={remove} title="Remove tutors">
                     <CircleMinusIcon /> Remove
                 </Button>
-                <Button className="w-28 justify-start" onClick={addAction} title="Add tutors">
+                <Button className="w-28 justify-start" onClick={add} title="Add tutors">
                     <PlusCircleIcon /> Add
+                </Button>
+                <div className="flex-grow" />
+                <div className="text-xs text-gray-500">{rows.length} tutors</div>
+                <div className="flex-grow" />
+                <Button
+                    className="w-36 justify-start"
+                    onClick={copyEmails}
+                    title="Copy emails to clipboard"
+                    variant={'outline'}
+                >
+                    <CopyIcon /> Copy emails
+                </Button>
+                <Button
+                    className="w-36 justify-start"
+                    onClick={exportCsv}
+                    title="Export to CSV"
+                    variant={'outline'}
+                >
+                    <DownloadCloudIcon /> Export to CSV
                 </Button>
             </div>
 
