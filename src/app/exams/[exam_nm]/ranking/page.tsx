@@ -59,7 +59,6 @@ function ExamRankingView() {
 
     return (
         <div className="text-sm">
-            <p>Under development</p>
             <table>
                 <tbody>
                     {examProblems.length > 0 && examProblems[0].icon && (
@@ -181,7 +180,7 @@ function Score({ result, colors }: { result: RankingResult; colors: ColorMapping
         )
 
     return (
-        <div className="" style={{ color: colors.verdicts.WA }}>
+        <div className="" style={{ color: colors.verdicts[result.verdict] }}>
             {/*<span className="text-blue-700">{result.historic}</span>*/}
             {Math.floor(result.time)}
             {result.wrongs !== 0 && <span className="text-xs">&nbsp;({result.wrongs})</span>}
