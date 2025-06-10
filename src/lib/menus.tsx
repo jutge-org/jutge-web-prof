@@ -19,6 +19,8 @@ import {
     TagsIcon,
 } from 'lucide-react'
 
+export const shortTitle = 'prof.jutge.org'
+
 export const menus: Record<string, Menu> = {
     public: {
         home: {

@@ -105,10 +105,11 @@ function ProblemsListView() {
         },
         {
             field: 'created_at',
-            headerName: 'Creation',
-            width: 125,
+            headerName: 'Created',
+            width: 140,
             filter: true,
             cellRenderer: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+            sort: 'desc',
         },
         { field: 'title', flex: 2, filter: true },
         {
@@ -117,7 +118,6 @@ function ProblemsListView() {
             width: 120,
             filter: true,
         },
-
         {
             field: 'languages',
             width: 150,
@@ -128,6 +128,7 @@ function ProblemsListView() {
                         {language}
                     </Badge>
                 )),
+            valueGetter: (p: any) => p.data.languages.join(', '),
         },
     ])
 
