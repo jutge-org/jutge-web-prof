@@ -19,6 +19,7 @@ type ProblemRow = {
     created_at: any // TODO
     deprecated: boolean
     languages: string[]
+    passcode: boolean
 }
 
 export default function ProblemsListPage() {
@@ -55,6 +56,8 @@ function ProblemsListView() {
     useEffect(() => {
         async function fetchProblems() {
             const ownProblems = await jutge.instructor.problems.getOwnProblems()
+            const ownProblemsWithPasscode =
+                await jutge.instructor.problems.getOwnProblemsWithPasscode()
             const abstractProblems = await jutge.problems.getAbstractProblems(ownProblems.join(','))
 
             function buildTitle(problem_nm: string) {
@@ -73,6 +76,7 @@ function ProblemsListView() {
                         abstractProblem.problems,
                         (problem_id, problem) => problem.language_id,
                     ),
+                    passcode: ownProblemsWithPasscode.includes(problem_nm),
                 }
             })
 
@@ -108,8 +112,15 @@ function ProblemsListView() {
         },
         { field: 'title', flex: 2, filter: true },
         {
+            field: 'passcode',
+            headerName: 'Passcode',
+            width: 120,
+            filter: true,
+        },
+
+        {
             field: 'languages',
-            width: 125,
+            width: 150,
             filter: true,
             cellRenderer: (p: any) =>
                 p.data.languages.map((language: string) => (

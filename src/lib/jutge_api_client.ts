@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-02T09:58:29.746Z
+ * This file has been automatically generated at 2025-06-10T10:07:34.482Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -200,7 +200,7 @@ export type Profile = {
     webpage: string | null
     description: string | null
     affiliation: string | null
-    birth_year: number
+    birth_year: number | null
     max_subsxhour: number
     max_subsxday: number
     administrator: number
@@ -644,6 +644,33 @@ export type UserEmailAndName = {
 }
 
 export type UsersEmailsAndNames = UserEmailAndName[]
+
+export type ProfileForAdmin = {
+    user_id: string
+    user_uid: string
+    email: string
+    name: string
+    username: string | null
+    nickname: string | null
+    webpage: string | null
+    description: string | null
+    affiliation: string | null
+    birth_year: number | null
+    max_subsxhour: number
+    max_subsxday: number
+    administrator: number
+    instructor: number
+    parent_email: string | null
+    country_id: string | null
+    timezone_id: string
+    compiler_id: string | null
+    language_id: string | null
+    locked: number
+    banned: number
+    nb_bans: number
+    reason: string | null
+    creation_date: string | string | string | number
+}
 
 export type FreeDiskSpaceItem = {
     disk: string
@@ -2877,6 +2904,18 @@ class Module_instructor_problems {
     }
 
     /**
+     * Get the list of own problems that have a passcode.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getOwnProblemsWithPasscode(): Promise<string[]> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getOwnProblemsWithPasscode", null)
+        return output
+    }
+
+    /**
      * Get the passcode of a problem.
      *
      * 🔐 Authentication: instructor
@@ -3233,6 +3272,18 @@ class Module_admin_users {
      */
     async setPassword(data: { email: string; password: string; message: string }): Promise<void> {
         const [output, ofiles] = await this.root.execute("admin.users.setPassword", data)
+        return output
+    }
+
+    /**
+     * Get all profiles of users whose email or name contains a specific string
+     *
+     * 🔐 Authentication: admin
+     * No warnings
+     *
+     */
+    async getProfiles(data: string): Promise<ProfileForAdmin[]> {
+        const [output, ofiles] = await this.root.execute("admin.users.getProfiles", data)
         return output
     }
 
