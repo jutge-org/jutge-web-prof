@@ -58,7 +58,7 @@ function ExamRankingView() {
     if (exam === null || examProblems === null || ranking === null || colors === null) return null
 
     return (
-        <div className="text-sm">
+        <div className="text-sm flex justify-center items-center">
             <table>
                 <tbody>
                     {examProblems.length > 0 && examProblems[0].icon && (

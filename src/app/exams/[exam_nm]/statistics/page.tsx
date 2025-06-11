@@ -14,6 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
+import { Warning } from '@/jutge-components/ui/Warning'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
@@ -91,8 +92,13 @@ function ExamStatisticsView() {
         statistics === null ||
         abstractProblems === null ||
         colors === null
-    )
+    ) {
         return <SimpleSpinner />
+    }
+
+    if (!exam.time_start) {
+        return <Warning>Exam has not started yet.</Warning>
+    }
 
     const submissions = (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">

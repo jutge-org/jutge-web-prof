@@ -3,6 +3,7 @@
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
+import { Warning } from '@/jutge-components/ui/Warning'
 import jutge from '@/lib/jutge'
 import { InstructorExam, InstructorExamSubmissionsOptions } from '@/lib/jutge_api_client'
 import {
@@ -46,6 +47,10 @@ function ExamSubmissionsView() {
     }, [exam_nm])
 
     if (exam === null) return <SimpleSpinner />
+
+    if (!exam.time_start) {
+        return <Warning>Exam has not started yet.</Warning>
+    }
 
     return <EditExamForm exam={exam} />
 }

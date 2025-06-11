@@ -58,7 +58,7 @@ function ExamPropertiesView() {
             label: 'Place',
             value: place,
             setValue: setPlace,
-            validator: z.string().min(8),
+            validator: z.string(),
             placeHolder: 'Where the exam takes place',
         },
         description: {

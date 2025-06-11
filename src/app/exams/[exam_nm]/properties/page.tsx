@@ -87,6 +87,7 @@ function EditExamForm(props: ExamFormProps) {
     })
 
     const [exam_nm, setExam_nm] = useState(props.exam.exam_nm)
+    const [code, setCode] = useState(props.exam.code || '')
     const [title, setTitle] = useState(props.exam.title)
     const [place, setPlace] = useState(props.exam.place)
     const [expectedStart, setExpectedStart] = useState(props.exam.exp_time_start as string)
@@ -120,7 +121,7 @@ function EditExamForm(props: ExamFormProps) {
             label: 'Title',
             value: title,
             setValue: setTitle,
-            validator: z.string().min(5),
+            validator: z.string().min(8),
             placeHolder: 'Exam Title',
         },
         place: {
@@ -159,6 +160,11 @@ function EditExamForm(props: ExamFormProps) {
             setValue: setRunningTime,
             placeHolder: 'How long the exam is expected to last',
             validator: z.number().min(1),
+        },
+        code: {
+            type: 'input',
+            label: 'Exam password',
+            value: code,
         },
         contest: {
             type: 'switch',
@@ -244,6 +250,7 @@ function EditExamForm(props: ExamFormProps) {
             const newExam: InstructorExamUpdate = {
                 exam_nm,
                 title,
+                code,
                 place: place || '',
                 exp_time_start: expectedStart,
                 running_time: runningTime,

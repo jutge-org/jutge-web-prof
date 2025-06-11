@@ -69,11 +69,6 @@ function ExamStudentsView() {
         },
         { field: 'name', flex: 3, filter: true },
         {
-            field: 'code',
-            width: 100,
-            cellRenderer: (p: any) => <code className="text-xs">{p.data.code}</code>,
-        },
-        {
             field: 'taken_exam',
             headerName: 'Taken',
             width: 90,
@@ -133,7 +128,7 @@ function ExamStudentsView() {
         const newRows: InstructorExamStudent[] = result.validEmails.map((email) => ({
             email,
             name: '',
-            code: '',
+            code: '', // API already uses the exam code
             restricted: 0,
             annotation: null,
             result: null,
@@ -185,7 +180,6 @@ function ExamStudentsView() {
         const data = rows.map((row) => ({
             email: row.email,
             name: row.name,
-            code: row.code,
             taken_exam: row.taken_exam ? 'Yes' : 'No',
             finished: row.finished ? 'Yes' : 'No',
             banned: row.banned ? 'Yes' : 'No',
@@ -230,8 +224,6 @@ function ExamStudentsView() {
                 rowSelection={rowSelection}
                 ref={gridRef}
                 rowHeight={32}
-                pagination={true}
-                paginationAutoPageSize={true}
             />
             <div className="mt-4 flex flex-row-reverse gap-2 items-center">
                 <Button className="w-36 justify-start" onClick={saveHandle} title="Save changes">
