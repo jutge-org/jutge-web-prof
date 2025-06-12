@@ -15,7 +15,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 export default function CoursePropertiesPage() {
-    const [key, setKey] = useState(Math.random())
     const { course_nm } = useParams<{ course_nm: string }>()
 
     return (
@@ -29,12 +28,13 @@ export default function CoursePropertiesPage() {
                 subCurrent: 'properties',
             }}
         >
-            <CoursePropertiesView key={key} setKey={setKey} />
+            <CoursePropertiesView />
         </Page>
     )
 }
 
-function CoursePropertiesView({ setKey }: { setKey: (key: number) => void }) {
+function CoursePropertiesView() {
+    const [key, setKey] = useState(Math.random())
     const { course_nm } = useParams<{ course_nm: string }>()
     const [course, setCourse] = useState<InstructorCourse | null>(null)
     const [archived, setArchived] = useState(false)
@@ -48,16 +48,17 @@ function CoursePropertiesView({ setKey }: { setKey: (key: number) => void }) {
         }
 
         fetchCourse()
-    }, [course_nm])
+    }, [course_nm, key])
 
     if (course === null) return <SimpleSpinner />
 
     return (
         <EditCourseForm
+            key={key}
+            setKey={setKey}
             course={course}
             archived={archived}
             setArchived={setArchived}
-            setKey={setKey}
         />
     )
 }
@@ -151,18 +152,18 @@ function EditCourseForm(props: CourseFormProps) {
             type: 'button',
             text: 'Save changes',
             icon: <SaveIcon />,
-            action: updateAction,
+            action: save,
         },
         delete: {
             type: 'button',
             text: 'Delete course',
             icon: <TrashIcon />,
-            action: deleteAction,
+            action: remove,
             ignoreValidation: true,
         },
     }
 
-    async function updateAction() {
+    async function save() {
         const oldCurse = await jutge.instructor.courses.get(course_nm)
         const newCourse = {
             ...oldCurse,
@@ -183,7 +184,7 @@ function EditCourseForm(props: CourseFormProps) {
         props.setKey(Math.random()) // force render to refresh the data
     }
 
-    async function deleteAction() {
+    async function remove() {
         if (
             !(await runConfirmDialog(
                 `Are you sure you want to delete course '${props.course.course_nm}'?`,

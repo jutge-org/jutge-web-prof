@@ -121,10 +121,6 @@ function ListProblemView() {
                 })
             }
         })
-        console.log(
-            'Saving items:',
-            items.map((item) => item.problem_nm || item.description),
-        )
         const list = await jutge.instructor.lists.get(list_nm)
         const newList = { ...list, items }
         await jutge.instructor.lists.update(newList)

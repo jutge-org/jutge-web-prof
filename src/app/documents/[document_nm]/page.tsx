@@ -34,6 +34,7 @@ export default function DocumentPropertiesPage() {
 }
 
 function DocumentPropertiesView() {
+    const [key, setKey] = useState(Math.random())
     const { document_nm } = useParams<{ document_nm: string }>()
     const [document, setDocument] = useState<Document | null>(null)
 
@@ -44,15 +45,16 @@ function DocumentPropertiesView() {
         }
 
         fetchDocument()
-    }, [document_nm])
+    }, [document_nm, key])
 
     if (!document) return <SimpleSpinner />
 
-    return <EditDocumentForm document={document} />
+    return <EditDocumentForm key={key} setKey={setKey} document={document} />
 }
 
 interface DocumentFormProps {
     document: Document
+    setKey: (key: number) => void
 }
 
 function EditDocumentForm(props: DocumentFormProps) {
@@ -108,11 +110,7 @@ function EditDocumentForm(props: DocumentFormProps) {
             type: 'free',
             label: 'Current PDF',
             content: (
-                <Button
-                    variant="outline"
-                    className="h-16 w-16 [&_svg]:size-12"
-                    onClick={downloadAction}
-                >
+                <Button variant="outline" className="h-16 w-16 [&_svg]:size-12" onClick={download}>
                     <FileIcon strokeWidth={0.6} />
                 </Button>
             ),
@@ -130,18 +128,18 @@ function EditDocumentForm(props: DocumentFormProps) {
             type: 'button',
             text: 'Save',
             icon: <SaveIcon />,
-            action: updateAction,
+            action: save,
         },
         delete: {
             type: 'button',
             text: 'Delete document',
             icon: <TrashIcon />,
-            action: deleteAction,
+            action: remove,
             ignoreValidation: true,
         },
     }
 
-    async function downloadAction() {
+    async function download() {
         try {
             const download = await jutge.instructor.documents.getPdf(props.document.document_nm)
             offerDownloadFile(download, props.document.document_nm + '.pdf')
@@ -150,7 +148,7 @@ function EditDocumentForm(props: DocumentFormProps) {
         }
     }
 
-    async function updateAction() {
+    async function save() {
         try {
             const download = await jutge.instructor.documents.getPdf(props.document.document_nm)
             const newDocument = {
@@ -165,10 +163,10 @@ function EditDocumentForm(props: DocumentFormProps) {
         } catch (error) {
             return showError(error)
         }
-        redirect('/documents')
+        props.setKey(Math.random()) // force render to refresh the data
     }
 
-    async function deleteAction() {
+    async function remove() {
         const message = `Are you sure you want to delete document '${props.document.document_nm}'?`
         if (!(await runConfirmDialog(message))) return
 

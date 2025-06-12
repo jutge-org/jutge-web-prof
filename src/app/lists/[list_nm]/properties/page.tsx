@@ -15,7 +15,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 export default function ListPropertiesPage() {
-    const [key, setKey] = useState(Math.random())
     const { list_nm } = useParams<{ list_nm: string }>()
 
     return (
@@ -29,12 +28,13 @@ export default function ListPropertiesPage() {
                 subCurrent: 'properties',
             }}
         >
-            <ListPropertiesView key={key} setKey={setKey} />
+            <ListPropertiesView />
         </Page>
     )
 }
 
-function ListPropertiesView({ setKey }: { setKey: (key: number) => void }) {
+function ListPropertiesView() {
+    const [key, setKey] = useState(Math.random())
     const { list_nm } = useParams<{ list_nm: string }>()
     const [list, setList] = useState<InstructorList | null>(null)
     const [archived, setArchived] = useState(false)
@@ -48,7 +48,7 @@ function ListPropertiesView({ setKey }: { setKey: (key: number) => void }) {
         }
 
         fetchList()
-    }, [list_nm])
+    }, [list_nm, key])
 
     useEffect(() => {
         // launch this in the background to cache the problems
@@ -58,7 +58,13 @@ function ListPropertiesView({ setKey }: { setKey: (key: number) => void }) {
     if (list === null) return <SimpleSpinner />
 
     return (
-        <EditListForm list={list} archived={archived} setArchived={setArchived} setKey={setKey} />
+        <EditListForm
+            key={key}
+            setKey={setKey}
+            list={list}
+            archived={archived}
+            setArchived={setArchived}
+        />
     )
 }
 
@@ -151,18 +157,18 @@ function EditListForm(props: ListFormProps) {
             type: 'button',
             text: 'Save changes',
             icon: <SaveIcon />,
-            action: updateAction,
+            action: save,
         },
         delete: {
             type: 'button',
             text: 'Delete list',
             icon: <TrashIcon />,
-            action: deleteAction,
+            action: remove,
             ignoreValidation: true,
         },
     }
 
-    async function updateAction() {
+    async function save() {
         const oldCurse = await jutge.instructor.lists.get(list_nm)
         const newList = {
             ...oldCurse,
@@ -183,7 +189,7 @@ function EditListForm(props: ListFormProps) {
         props.setKey(Math.random()) // force render to refresh the data
     }
 
-    async function deleteAction() {
+    async function remove() {
         const message = `Are you sure you want to delete list '${props.list.list_nm}'?`
         if (!(await runConfirmDialog(message))) return
 

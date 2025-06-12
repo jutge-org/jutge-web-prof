@@ -39,6 +39,7 @@ export default function ExamPropertiesPage() {
 }
 
 function ExamPropertiesView() {
+    const [key, setKey] = useState(Math.random())
     const { exam_nm } = useParams<{ exam_nm: string }>()
     const [exam, setExam] = useState<InstructorExam | null>(null)
     const [compilers, setCompilers] = useState<Dict<Compiler> | null>(null)
@@ -59,7 +60,7 @@ function ExamPropertiesView() {
         }
 
         fetchData()
-    }, [exam_nm])
+    }, [exam_nm, key])
 
     if (!exam || !compilers || !documents) return <SimpleSpinner />
 
@@ -71,6 +72,8 @@ function ExamPropertiesView() {
 
     return (
         <EditExamForm
+            key={key}
+            setKey={setKey}
             exam={exam}
             courses={courses}
             archived={archived}
@@ -87,6 +90,7 @@ interface ExamFormProps {
     courses: Dict<InstructorBriefCourse>
     archived: boolean
     setArchived: (archived: boolean) => void
+    setKey: (key: number) => void
 
     allCompilers: Dict<Compiler>
     allDocuments: Dict<Document>
@@ -258,24 +262,24 @@ function EditExamForm(props: ExamFormProps) {
             type: 'button',
             text: 'Save changes',
             icon: <SaveIcon />,
-            action: saveAction,
+            action: save,
         },
         addToCal: {
             type: 'button',
             text: 'Add to calendar',
             icon: <CalendarPlusIcon />,
-            action: addToCalAction,
+            action: addToCalendar,
         },
         delete: {
             type: 'button',
             text: 'Delete exam',
             icon: <TrashIcon />,
-            action: deleteAction,
+            action: remove,
             ignoreValidation: true,
         },
     }
 
-    async function saveAction() {
+    async function save() {
         try {
             const newExam: InstructorExamUpdate = {
                 exam_nm,
@@ -303,18 +307,18 @@ function EditExamForm(props: ExamFormProps) {
 
             if (props.archived) await jutge.instructor.exams.archive(exam_nm)
             else await jutge.instructor.exams.unarchive(exam_nm)
-
-            toast.success(`Exam '${exam_nm}' saved.`)
         } catch (error) {
             return showError(error)
         }
+        toast.success(`Exam '${exam_nm}' saved.`)
+        props.setKey(Math.random()) // force render to refresh the data
     }
 
-    async function addToCalAction() {
+    async function addToCalendar() {
         window.open(examToCalendarLink(props.exam))
     }
 
-    async function deleteAction() {
+    async function remove() {
         const message = `Are you sure you want to delete exam '${props.exam.exam_nm}'?`
         if (!(await runConfirmDialog(message))) return
 

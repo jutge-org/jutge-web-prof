@@ -70,7 +70,6 @@ function ExamsListView() {
         async function fetchExams() {
             const archived = await jutge.instructor.exams.getArchived()
             const dict = await jutge.instructor.exams.index()
-            console.log(dict)
             const array = Object.values(dict).sort((a, b) =>
                 dayjs(b.exp_time_start).diff(dayjs(a.exp_time_start)),
             )
