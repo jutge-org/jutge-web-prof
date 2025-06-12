@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-12T11:33:29.742Z
+ * This file has been automatically generated at 2025-06-12T11:50:16.532Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -110,7 +110,8 @@ export type BriefAbstractProblem = {
     driver_id: string | null
     type: string | null
     deprecation: string | null
-    created_at: string | string | string | number | null
+    created_at: string | string | string | number
+    updated_at: string | string | string | number
 }
 
 export type BriefProblem = {
@@ -136,7 +137,8 @@ export type AbstractProblem = {
     driver_id: string | null
     type: string | null
     deprecation: string | null
-    created_at: string | string | string | number | null
+    created_at: string | string | string | number
+    updated_at: string | string | string | number
     problems: BriefProblemDict
 }
 
