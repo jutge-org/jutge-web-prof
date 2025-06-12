@@ -102,6 +102,12 @@ function EditProblemForm({ info }: ProblemFormProps) {
     //
 
     const [problem_nm, setProblem_nm] = useState(info.abstractProblem.problem_nm)
+    const [created_at, setCreated_at] = useState(
+        dayjs(info.abstractProblem.created_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
+    const [updated_at, setUpdated_at] = useState(
+        dayjs(info.abstractProblem.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
     const [isDeprecationDialogOpen, setIsDeprecationDialogOpen] = useState(false)
     const [isPasscodeDialogOpen, setIsPasscodeDialogOpen] = useState(false)
@@ -112,15 +118,17 @@ function EditProblemForm({ info }: ProblemFormProps) {
             label: 'Id',
             value: info.abstractProblem.problem_nm,
         },
-        passcode: {
-            type: 'password',
-            label: 'Passcode',
-            value: info.passcode,
+        created_at: {
+            type: 'datetime',
+            label: 'Created at',
+            value: created_at,
+            disabled: true,
         },
-        deprecation: {
-            type: 'input',
-            label: 'Deprecation reason',
-            value: info.abstractProblem.deprecation || '',
+        updated_at: {
+            type: 'datetime',
+            label: 'Updated at',
+            value: updated_at,
+            disabled: true,
         },
         translations: {
             type: 'free',
@@ -160,11 +168,6 @@ function EditProblemForm({ info }: ProblemFormProps) {
             label: 'Author email',
             value: info.abstractProblem.author_email || '',
         },
-        created_at: {
-            type: 'input',
-            label: 'Creation',
-            value: dayjs(info.abstractProblem.created_at).format('YYYY-MM-DD HH:mm:ss'),
-        },
         type: {
             type: 'free',
             label: 'Type',
@@ -182,6 +185,16 @@ function EditProblemForm({ info }: ProblemFormProps) {
                     {info.abstractProblem.driver_id}
                 </Badge>
             ),
+        },
+        passcode: {
+            type: 'password',
+            label: 'Passcode',
+            value: info.passcode,
+        },
+        deprecation: {
+            type: 'input',
+            label: 'Deprecation reason',
+            value: info.abstractProblem.deprecation || '',
         },
         oldArchive: {
             type: 'free',

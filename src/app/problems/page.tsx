@@ -17,6 +17,7 @@ type ProblemRow = {
     problem_nm: string
     title: string
     created_at: any // TODO
+    updated_at: any // TODO
     deprecated: boolean
     languages: string[]
     passcode: boolean
@@ -71,6 +72,7 @@ function ProblemsListView() {
                     problem_nm,
                     title: buildTitle(abstractProblem.problem_nm),
                     created_at: abstractProblem.created_at,
+                    updated_at: abstractProblem.updated_at,
                     deprecated: abstractProblem.deprecation !== null,
                     languages: mapmap(
                         abstractProblem.problems,
@@ -102,16 +104,24 @@ function ProblemsListView() {
             ),
             width: 100,
             filter: true,
+            valueGetter: (p: any) => p.data.problem_nm,
         },
+        { field: 'title', flex: 2, filter: true },
         {
             field: 'created_at',
             headerName: 'Created',
             width: 140,
             filter: true,
-            cellRenderer: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+            valueGetter: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+        },
+        {
+            field: 'updated_at',
+            headerName: 'Updated',
+            width: 140,
+            filter: true,
+            valueGetter: (p: any) => dayjs(p.data.updated_at).format('YYYY-MM-DD'),
             sort: 'desc',
         },
-        { field: 'title', flex: 2, filter: true },
         {
             field: 'passcode',
             headerName: 'Passcode',
