@@ -7,6 +7,7 @@ import Page from '@/jutge-components/layouts/court/Page'
 import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { InstructorBriefList } from '@/lib/jutge_api_client'
+import dayjs from 'dayjs'
 import { SquarePlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -48,7 +49,23 @@ function ListsListView() {
             filter: true,
         },
         { field: 'title', flex: 2, filter: true },
-        { field: 'annotation', flex: 2, filter: true },
+        {
+            field: 'created_at',
+            headerName: 'Created',
+            width: 140,
+            filter: true,
+            valueGetter: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+        },
+        {
+            field: 'updated_at',
+            headerName: 'Updated',
+            width: 140,
+            filter: true,
+            valueGetter: (p: any) => dayjs(p.data.updated_at).format('YYYY-MM-DD'),
+            sort: 'desc',
+        },
+
+        //        { field: 'annotation', flex: 2, filter: true },
     ])
 
     useEffect(() => {

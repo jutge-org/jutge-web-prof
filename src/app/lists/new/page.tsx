@@ -3,7 +3,6 @@
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
-import { InstructorList } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
 import { PlusCircleIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -77,7 +76,7 @@ function ListsNewView() {
     }
 
     async function addAction() {
-        const newList: InstructorList = {
+        const newList = {
             list_nm,
             title,
             description,

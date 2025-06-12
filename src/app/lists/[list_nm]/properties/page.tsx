@@ -7,6 +7,7 @@ import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { InstructorList } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
+import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -14,7 +15,9 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 export default function ListPropertiesPage() {
+    const [key, setKey] = useState(Math.random())
     const { list_nm } = useParams<{ list_nm: string }>()
+
     return (
         <Page
             pageContext={{
@@ -26,12 +29,12 @@ export default function ListPropertiesPage() {
                 subCurrent: 'properties',
             }}
         >
-            <ListPropertiesView />
+            <ListPropertiesView key={key} setKey={setKey} />
         </Page>
     )
 }
 
-function ListPropertiesView() {
+function ListPropertiesView({ setKey }: { setKey: (key: number) => void }) {
     const { list_nm } = useParams<{ list_nm: string }>()
     const [list, setList] = useState<InstructorList | null>(null)
     const [archived, setArchived] = useState(false)
@@ -54,13 +57,16 @@ function ListPropertiesView() {
 
     if (list === null) return <SimpleSpinner />
 
-    return <EditListForm list={list} archived={archived} setArchived={setArchived} />
+    return (
+        <EditListForm list={list} archived={archived} setArchived={setArchived} setKey={setKey} />
+    )
 }
 
 interface ListFormProps {
     list: InstructorList
     archived: boolean
     setArchived: (archived: boolean) => void
+    setKey: (key: number) => void
 }
 
 function EditListForm(props: ListFormProps) {
@@ -77,6 +83,12 @@ function EditListForm(props: ListFormProps) {
     const [title, setTitle] = useState(props.list.title)
     const [description, setDescription] = useState(props.list.description)
     const [annotation, setAnnotation] = useState(props.list.annotation)
+    const [created_at, setCreated_at] = useState(
+        dayjs(props.list.created_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
+    const [updated_at, setUpdated_at] = useState(
+        dayjs(props.list.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
 
     const fields: JFormFields = {
         /*
@@ -100,6 +112,18 @@ function EditListForm(props: ListFormProps) {
             setValue: setTitle,
             validator: z.string().min(5),
             placeHolder: 'List Title',
+        },
+        created_at: {
+            type: 'datetime',
+            label: 'Created at',
+            value: created_at,
+            disabled: true,
+        },
+        updated_at: {
+            type: 'datetime',
+            label: 'Updated at',
+            value: updated_at,
+            disabled: true,
         },
         description: {
             type: 'markdown',
@@ -156,6 +180,7 @@ function EditListForm(props: ListFormProps) {
             return showError(error)
         }
         toast.success(`List '${props.list.list_nm}' updated`)
+        props.setKey(Math.random()) // force render to refresh the data
     }
 
     async function deleteAction() {

@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-12T11:50:16.532Z
+ * This file has been automatically generated at 2025-06-12T14:43:45.239Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -407,6 +407,8 @@ export type InstructorBriefList = {
     annotation: string
     official: number
     public: number
+    created_at: string | string | string | number
+    updated_at: string | string | string | number
 }
 
 export type InstructorListItem = {
@@ -423,8 +425,22 @@ export type InstructorList = {
     annotation: string
     official: number
     public: number
+    created_at: string | string | string | number
+    updated_at: string | string | string | number
     items: InstructorListItems
 }
+
+export type InstructorListCreation = {
+    list_nm: string
+    title: string
+    description: string
+    annotation: string
+    official: number
+    public: number
+    items: InstructorListItems
+}
+
+export type InstructorListUpdate = InstructorListCreation
 
 export type InstructorBriefCourse = {
     course_nm: string
@@ -2393,7 +2409,7 @@ class Module_instructor_lists {
      * No warnings
      *
      */
-    async create(data: InstructorList): Promise<void> {
+    async create(data: InstructorListCreation): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.lists.create", data)
         return output
     }
@@ -2405,7 +2421,7 @@ class Module_instructor_lists {
      * No warnings
      *
      */
-    async update(data: InstructorList): Promise<void> {
+    async update(data: InstructorListCreation): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.lists.update", data)
         return output
     }
