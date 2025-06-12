@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-11T16:37:18.691Z
+ * This file has been automatically generated at 2025-06-12T07:44:30.048Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -483,14 +483,14 @@ export type InstructorExamStudent = {
 
 export type InstructorExamCreation = {
     exam_nm: string
+    course_nm: string
     title: string
-    description: string
-    place: string
     exp_time_start: string | string | string | number
 }
 
 export type InstructorExamUpdate = {
     exam_nm: string
+    course_nm: string
     title: string
     place: string
     code: string
@@ -545,6 +545,7 @@ export type InstructorBriefExam = {
     instructions: string | null
     avatars: string | null
     anonymous: number
+    course: { course_nm: string; title: string }
 }
 
 export type InstructorExam = {
@@ -562,6 +563,7 @@ export type InstructorExam = {
     instructions: string | null
     avatars: string | null
     anonymous: number
+    course: { course_nm: string; title: string }
     documents: InstructorExamDocument[]
     compilers: InstructorExamCompiler[]
     problems: InstructorExamProblem[]

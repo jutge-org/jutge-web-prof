@@ -3,11 +3,11 @@
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
-import { InstructorExamCreation } from '@/lib/jutge_api_client'
-import { showError } from '@/lib/utils'
+import { InstructorBriefCourse, InstructorExamCreation } from '@/lib/jutge_api_client'
+import { Dict, mapmap, showError } from '@/lib/utils'
 import { CirclePlusIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -28,10 +28,19 @@ export default function ExamPropertiesPage() {
 
 function ExamPropertiesView() {
     const [exam_nm, setExam_nm] = useState('')
+    const [course_nm, setCourse_nm] = useState<string | null>('')
     const [title, setTitle] = useState('')
-    const [place, setPlace] = useState('')
-    const [description, setDescription] = useState('')
     const [expectedStart, setExpectedStart] = useState(new Date().toISOString())
+
+    const [courses, setCourses] = useState<Dict<InstructorBriefCourse>>({})
+
+    useEffect(() => {
+        async function fetchCourses() {
+            const courses = await jutge.instructor.courses.index()
+            setCourses(courses)
+        }
+        fetchCourses()
+    }, [])
 
     const fields: JFormFields = {
         exam_nm: {
@@ -53,20 +62,17 @@ function ExamPropertiesView() {
             validator: z.string().min(8),
             placeHolder: 'Title of the exam',
         },
-        place: {
-            type: 'input',
-            label: 'Place',
-            value: place,
-            setValue: setPlace,
-            validator: z.string(),
-            placeHolder: 'Where the exam takes place',
-        },
-        description: {
-            type: 'markdown',
-            label: 'Description',
-            value: description || '',
-            setValue: setDescription,
-            placeHolder: 'Exam description (available to students)',
+        course: {
+            type: 'select',
+            label: 'Course',
+            value: course_nm,
+            setValue: setCourse_nm,
+            options: [{ value: '', label: '—' }].concat(
+                mapmap(courses, (course_nm, course) => ({
+                    value: course_nm,
+                    label: course.title,
+                })).sort(),
+            ),
         },
         expectedStart: {
             type: 'datetime',
@@ -98,9 +104,8 @@ function ExamPropertiesView() {
     async function addAction() {
         const exam: InstructorExamCreation = {
             exam_nm,
+            course_nm: course_nm || '',
             title,
-            place,
-            description,
             exp_time_start: expectedStart,
         }
 

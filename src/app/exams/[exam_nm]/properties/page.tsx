@@ -5,7 +5,13 @@ import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
-import { Compiler, Document, InstructorExam, InstructorExamUpdate } from '@/lib/jutge_api_client'
+import {
+    Compiler,
+    Document,
+    InstructorBriefCourse,
+    InstructorExam,
+    InstructorExamUpdate,
+} from '@/lib/jutge_api_client'
 import { Dict, mapmap, showError } from '@/lib/utils'
 import { CalendarPlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
@@ -40,8 +46,11 @@ function ExamPropertiesView() {
     const [avatarPacks, setAvatarPacks] = useState<string[]>([])
     const [archived, setArchived] = useState(false)
 
+    const [courses, setCourses] = useState<Dict<InstructorBriefCourse>>({})
+
     useEffect(() => {
         async function fetchData() {
+            setCourses(await jutge.instructor.courses.index())
             setExam(await jutge.instructor.exams.get(exam_nm))
             setArchived((await jutge.instructor.exams.getArchived()).includes(exam_nm))
             setCompilers(await jutge.tables.getCompilers())
@@ -54,9 +63,16 @@ function ExamPropertiesView() {
 
     if (!exam || !compilers || !documents) return <SimpleSpinner />
 
+    // xapuça perquè el All problems és especial
+    if (exam.course.course_nm === 'All' && exam.course.title === 'All problems') {
+        exam.course.course_nm = ''
+        exam.course.title = ''
+    }
+
     return (
         <EditExamForm
             exam={exam}
+            courses={courses}
             archived={archived}
             setArchived={setArchived}
             allCompilers={compilers}
@@ -68,6 +84,7 @@ function ExamPropertiesView() {
 
 interface ExamFormProps {
     exam: InstructorExam
+    courses: Dict<InstructorBriefCourse>
     archived: boolean
     setArchived: (archived: boolean) => void
 
@@ -87,6 +104,7 @@ function EditExamForm(props: ExamFormProps) {
     })
 
     const [exam_nm, setExam_nm] = useState(props.exam.exam_nm)
+    const [course_nm, setCourse_nm] = useState<string | null>(props.exam.course.course_nm || '')
     const [code, setCode] = useState(props.exam.code || '')
     const [title, setTitle] = useState(props.exam.title)
     const [place, setPlace] = useState(props.exam.place)
@@ -123,6 +141,18 @@ function EditExamForm(props: ExamFormProps) {
             setValue: setTitle,
             validator: z.string().min(8),
             placeHolder: 'Exam Title',
+        },
+        course: {
+            type: 'select',
+            label: 'Course',
+            value: course_nm,
+            setValue: setCourse_nm,
+            options: [{ value: '', label: '—' }].concat(
+                mapmap(props.courses, (course_nm, course) => ({
+                    value: course_nm,
+                    label: course.title,
+                })).sort(),
+            ),
         },
         place: {
             type: 'input',
@@ -249,6 +279,7 @@ function EditExamForm(props: ExamFormProps) {
         try {
             const newExam: InstructorExamUpdate = {
                 exam_nm,
+                course_nm: course_nm || '',
                 title,
                 code,
                 place: place || '',
