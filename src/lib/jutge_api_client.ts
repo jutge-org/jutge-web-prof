@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-12T07:44:30.048Z
+ * This file has been automatically generated at 2025-06-12T09:08:31.365Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -386,7 +386,17 @@ export type Document = {
     document_nm: string
     title: string
     description: string
+    created_at: string | string | string | number
+    updated_at: string | string | string | number
 }
+
+export type DocumentCreation = {
+    document_nm: string
+    title: string
+    description: string
+}
+
+export type DocumentUpdate = DocumentCreation
 
 export type InstructorBriefList = {
     list_nm: string
@@ -2308,7 +2318,7 @@ class Module_instructor_documents {
      * No warnings
      *
      */
-    async create(data: Document, ifile: File): Promise<void> {
+    async create(data: DocumentCreation, ifile: File): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.documents.create", data, [ifile])
         return output
     }
@@ -2320,7 +2330,7 @@ class Module_instructor_documents {
      * No warnings
      *
      */
-    async update(data: Document, ifile: File): Promise<void> {
+    async update(data: DocumentCreation, ifile: File): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.documents.update", data, [ifile])
         return output
     }

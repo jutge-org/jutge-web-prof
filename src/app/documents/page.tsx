@@ -7,6 +7,7 @@ import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { Document } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'
+import dayjs from 'dayjs'
 import { FileIcon, SquarePlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -41,14 +42,27 @@ function DocumentsListView() {
             cellRenderer: (p: any) => (
                 <Link href={`documents/${p.data.document_nm}`}>{p.data.document_nm}</Link>
             ),
-            flex: 2,
+            width: 200,
             filter: true,
         },
         { field: 'title', flex: 2, filter: true },
-        { field: 'annotation', flex: 2, filter: true },
+        {
+            field: 'created_at',
+            width: 120,
+            cellRenderer: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+            headerName: 'Created',
+        },
+        {
+            field: 'updated_at',
+            width: 120,
+            sort: 'desc',
+            cellRenderer: (p: any) => dayjs(p.data.updated_at).format('YYYY-MM-DD'),
+            headerName: 'Updated',
+        },
+        // { field: 'annotation', flex: 2, filter: true },
         {
             field: 'pdf',
-            flex: 1,
+            width: 100,
             filter: false,
             cellRenderer: (p: any) => (
                 <Button

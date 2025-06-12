@@ -8,6 +8,7 @@ import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Document } from '@/lib/jutge_api_client'
 import { offerDownloadFile, showError } from '@/lib/utils'
+import dayjs from 'dayjs'
 import { FileIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -66,6 +67,12 @@ function EditDocumentForm(props: DocumentFormProps) {
 
     const [document_nm, setDocument_nm] = useState(props.document.document_nm)
     const [title, setTitle] = useState(props.document.title)
+    const [created_at, setCreated_at] = useState(
+        dayjs(props.document.created_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
+    const [updated_at, setUpdated_at] = useState(
+        dayjs(props.document.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
     const [description, setDescription] = useState(props.document.description)
     const [file, setFile] = useState<File | null>(null)
 
@@ -77,6 +84,18 @@ function EditDocumentForm(props: DocumentFormProps) {
             setValue: setTitle,
             validator: z.string().min(5),
             placeHolder: 'Document Title',
+        },
+        created_at: {
+            type: 'datetime',
+            label: 'Created at',
+            value: created_at,
+            disabled: true,
+        },
+        updated_at: {
+            type: 'datetime',
+            label: 'Updated at',
+            value: updated_at,
+            disabled: true,
         },
         description: {
             type: 'markdown',
@@ -143,10 +162,10 @@ function EditDocumentForm(props: DocumentFormProps) {
 
             await jutge.instructor.documents.update(newDocument, newFile)
             toast.success(`Document '${props.document.document_nm}' updated`)
-            redirect('/documents')
         } catch (error) {
             return showError(error)
         }
+        redirect('/documents')
     }
 
     async function deleteAction() {
