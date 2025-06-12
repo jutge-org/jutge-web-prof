@@ -3,7 +3,7 @@
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
-import { InstructorCourse } from '@/lib/jutge_api_client'
+import { InstructorCourseCreation } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
 import { PlusCircleIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -77,7 +77,7 @@ function CoursesNewView() {
     }
 
     async function addAction() {
-        const newCourse: InstructorCourse = {
+        const newCourse: InstructorCourseCreation = {
             course_nm,
             title,
             description,

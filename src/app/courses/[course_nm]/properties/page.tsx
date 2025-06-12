@@ -7,6 +7,7 @@ import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { InstructorCourse } from '@/lib/jutge_api_client'
 import { showError } from '@/lib/utils'
+import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -14,7 +15,9 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 export default function CoursePropertiesPage() {
+    const [key, setKey] = useState(Math.random())
     const { course_nm } = useParams<{ course_nm: string }>()
+
     return (
         <Page
             pageContext={{
@@ -26,12 +29,12 @@ export default function CoursePropertiesPage() {
                 subCurrent: 'properties',
             }}
         >
-            <CoursePropertiesView />
+            <CoursePropertiesView key={key} setKey={setKey} />
         </Page>
     )
 }
 
-function CoursePropertiesView() {
+function CoursePropertiesView({ setKey }: { setKey: (key: number) => void }) {
     const { course_nm } = useParams<{ course_nm: string }>()
     const [course, setCourse] = useState<InstructorCourse | null>(null)
     const [archived, setArchived] = useState(false)
@@ -49,13 +52,21 @@ function CoursePropertiesView() {
 
     if (course === null) return <SimpleSpinner />
 
-    return <EditCourseForm course={course} archived={archived} setArchived={setArchived} />
+    return (
+        <EditCourseForm
+            course={course}
+            archived={archived}
+            setArchived={setArchived}
+            setKey={setKey}
+        />
+    )
 }
 
 interface CourseFormProps {
     course: InstructorCourse
     archived: boolean
     setArchived: (archived: boolean) => void
+    setKey: (key: number) => void
 }
 
 function EditCourseForm(props: CourseFormProps) {
@@ -72,6 +83,12 @@ function EditCourseForm(props: CourseFormProps) {
     const [title, setTitle] = useState(props.course.title)
     const [description, setDescription] = useState(props.course.description)
     const [annotation, setAnnotation] = useState(props.course.annotation)
+    const [created_at, setCreated_at] = useState(
+        dayjs(props.course.created_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
+    const [updated_at, setUpdated_at] = useState(
+        dayjs(props.course.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
 
     const fields: JFormFields = {
         /*
@@ -95,6 +112,18 @@ function EditCourseForm(props: CourseFormProps) {
             setValue: setTitle,
             validator: z.string().min(5),
             placeHolder: 'Course Title',
+        },
+        created_at: {
+            type: 'datetime',
+            label: 'Created at',
+            value: created_at,
+            disabled: true,
+        },
+        updated_at: {
+            type: 'datetime',
+            label: 'Updated at',
+            value: updated_at,
+            disabled: true,
         },
         description: {
             type: 'markdown',
@@ -151,7 +180,7 @@ function EditCourseForm(props: CourseFormProps) {
             return showError(error)
         }
         toast.success(`Course '${props.course.course_nm}' updated`)
-        redirect('/courses')
+        props.setKey(Math.random()) // force render to refresh the data
     }
 
     async function deleteAction() {

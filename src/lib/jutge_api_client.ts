@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-12T14:43:45.239Z
+ * This file has been automatically generated at 2025-06-12T15:05:52.191Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -449,6 +449,8 @@ export type InstructorBriefCourse = {
     annotation: string
     official: number
     public: number
+    created_at: string | string | string | number
+    updated_at: string | string | string | number
 }
 
 export type CourseMembers = {
@@ -464,6 +466,8 @@ export type InstructorCourse = {
     annotation: string
     official: number
     public: number
+    created_at: string | string | string | number
+    updated_at: string | string | string | number
     lists: string[]
     students: CourseMembers
     tutors: CourseMembers
@@ -473,6 +477,20 @@ export type StudentProfile = {
     name: string
     email: string
 }
+
+export type InstructorCourseCreation = {
+    course_nm: string
+    title: string
+    description: string
+    annotation: string
+    official: number
+    public: number
+    lists: string[]
+    students: CourseMembers
+    tutors: CourseMembers
+}
+
+export type InstructorCourseUpdate = InstructorCourseCreation
 
 export type InstructorExamDocument = {
     document_nm: string
@@ -2528,7 +2546,7 @@ class Module_instructor_courses {
      * No warnings
      * Only invited students and tutors are taken into account. Enrolled and pending students and tutors are ignored, as these are managed by the system.
      */
-    async create(data: InstructorCourse): Promise<void> {
+    async create(data: InstructorCourseCreation): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.courses.create", data)
         return output
     }
@@ -2540,7 +2558,7 @@ class Module_instructor_courses {
      * No warnings
      * Only invited students and tutors are taken into account. Enrolled and pending students and tutors are ignored, as these are managed by the system.
      */
-    async update(data: InstructorCourse): Promise<void> {
+    async update(data: InstructorCourseCreation): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.courses.update", data)
         return output
     }
