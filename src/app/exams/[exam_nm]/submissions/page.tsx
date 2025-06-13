@@ -68,6 +68,7 @@ function EditExamForm(props: ExamFormProps) {
     const [includeSource, setIncludeSource] = useState(true)
     const [includePDF, setIncludePDF] = useState(true)
     const [includeMetadata, setIncludeMetadata] = useState(true)
+    const [obscurePrivateTestNames, setObscurePrivateTestNames] = useState(false)
     const [onlyLast, setOnlyLast] = useState('1')
     const [layout, setLayout] = useState('vertical')
     const [fontSize, setFontSize] = useState('10')
@@ -112,9 +113,15 @@ function EditExamForm(props: ExamFormProps) {
             value: includeMetadata,
             setValue: setIncludeMetadata,
         },
+        obscurePrivateTestNames: {
+            type: 'switch',
+            label: 'Obscure private testcases',
+            value: obscurePrivateTestNames,
+            setValue: setObscurePrivateTestNames,
+        },
         includePDF: {
             type: 'switch',
-            label: 'PDF',
+            label: 'Create PDFs',
             value: includePDF,
             setValue: setIncludePDF,
         },
@@ -183,6 +190,7 @@ function EditExamForm(props: ExamFormProps) {
             problems: selectedProblems.join(','),
             font_size: parseInt(fontSize, 10),
             layout: layout,
+            obscure_private_testcases_names: obscurePrivateTestNames,
         }
         const webstream = await jutge.instructor.exams.getSubmissions({
             exam_nm: props.exam.exam_nm,

@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-12T15:05:52.191Z
+ * This file has been automatically generated at 2025-06-13T09:05:43.943Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -569,6 +569,7 @@ export type InstructorExamSubmissionsOptions = {
     only_last: boolean
     font_size: number
     layout: string
+    obscure_private_testcases_names: boolean
 }
 
 export type Pack = {
