@@ -554,7 +554,7 @@ function ProblemTitle(props: ProblemTitleProps) {
                     )}
                     {props.problem.problem_nm}
                 </div>
-                <div className="font-normal text-sm text-gray-500 truncate">
+                <div className="font-normal text-sm text-gray-500 line-clamp-1">
                     {getProblemTitle(props.user, props.problem.problem_nm, props.abstractProblems)}
                 </div>
             </div>
