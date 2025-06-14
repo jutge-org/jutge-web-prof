@@ -54,6 +54,21 @@ function ExamsListView() {
             valueGetter: (p: any) => p.data.course.title,
         },
         {
+            field: 'created_at',
+            headerName: 'Created',
+            width: 140,
+            filter: true,
+            valueGetter: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+        },
+        {
+            field: 'updated_at',
+            headerName: 'Updated',
+            width: 140,
+            filter: true,
+            valueGetter: (p: any) => dayjs(p.data.updated_at).format('YYYY-MM-DD'),
+            sort: 'desc',
+        },
+        {
             field: 'exp_time_start',
             width: 200,
             filter: true,

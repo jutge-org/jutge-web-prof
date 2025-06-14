@@ -13,6 +13,7 @@ import {
     InstructorExamUpdate,
 } from '@/lib/jutge_api_client'
 import { Dict, mapmap, showError } from '@/lib/utils'
+import dayjs from 'dayjs'
 import { CalendarPlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { capitalize } from 'radash'
@@ -124,6 +125,12 @@ function EditExamForm(props: ExamFormProps) {
     const [avatarPack, setAvatarPack] = useState<string | null>(props.exam.avatars || '')
     const [documents, setDocuments] = useState(props.exam.documents.map((d) => d.document_nm))
     const [compilers, setCompilers] = useState(props.exam.compilers.map((c) => c.compiler_id))
+    const [created_at, setCreated_at] = useState(
+        dayjs(props.exam.created_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
+    const [updated_at, setUpdated_at] = useState(
+        dayjs(props.exam.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+    )
 
     function optionCompare(
         a: { label: string; value: string },
@@ -133,11 +140,6 @@ function EditExamForm(props: ExamFormProps) {
     }
 
     const fields: JFormFields = {
-        exam_nm: {
-            type: 'input',
-            label: 'Id',
-            value: exam_nm,
-        },
         title: {
             type: 'input',
             label: 'Title',
@@ -145,6 +147,18 @@ function EditExamForm(props: ExamFormProps) {
             setValue: setTitle,
             validator: z.string().min(8),
             placeHolder: 'Exam Title',
+        },
+        created_at: {
+            type: 'datetime',
+            label: 'Created at',
+            value: created_at,
+            disabled: true,
+        },
+        updated_at: {
+            type: 'datetime',
+            label: 'Updated at',
+            value: updated_at,
+            disabled: true,
         },
         course: {
             type: 'select',
