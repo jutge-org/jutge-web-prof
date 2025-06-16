@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-14T11:06:03.818Z
+ * This file has been automatically generated at 2025-06-16T10:56:42.364Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -1096,6 +1096,7 @@ export class JutgeApiClient {
         this.clientTTLs.set("tables.getDrivers", 300)
         this.clientTTLs.set("tables.getVerdicts", 300)
         this.clientTTLs.set("tables.getProglangs", 300)
+        this.clientTTLs.set("problems.getAllAbstractProblems", 3600)
     }
 }
 
