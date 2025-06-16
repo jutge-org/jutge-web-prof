@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-06-16T10:56:42.364Z
+ * This file has been automatically generated at 2025-06-16T17:53:30.386Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -15,6 +15,13 @@
 export type CredentialsIn = {
     email: string
     password: string
+}
+
+export type ExamCredentialsIn = {
+    email: string
+    password: string
+    exam: string
+    exam_password: string
 }
 
 export type CredentialsOut = {
@@ -342,6 +349,35 @@ export type List = {
     owner: PublicProfile
 }
 
+export type ReadyExam = {
+    exam_key: string
+    title: string
+    place: string
+    description: string
+    exp_time_start: string | string | string | number
+    running_time: number
+    contest: boolean
+}
+
+export type RunningExamProblem = {
+    problem_nm: string
+    icon: string | null
+    caption: string | null
+    weight: number | null
+}
+
+export type RunningExam = {
+    title: string
+    description: string
+    instructions: string
+    time_start: string | string | string | number | null
+    exp_time_start: string | string | string | number
+    running_time: number
+    contest: number
+    problems: RunningExamProblem[]
+    compilers: { compiler_id: string }[]
+}
+
 export type AbstractStatus = {
     problem_nm: string
     nb_submissions: number
@@ -492,6 +528,11 @@ export type InstructorCourseCreation = {
 
 export type InstructorCourseUpdate = InstructorCourseCreation
 
+export type InstructorExamCourse = {
+    course_nm: string
+    title: string
+}
+
 export type InstructorExamDocument = {
     document_nm: string
     title: string
@@ -592,7 +633,7 @@ export type InstructorBriefExam = {
     instructions: string | null
     avatars: string | null
     anonymous: number
-    course: { course_nm: string; title: string }
+    course: InstructorExamCourse
     created_at: string | string | string | number
     updated_at: string | string | string | number
 }
@@ -612,7 +653,7 @@ export type InstructorExam = {
     instructions: string | null
     avatars: string | null
     anonymous: number
-    course: { course_nm: string; title: string }
+    course: InstructorExamCourse
     created_at: string | string | string | number
     updated_at: string | string | string | number
     documents: InstructorExamDocument[]
@@ -1115,7 +1156,7 @@ class Module_auth {
     /**
      * Login: Get an access token.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * On success, token is a valid token and error is empty. On failure, token is empty and error is a message.
      */
@@ -1135,6 +1176,18 @@ class Module_auth {
         const [output, ofiles] = await this.root.execute("auth.logout", null)
         return output
     }
+
+    /**
+     * ExamLogin: Get an access token for an exam.
+     *
+     * 🔐 Authentication: any
+     * No warnings
+     * On success, token is a valid token and error is empty. On failure, token is empty and error is a message.
+     */
+    async examLogin(data: ExamCredentialsIn): Promise<CredentialsOut> {
+        const [output, ofiles] = await this.root.execute("auth.examLogin", data)
+        return output
+    }
 }
 
 /**
@@ -1152,7 +1205,7 @@ class Module_misc {
     /**
      * Get version information of the API.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -1164,7 +1217,7 @@ class Module_misc {
     /**
      * Get a fortune message.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -1176,7 +1229,7 @@ class Module_misc {
     /**
      * Get server time.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -1188,7 +1241,7 @@ class Module_misc {
     /**
      * Get homepage stats.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -1200,7 +1253,7 @@ class Module_misc {
     /**
      * Get Jutge.org logo as a PNG file.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -1212,7 +1265,7 @@ class Module_misc {
     /**
      * Returns all packs of avatars.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Avatars are used in exams and contests to identify students or participants.
      */
@@ -1224,7 +1277,7 @@ class Module_misc {
     /**
      * Returns all exam icons.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Exam icon are used in exams and contests to identify problems.
      */
@@ -1236,7 +1289,7 @@ class Module_misc {
     /**
      * Returns color mappings using colornames notation.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Color mappings may be used to colorize keys in the frontends. Color names are as defined in https://github.com/timoxley/colornames
      */
@@ -1248,7 +1301,7 @@ class Module_misc {
     /**
      * Returns color mappings using hexadecimal color notation.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Color mappings may be used to colorize keys in the frontends.
      */
@@ -1260,7 +1313,7 @@ class Module_misc {
     /**
      * Returns code demos for a given compiler as a dictionary of base64 codes indexed by problem_nm.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -1285,7 +1338,7 @@ class Module_tables {
     /**
      * Returns all tables.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Returns all compilers, countries, drivers, languages, proglangs, and verdicts in a single request. This data does not change often, so you should only request it once per session.
      */
@@ -1297,7 +1350,7 @@ class Module_tables {
     /**
      * Returns all languages.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Returns all languages as a dictionary of objects, indexed by id.
      */
@@ -1309,7 +1362,7 @@ class Module_tables {
     /**
      * Returns all countries.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Returns all countries as a dictionary of objects, indexed by id.
      */
@@ -1321,7 +1374,7 @@ class Module_tables {
     /**
      * Returns all compilers.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Returns all compilers as a dictionary of objects, indexed by id.
      */
@@ -1333,7 +1386,7 @@ class Module_tables {
     /**
      * Returns all drivers.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Returns all drivers as a dictionary of objects, indexed by id.
      */
@@ -1345,7 +1398,7 @@ class Module_tables {
     /**
      * Returns all verdicts.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Returns all verdicts as a dictionary of objects, indexed by id.
      */
@@ -1357,7 +1410,7 @@ class Module_tables {
     /**
      * Returns all proglangs.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      * Returns all proglangs (porgramming languages) as a dictionary of objects, indexed by id.
      */
@@ -1613,6 +1666,7 @@ class Module_student {
     readonly submissions: Module_student_submissions
     readonly courses: Module_student_courses
     readonly lists: Module_student_lists
+    readonly exam: Module_student_exam
     readonly statuses: Module_student_statuses
     readonly awards: Module_student_awards
 
@@ -1624,6 +1678,7 @@ class Module_student {
         this.submissions = new Module_student_submissions(root)
         this.courses = new Module_student_courses(root)
         this.lists = new Module_student_lists(root)
+        this.exam = new Module_student_exam(root)
         this.statuses = new Module_student_statuses(root)
         this.awards = new Module_student_awards(root)
     }
@@ -2187,6 +2242,43 @@ class Module_student_lists {
      */
     async get(list_key: string): Promise<List> {
         const [output, ofiles] = await this.root.execute("student.lists.get", list_key)
+        return output
+    }
+}
+
+/**
+ *
+ * The state of this module is UNDER CONSTRUCTION. It is not ready for production use.
+ *
+ */
+class Module_student_exam {
+    private readonly root: JutgeApiClient
+
+    constructor(root: JutgeApiClient) {
+        this.root = root
+    }
+
+    /**
+     * Get list of ready exams.
+     *
+     * 🔐 Authentication: any
+     * No warnings
+     * An exam is ready if the current time is between its expected start time minus two days and its expected end time plus two days. Exams are sorted by their distance to the current time and by title order in case of ties.
+     */
+    async getReadyExams(): Promise<ReadyExam[]> {
+        const [output, ofiles] = await this.root.execute("student.exam.getReadyExams", null)
+        return output
+    }
+
+    /**
+     * Get current exam.
+     *
+     * 🔐 Authentication: exam
+     * No warnings
+     *
+     */
+    async get(): Promise<RunningExam> {
+        const [output, ofiles] = await this.root.execute("student.exam.get", null)
         return output
     }
 }
@@ -3950,7 +4042,7 @@ class Module_testing_check {
     /**
      * Throw an exception of the given type.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -3975,7 +4067,7 @@ class Module_testing_playground {
     /**
      * Upload a file.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -3987,7 +4079,7 @@ class Module_testing_playground {
     /**
      * Get negative of an image.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -3999,7 +4091,7 @@ class Module_testing_playground {
     /**
      * Download a file.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4011,7 +4103,7 @@ class Module_testing_playground {
     /**
      * Download a file with a string.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4023,7 +4115,7 @@ class Module_testing_playground {
     /**
      * Ping the server to get a pong string.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4035,7 +4127,7 @@ class Module_testing_playground {
     /**
      * Returns the given string in uppercase.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4047,7 +4139,7 @@ class Module_testing_playground {
     /**
      * Returns the sum of two integers.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4059,7 +4151,7 @@ class Module_testing_playground {
     /**
      * Returns the sum of two floats.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4071,7 +4163,7 @@ class Module_testing_playground {
     /**
      * increment two numbers.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4083,7 +4175,7 @@ class Module_testing_playground {
     /**
      * Returns the sum of three integers.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4095,7 +4187,7 @@ class Module_testing_playground {
     /**
      * Returns a type with defaults.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
@@ -4107,7 +4199,7 @@ class Module_testing_playground {
     /**
      * Get a webstream with clok data.
      *
-     * No authentication
+     * 🔐 Authentication: any
      * No warnings
      *
      */
