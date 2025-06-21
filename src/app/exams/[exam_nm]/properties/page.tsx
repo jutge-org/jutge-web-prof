@@ -1,5 +1,6 @@
 'use client'
 
+import { useDynamic } from '@/hooks/use-dynamic'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
@@ -40,7 +41,6 @@ export default function ExamPropertiesPage() {
 }
 
 function ExamPropertiesView() {
-    const [key, setKey] = useState(Math.random())
     const { exam_nm } = useParams<{ exam_nm: string }>()
     const [exam, setExam] = useState<InstructorExam | null>(null)
     const [compilers, setCompilers] = useState<Dict<Compiler> | null>(null)
@@ -50,18 +50,18 @@ function ExamPropertiesView() {
 
     const [courses, setCourses] = useState<Dict<InstructorBriefCourse>>({})
 
+    async function fetchData() {
+        setCourses(await jutge.instructor.courses.index())
+        setExam(await jutge.instructor.exams.get(exam_nm))
+        setArchived((await jutge.instructor.exams.getArchived()).includes(exam_nm))
+        setCompilers(await jutge.tables.getCompilers())
+        setDocuments(await jutge.instructor.documents.index())
+        setAvatarPacks(await jutge.misc.getAvatarPacks())
+    }
     useEffect(() => {
-        async function fetchData() {
-            setCourses(await jutge.instructor.courses.index())
-            setExam(await jutge.instructor.exams.get(exam_nm))
-            setArchived((await jutge.instructor.exams.getArchived()).includes(exam_nm))
-            setCompilers(await jutge.tables.getCompilers())
-            setDocuments(await jutge.instructor.documents.index())
-            setAvatarPacks(await jutge.misc.getAvatarPacks())
-        }
 
         fetchData()
-    }, [exam_nm, key])
+    }, [exam_nm])
 
     if (!exam || !compilers || !documents) return <SimpleSpinner />
 
@@ -73,8 +73,7 @@ function ExamPropertiesView() {
 
     return (
         <EditExamForm
-            key={key}
-            setKey={setKey}
+            fetchData={fetchData}
             exam={exam}
             courses={courses}
             archived={archived}
@@ -87,11 +86,11 @@ function ExamPropertiesView() {
 }
 
 interface ExamFormProps {
+    fetchData: () => Promise<void>
     exam: InstructorExam
     courses: Dict<InstructorBriefCourse>
     archived: boolean
     setArchived: (archived: boolean) => void
-    setKey: (key: number) => void
 
     allCompilers: Dict<Compiler>
     allDocuments: Dict<Document>
@@ -108,28 +107,30 @@ function EditExamForm(props: ExamFormProps) {
         cancelLabel: 'No',
     })
 
-    const [exam_nm, setExam_nm] = useState(props.exam.exam_nm)
-    const [course_nm, setCourse_nm] = useState<string | null>(props.exam.course.course_nm || '')
-    const [code, setCode] = useState(props.exam.code || '')
-    const [title, setTitle] = useState(props.exam.title)
-    const [place, setPlace] = useState(props.exam.place)
-    const [expectedStart, setExpectedStart] = useState(props.exam.exp_time_start as string)
-    const [runningTime, setRunningTime] = useState(props.exam.running_time)
-    const [description, setDescription] = useState(props.exam.description)
-    const [instructions, setInstructions] = useState(props.exam.instructions)
-    const [contest, setContest] = useState(props.exam.contest != 0)
-    const [anonymous, setAnonymous] = useState(props.exam.anonymous != 0)
-    const [visibleSubmissions, setVisibleSubmissions] = useState(
-        props.exam.visible_submissions != 0,
+    const [exam_nm, setExam_nm] = useDynamic(props.exam.exam_nm, [props])
+    const [course_nm, setCourse_nm] = useDynamic(props.exam.course.course_nm || '', [props])
+    const [code, setCode] = useDynamic(props.exam.code || '', [props])
+    const [title, setTitle] = useDynamic(props.exam.title, [props])
+    const [place, setPlace] = useDynamic(props.exam.place, [props])
+    const [expectedStart, setExpectedStart] = useDynamic(props.exam.exp_time_start as string, [props])
+    const [runningTime, setRunningTime] = useDynamic(props.exam.running_time, [props])
+    const [description, setDescription] = useDynamic(props.exam.description, [props])
+    const [instructions, setInstructions] = useDynamic(props.exam.instructions, [props])
+    const [contest, setContest] = useDynamic(props.exam.contest != 0, [props])
+    const [anonymous, setAnonymous] = useDynamic(props.exam.anonymous != 0, [props])
+    const [visibleSubmissions, setVisibleSubmissions] = useDynamic(
+        props.exam.visible_submissions != 0, [props]
     )
-    const [avatarPack, setAvatarPack] = useState<string | null>(props.exam.avatars || '')
-    const [documents, setDocuments] = useState(props.exam.documents.map((d) => d.document_nm))
-    const [compilers, setCompilers] = useState(props.exam.compilers.map((c) => c.compiler_id))
-    const [created_at, setCreated_at] = useState(
+    const [avatarPack, setAvatarPack] = useDynamic(props.exam.avatars || '', [props])
+    const [documents, setDocuments] = useDynamic(props.exam.documents.map((d) => d.document_nm), [props])
+    const [compilers, setCompilers] = useDynamic(props.exam.compilers.map((c) => c.compiler_id), [props])
+    const [created_at, setCreated_at] = useDynamic(
         dayjs(props.exam.created_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props]
     )
-    const [updated_at, setUpdated_at] = useState(
+    const [updated_at, setUpdated_at] = useDynamic(
         dayjs(props.exam.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props]
     )
 
     function optionCompare(
@@ -274,7 +275,7 @@ function EditExamForm(props: ExamFormProps) {
 
         update: {
             type: 'button',
-            text: 'Save changes',
+            text: 'Save',
             icon: <SaveIcon />,
             action: save,
         },
@@ -286,7 +287,7 @@ function EditExamForm(props: ExamFormProps) {
         },
         delete: {
             type: 'button',
-            text: 'Delete exam',
+            text: 'Delete',
             icon: <TrashIcon />,
             action: remove,
             ignoreValidation: true,
@@ -324,8 +325,8 @@ function EditExamForm(props: ExamFormProps) {
         } catch (error) {
             return showError(error)
         }
+        await props.fetchData()
         toast.success(`Exam '${exam_nm}' saved.`)
-        props.setKey(Math.random()) // force render to refresh the data
     }
 
     async function addToCalendar() {

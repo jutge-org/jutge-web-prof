@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { useDynamic } from '@/hooks/use-dynamic'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
@@ -34,27 +35,26 @@ export default function DocumentPropertiesPage() {
 }
 
 function DocumentPropertiesView() {
-    const [key, setKey] = useState(Math.random())
     const { document_nm } = useParams<{ document_nm: string }>()
     const [document, setDocument] = useState<Document | null>(null)
 
-    useEffect(() => {
-        async function fetchDocument() {
-            const document = await jutge.instructor.documents.get(document_nm)
-            setDocument(document)
-        }
+    async function fetchData() {
+        const document = await jutge.instructor.documents.get(document_nm)
+        setDocument(document)
+    }
 
-        fetchDocument()
-    }, [document_nm, key])
+    useEffect(() => {
+        fetchData()
+    }, [document_nm])
 
     if (!document) return <SimpleSpinner />
 
-    return <EditDocumentForm key={key} setKey={setKey} document={document} />
+    return <EditDocumentForm fetchData={fetchData} document={document} />
 }
 
 interface DocumentFormProps {
+    fetchData: () => Promise<void>
     document: Document
-    setKey: (key: number) => void
 }
 
 function EditDocumentForm(props: DocumentFormProps) {
@@ -67,16 +67,18 @@ function EditDocumentForm(props: DocumentFormProps) {
         cancelLabel: 'No',
     })
 
-    const [document_nm, setDocument_nm] = useState(props.document.document_nm)
-    const [title, setTitle] = useState(props.document.title)
-    const [created_at, setCreated_at] = useState(
+    const [document_nm, setDocument_nm] = useDynamic(props.document.document_nm, [props.document])
+    const [title, setTitle] = useDynamic(props.document.title, [props.document])
+    const [created_at, setCreated_at] = useDynamic(
         dayjs(props.document.created_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props.document]
     )
-    const [updated_at, setUpdated_at] = useState(
+    const [updated_at, setUpdated_at] = useDynamic(
         dayjs(props.document.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props.document]
     )
-    const [description, setDescription] = useState(props.document.description)
-    const [file, setFile] = useState<File | null>(null)
+    const [description, setDescription] = useDynamic(props.document.description, [props.document])
+    const [file, setFile] = useDynamic(null as File | null, [props.document])
 
     const fields: JFormFields = {
         title: {
@@ -132,7 +134,7 @@ function EditDocumentForm(props: DocumentFormProps) {
         },
         delete: {
             type: 'button',
-            text: 'Delete document',
+            text: 'Delete',
             icon: <TrashIcon />,
             action: remove,
             ignoreValidation: true,
@@ -159,11 +161,11 @@ function EditDocumentForm(props: DocumentFormProps) {
             const newFile = file ? file : new File([download.data], download.name)
 
             await jutge.instructor.documents.update(newDocument, newFile)
-            toast.success(`Document '${props.document.document_nm}' updated`)
         } catch (error) {
             return showError(error)
         }
-        props.setKey(Math.random()) // force render to refresh the data
+        await props.fetchData()
+        toast.success(`Document '${props.document.document_nm}' saved.`)
     }
 
     async function remove() {
@@ -175,7 +177,7 @@ function EditDocumentForm(props: DocumentFormProps) {
         } catch (error) {
             return showError(error)
         }
-        toast.success(`Document '${props.document.document_nm}' deleted`)
+        toast.success(`Document '${props.document.document_nm}' deleted.`)
         redirect('/documents')
     }
 

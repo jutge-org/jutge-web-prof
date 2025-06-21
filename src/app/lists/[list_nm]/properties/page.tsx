@@ -183,8 +183,8 @@ function ListPropertiesForm(props: ListPropertiesFormProps) {
         } catch (error) {
             return showError(error)
         }
-        toast.success(`List '${props.list.list_nm}' updated.`)
-        props.fetchData()
+        await props.fetchData()
+        toast.success(`List '${props.list.list_nm}' saved.`)
     }
 
     async function remove() {

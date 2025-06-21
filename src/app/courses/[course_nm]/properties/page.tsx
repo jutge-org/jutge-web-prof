@@ -180,7 +180,7 @@ function EditCourseForm(props: CourseFormProps) {
             return showError(error)
         }
         await props.fetchData()
-        toast.success(`Course '${props.course.course_nm}' updated.`)
+        toast.success(`Course '${props.course.course_nm}' saved.`)
     }
 
     async function remove() {
