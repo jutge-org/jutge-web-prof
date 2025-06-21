@@ -1,5 +1,6 @@
 'use client'
 
+import { useDynamic } from '@/hooks/use-dynamic'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
@@ -34,28 +35,26 @@ export default function CoursePropertiesPage() {
 }
 
 function CoursePropertiesView() {
-    const [key, setKey] = useState(Math.random())
     const { course_nm } = useParams<{ course_nm: string }>()
     const [course, setCourse] = useState<InstructorCourse | null>(null)
     const [archived, setArchived] = useState(false)
 
-    useEffect(() => {
-        async function fetchCourse() {
-            const course = await jutge.instructor.courses.get(course_nm)
-            setCourse(course)
-            const archived = (await jutge.instructor.courses.getArchived()).includes(course_nm)
-            setArchived(archived)
-        }
+    async function fetchData() {
+        const course = await jutge.instructor.courses.get(course_nm)
+        setCourse(course)
+        const archived = (await jutge.instructor.courses.getArchived()).includes(course_nm)
+        setArchived(archived)
+    }
 
-        fetchCourse()
-    }, [course_nm, key])
+    useEffect(() => {
+        fetchData()
+    }, [course_nm])
 
     if (course === null) return <SimpleSpinner />
 
     return (
         <EditCourseForm
-            key={key}
-            setKey={setKey}
+            fetchData={fetchData}
             course={course}
             archived={archived}
             setArchived={setArchived}
@@ -67,7 +66,7 @@ interface CourseFormProps {
     course: InstructorCourse
     archived: boolean
     setArchived: (archived: boolean) => void
-    setKey: (key: number) => void
+    fetchData: () => Promise<void>
 }
 
 function EditCourseForm(props: CourseFormProps) {
@@ -80,15 +79,15 @@ function EditCourseForm(props: CourseFormProps) {
         cancelLabel: 'No',
     })
 
-    const [course_nm, setCourse_nm] = useState(props.course.course_nm)
-    const [title, setTitle] = useState(props.course.title)
-    const [description, setDescription] = useState(props.course.description)
-    const [annotation, setAnnotation] = useState(props.course.annotation)
-    const [created_at, setCreated_at] = useState(
-        dayjs(props.course.created_at).format('YYYY-MM-DD HH:mm:ss'),
+    const [course_nm, setCourse_nm] = useDynamic(props.course.course_nm, [props.course])
+    const [title, setTitle] = useDynamic(props.course.title, [props.course])
+    const [description, setDescription] = useDynamic(props.course.description, [props.course])
+    const [annotation, setAnnotation] = useDynamic(props.course.annotation, [props.course])
+    const [created_at, setCreated_at] = useDynamic(
+        dayjs(props.course.created_at).format('YYYY-MM-DD HH:mm:ss'), [props.course]
     )
-    const [updated_at, setUpdated_at] = useState(
-        dayjs(props.course.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+    const [updated_at, setUpdated_at] = useDynamic(
+        dayjs(props.course.updated_at).format('YYYY-MM-DD HH:mm:ss'), [props.course]
     )
 
     const fields: JFormFields = {
@@ -150,13 +149,13 @@ function EditCourseForm(props: CourseFormProps) {
         sep: { type: 'separator' },
         update: {
             type: 'button',
-            text: 'Save changes',
+            text: 'Save',
             icon: <SaveIcon />,
             action: save,
         },
         delete: {
             type: 'button',
-            text: 'Delete course',
+            text: 'Delete',
             icon: <TrashIcon />,
             action: remove,
             ignoreValidation: true,
@@ -180,8 +179,8 @@ function EditCourseForm(props: CourseFormProps) {
         } catch (error) {
             return showError(error)
         }
+        await props.fetchData()
         toast.success(`Course '${props.course.course_nm}' updated`)
-        props.setKey(Math.random()) // force render to refresh the data
     }
 
     async function remove() {

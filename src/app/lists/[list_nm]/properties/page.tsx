@@ -153,13 +153,13 @@ function ListPropertiesForm(props: ListPropertiesFormProps) {
         sep: { type: 'separator' },
         update: {
             type: 'button',
-            text: 'Save changes',
+            text: 'Save',
             icon: <SaveIcon />,
             action: save,
         },
         delete: {
             type: 'button',
-            text: 'Delete list',
+            text: 'Delete',
             icon: <TrashIcon />,
             action: remove,
             ignoreValidation: true,
