@@ -34,10 +34,10 @@ export default function ListPropertiesPage() {
     )
 }
 
-let keyGenerator = 0
+let refreshKeyGenerator = 0
 
 function ListPropertiesView() {
-    const [key, setKey] = useState(keyGenerator++)
+    const [refreshKey, setRefreshKey] = useState(refreshKeyGenerator++)
     const { list_nm } = useParams<{ list_nm: string }>()
     const [list, setList] = useState<InstructorList | null>(null)
     const [archived, setArchived] = useState(false)
@@ -50,21 +50,19 @@ function ListPropertiesView() {
             setArchived(archived)
         }
 
-        console.log("list", list_nm, "key", key)
         fetchList()
-    }, [list_nm, key])
+    }, [list_nm, refreshKey])
 
     useEffect(() => {
         // launch this in the background to cache the problems
         jutge.problems.getAllAbstractProblems()
     }, [list_nm])
 
-    if (list === null) return <SimpleSpinner key={key} />
+    if (list === null) return <SimpleSpinner />
 
     return (
         <EditListForm
-            key={key}
-            setKey={setKey}
+            setRefreshKey={setRefreshKey}
             list={list}
             archived={archived}
             setArchived={setArchived}
@@ -76,7 +74,7 @@ type ListFormProps = {
     list: InstructorList
     archived: boolean
     setArchived: (archived: boolean) => void
-    setKey: (key: number) => void
+    setRefreshKey: (key: number) => void
 }
 
 function EditListForm(props: ListFormProps) {
@@ -192,7 +190,7 @@ function EditListForm(props: ListFormProps) {
             return showError(error)
         }
         toast.success(`List '${props.list.list_nm}' updated`)
-        props.setKey(keyGenerator++) // force render to refresh the data
+        props.setRefreshKey(refreshKeyGenerator++) // force render to refresh the data
     }
 
     async function remove() {
