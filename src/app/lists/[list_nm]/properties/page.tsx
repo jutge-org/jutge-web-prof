@@ -11,8 +11,7 @@ import { showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
-import { sleep } from 'radash'
-import { DependencyList, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -86,13 +85,13 @@ function ListPropertiesForm(props: ListPropertiesFormProps) {
     const [description, setDescription] = useDynamic(props.list.description, [props.list])
     const [annotation, setAnnotation] = useDynamic(props.list.annotation, [props.list])
     const [created_at, setCreated_at] = useDynamic(
-        dayjs(props.list.created_at).format('YYYY-MM-DD HH:mm:ss')
-        , [props.list]
+        dayjs(props.list.created_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props.list],
     )
     const [updated_at, setUpdated_at] = useDynamic(
-        dayjs(props.list.updated_at).format('YYYY-MM-DD HH:mm:ss'), [props.list]
+        dayjs(props.list.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props.list],
     )
-
 
     const fields: JFormFields = {
         /*

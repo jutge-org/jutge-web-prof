@@ -84,10 +84,12 @@ function EditCourseForm(props: CourseFormProps) {
     const [description, setDescription] = useDynamic(props.course.description, [props.course])
     const [annotation, setAnnotation] = useDynamic(props.course.annotation, [props.course])
     const [created_at, setCreated_at] = useDynamic(
-        dayjs(props.course.created_at).format('YYYY-MM-DD HH:mm:ss'), [props.course]
+        dayjs(props.course.created_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props.course],
     )
     const [updated_at, setUpdated_at] = useDynamic(
-        dayjs(props.course.updated_at).format('YYYY-MM-DD HH:mm:ss'), [props.course]
+        dayjs(props.course.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+        [props.course],
     )
 
     const fields: JFormFields = {

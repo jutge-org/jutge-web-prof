@@ -71,11 +71,11 @@ function EditDocumentForm(props: DocumentFormProps) {
     const [title, setTitle] = useDynamic(props.document.title, [props.document])
     const [created_at, setCreated_at] = useDynamic(
         dayjs(props.document.created_at).format('YYYY-MM-DD HH:mm:ss'),
-        [props.document]
+        [props.document],
     )
     const [updated_at, setUpdated_at] = useDynamic(
         dayjs(props.document.updated_at).format('YYYY-MM-DD HH:mm:ss'),
-        [props.document]
+        [props.document],
     )
     const [description, setDescription] = useDynamic(props.document.description, [props.document])
     const [file, setFile] = useDynamic(null as File | null, [props.document])

@@ -59,7 +59,6 @@ function ExamPropertiesView() {
         setAvatarPacks(await jutge.misc.getAvatarPacks())
     }
     useEffect(() => {
-
         fetchData()
     }, [exam_nm])
 
@@ -112,25 +111,34 @@ function EditExamForm(props: ExamFormProps) {
     const [code, setCode] = useDynamic(props.exam.code || '', [props])
     const [title, setTitle] = useDynamic(props.exam.title, [props])
     const [place, setPlace] = useDynamic(props.exam.place, [props])
-    const [expectedStart, setExpectedStart] = useDynamic(props.exam.exp_time_start as string, [props])
+    const [expectedStart, setExpectedStart] = useDynamic(props.exam.exp_time_start as string, [
+        props,
+    ])
     const [runningTime, setRunningTime] = useDynamic(props.exam.running_time, [props])
     const [description, setDescription] = useDynamic(props.exam.description, [props])
     const [instructions, setInstructions] = useDynamic(props.exam.instructions, [props])
     const [contest, setContest] = useDynamic(props.exam.contest != 0, [props])
     const [anonymous, setAnonymous] = useDynamic(props.exam.anonymous != 0, [props])
     const [visibleSubmissions, setVisibleSubmissions] = useDynamic(
-        props.exam.visible_submissions != 0, [props]
+        props.exam.visible_submissions != 0,
+        [props],
     )
     const [avatarPack, setAvatarPack] = useDynamic(props.exam.avatars || '', [props])
-    const [documents, setDocuments] = useDynamic(props.exam.documents.map((d) => d.document_nm), [props])
-    const [compilers, setCompilers] = useDynamic(props.exam.compilers.map((c) => c.compiler_id), [props])
+    const [documents, setDocuments] = useDynamic(
+        props.exam.documents.map((d) => d.document_nm),
+        [props],
+    )
+    const [compilers, setCompilers] = useDynamic(
+        props.exam.compilers.map((c) => c.compiler_id),
+        [props],
+    )
     const [created_at, setCreated_at] = useDynamic(
         dayjs(props.exam.created_at).format('YYYY-MM-DD HH:mm:ss'),
-        [props]
+        [props],
     )
     const [updated_at, setUpdated_at] = useDynamic(
         dayjs(props.exam.updated_at).format('YYYY-MM-DD HH:mm:ss'),
-        [props]
+        [props],
     )
 
     function optionCompare(
