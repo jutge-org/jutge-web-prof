@@ -69,14 +69,14 @@ function ListPropertiesView() {
     )
 }
 
-type ListFormProps = {
+type EditListFormProps = {
     list: InstructorList
     archived: boolean
     setArchived: (archived: boolean) => void
     fetchData: () => Promise<void>
 }
 
-function EditListForm(props: ListFormProps) {
+function EditListForm(props: EditListFormProps) {
     //
 
     const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
