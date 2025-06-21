@@ -37,21 +37,20 @@ export default function ListPropertiesPage() {
 let refreshKeyGenerator = 0
 
 function ListPropertiesView() {
-    const [refreshKey, setRefreshKey] = useState(refreshKeyGenerator++)
     const { list_nm } = useParams<{ list_nm: string }>()
     const [list, setList] = useState<InstructorList | null>(null)
     const [archived, setArchived] = useState(false)
 
-    useEffect(() => {
-        async function fetchList() {
-            const list = await jutge.instructor.lists.get(list_nm)
-            setList(list)
-            const archived = (await jutge.instructor.lists.getArchived()).includes(list_nm)
-            setArchived(archived)
-        }
+    async function fetchData() {
+        const list = await jutge.instructor.lists.get(list_nm)
+        setList(list)
+        const archived = (await jutge.instructor.lists.getArchived()).includes(list_nm)
+        setArchived(archived)
+    }
 
-        fetchList()
-    }, [list_nm, refreshKey])
+    useEffect(() => {
+        fetchData()
+    }, [list_nm])
 
     useEffect(() => {
         // launch this in the background to cache the problems
@@ -62,7 +61,7 @@ function ListPropertiesView() {
 
     return (
         <EditListForm
-            setRefreshKey={setRefreshKey}
+            fetchData={fetchData}
             list={list}
             archived={archived}
             setArchived={setArchived}
@@ -74,7 +73,7 @@ type ListFormProps = {
     list: InstructorList
     archived: boolean
     setArchived: (archived: boolean) => void
-    setRefreshKey: (key: number) => void
+    fetchData: () => Promise<void>
 }
 
 function EditListForm(props: ListFormProps) {
@@ -189,8 +188,8 @@ function EditListForm(props: ListFormProps) {
         } catch (error) {
             return showError(error)
         }
-        toast.success(`List '${props.list.list_nm}' updated`)
-        props.setRefreshKey(refreshKeyGenerator++) // force render to refresh the data
+        toast.success(`List '${props.list.list_nm}' updated.`)
+        props.fetchData()
     }
 
     async function remove() {
