@@ -80,7 +80,10 @@ function ExamStudentsView() {
             cellRenderer: (p: any) => (p.data.finished ? 'Yes' : 'No'),
         },
         { field: 'banned', width: 90, cellRenderer: (p: any) => (p.data.banned ? 'Yes' : 'No') },
-        { field: 'invited', width: 90, cellRenderer: (p: any) => (p.data.banned ? 'Yes' : 'No') },
+        {
+            field: 'invited', width: 90, cellRenderer: (p: any) => (p.data.invited ? 'Yes' : 'No'),
+            hide: true, // Only show if contest is enabled
+        },
     ])
 
     const gridRef = useRef<AgGridReact<Item>>(null)
@@ -108,6 +111,7 @@ function ExamStudentsView() {
         const rows = exam.students.sort((a, b) => a.email.localeCompare(b.email))
         setExam(exam)
         setRows(rows)
+        gridRef.current!.api.setColumnsVisible(['invited'], exam.contest == 1)
     }, [exam_nm])
 
     useEffect(() => {
