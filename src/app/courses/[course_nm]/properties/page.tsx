@@ -184,13 +184,9 @@ function EditCourseForm(props: CourseFormProps) {
     }
 
     async function remove() {
-        if (
-            !(await runConfirmDialog(
-                `Are you sure you want to delete course '${props.course.course_nm}'?`,
-            ))
-        ) {
-            return
-        }
+        const message = `Are you sure you want to delete course '${props.course.course_nm}'?`
+        if (!(await runConfirmDialog(message))) return
+
         try {
             await jutge.instructor.courses.remove(props.course.course_nm)
         } catch (error) {
