@@ -11,6 +11,7 @@ import { showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
+import { sleep } from 'radash'
 import { DependencyList, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -34,8 +35,6 @@ export default function ListPropertiesPage() {
     )
 }
 
-let refreshKeyGenerator = 0
-
 function ListPropertiesView() {
     const { list_nm } = useParams<{ list_nm: string }>()
     const [list, setList] = useState<InstructorList | null>(null)
@@ -50,17 +49,13 @@ function ListPropertiesView() {
 
     useEffect(() => {
         fetchData()
+        jutge.problems.getAllAbstractProblems() // launch this in the background to cache the problems
     }, [list_nm])
 
-    useEffect(() => {
-        // launch this in the background to cache the problems
-        jutge.problems.getAllAbstractProblems()
-    }, [list_nm])
-
-    if (list === null) return <SimpleSpinner />
+    if (list === null) return <SimpleSpinner size={64} className="pt-24" />
 
     return (
-        <EditListForm
+        <ListPropertiesForm
             fetchData={fetchData}
             list={list}
             archived={archived}
@@ -69,14 +64,14 @@ function ListPropertiesView() {
     )
 }
 
-type EditListFormProps = {
+type ListPropertiesFormProps = {
     list: InstructorList
     archived: boolean
     setArchived: (archived: boolean) => void
     fetchData: () => Promise<void>
 }
 
-function EditListForm(props: EditListFormProps) {
+function ListPropertiesForm(props: ListPropertiesFormProps) {
     //
 
     const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
