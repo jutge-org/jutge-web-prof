@@ -11,6 +11,7 @@ import { showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
+import { all } from 'radash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -40,10 +41,12 @@ function CoursePropertiesView() {
     const [archived, setArchived] = useState(false)
 
     const fetchData = useCallback(async () => {
-        const course = await jutge.instructor.courses.get(course_nm)
-        setCourse(course)
-        const archived = (await jutge.instructor.courses.getArchived()).includes(course_nm)
-        setArchived(archived)
+        const data = await all({
+            course: jutge.instructor.courses.get(course_nm),
+            archived: jutge.instructor.courses.getArchived(),
+        })
+        setCourse(data.course)
+        setArchived(data.archived.includes(course_nm))
     }, [course_nm])
 
     useEffect(() => {

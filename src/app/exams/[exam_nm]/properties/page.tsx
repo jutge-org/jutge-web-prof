@@ -17,7 +17,7 @@ import { Dict, mapmap, showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { CalendarPlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
-import { capitalize } from 'radash'
+import { all, capitalize } from 'radash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -51,12 +51,20 @@ function ExamPropertiesView() {
     const [courses, setCourses] = useState<Dict<InstructorBriefCourse>>({})
 
     const fetchData = useCallback(async () => {
-        setCourses(await jutge.instructor.courses.index())
-        setExam(await jutge.instructor.exams.get(exam_nm))
-        setArchived((await jutge.instructor.exams.getArchived()).includes(exam_nm))
-        setCompilers(await jutge.tables.getCompilers())
-        setDocuments(await jutge.instructor.documents.index())
-        setAvatarPacks(await jutge.misc.getAvatarPacks())
+        const data = await all({
+            course: jutge.instructor.courses.index(),
+            exam: jutge.instructor.exams.get(exam_nm),
+            archived: jutge.instructor.exams.getArchived(),
+            compilers: jutge.tables.getCompilers(),
+            documents: jutge.instructor.documents.index(),
+            avatarPacks: jutge.misc.getAvatarPacks(),
+        })
+        setCourses(data.course)
+        setExam(data.exam)
+        setArchived(data.archived.includes(exam_nm))
+        setCompilers(data.compilers)
+        setDocuments(data.documents)
+        setAvatarPacks(data.avatarPacks)
     }, [exam_nm])
 
     useEffect(() => {

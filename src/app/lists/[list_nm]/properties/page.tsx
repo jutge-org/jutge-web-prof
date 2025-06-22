@@ -11,6 +11,7 @@ import { showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
+import { all } from 'radash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -40,10 +41,12 @@ function ListPropertiesView() {
     const [archived, setArchived] = useState(false)
 
     const fetchData = useCallback(async () => {
-        const list = await jutge.instructor.lists.get(list_nm)
-        setList(list)
-        const archived = (await jutge.instructor.lists.getArchived()).includes(list_nm)
-        setArchived(archived)
+        const data = await all({
+            list: jutge.instructor.lists.get(list_nm),
+            archived: jutge.instructor.lists.getArchived(),
+        })
+        setList(data.list)
+        setArchived(data.archived.includes(list_nm))
     }, [list_nm])
 
     useEffect(() => {

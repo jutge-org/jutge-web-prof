@@ -19,6 +19,7 @@ import { BriefAbstractProblem, Problem, ProblemSuppl } from '@/lib/jutge_api_cli
 import { offerDownloadFile } from '@/lib/utils'
 import { FileCodeIcon, FileTerminalIcon, FileTextIcon, FileTypeIcon, XIcon } from 'lucide-react'
 import { useParams } from 'next/navigation'
+import { all } from 'radash'
 import { JSX, useEffect, useState } from 'react'
 
 export default function ProblemPropertiesPage() {
@@ -52,18 +53,18 @@ function ProblemPropertiesView() {
     const [problemSuppl, setProblemSuppl] = useState<ProblemSuppl | null>(null)
 
     useEffect(() => {
-        async function fetchProblemInfo() {
-            const abstractProblem = await jutge.problems.getAbstractProblem(problem_nm)
-            setAbstractProblem(abstractProblem)
-
-            const problem = await jutge.problems.getProblem(problem_id)
-            setProblem(problem)
-
-            const problemSuppl = await jutge.problems.getProblemSuppl(problem_id)
-            setProblemSuppl(problemSuppl)
+        async function fetchData() {
+            const data = await all({
+                abstractProblem: jutge.problems.getAbstractProblem(problem_nm),
+                problem: jutge.problems.getProblem(problem_id),
+                problemSuppl: jutge.problems.getProblemSuppl(problem_id),
+            })
+            setAbstractProblem(data.abstractProblem)
+            setProblem(data.problem)
+            setProblemSuppl(data.problemSuppl)
         }
 
-        fetchProblemInfo()
+        fetchData()
     }, [problem_id, problem_nm])
 
     if (abstractProblem === null || problem === null || problemSuppl === null)
