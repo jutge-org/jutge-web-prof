@@ -1,6 +1,12 @@
 'use client'
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
 import {
@@ -13,7 +19,7 @@ import {
 import { PauseIcon, RabbitIcon, SnailIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function ExamRankingPage() {
     const { exam_nm } = useParams<{ exam_nm: string }>()
@@ -44,7 +50,7 @@ function ExamRankingView() {
     const [speed, setSpeed] = useState('0')
     const [counter, setCounter] = useState(0)
 
-    async function fetchData() {
+    const fetchData = useCallback(async () => {
         console.log('Fetching data for exam:', exam_nm, new Date())
         const exam = await jutge.instructor.exams.get(exam_nm)
         const examProblems = await jutge.instructor.exams.getProblems(exam_nm)
@@ -55,12 +61,11 @@ function ExamRankingView() {
         setExamProblems(examProblems)
         setRanking(ranking)
         setColors(colors)
-    }
+    }, [exam_nm])
 
     useEffect(() => {
         fetchData()
-    }, [exam_nm])
-
+    }, [exam_nm, fetchData])
 
     useEffect(() => {
         async function updateQueue() {
@@ -77,18 +82,15 @@ function ExamRankingView() {
         }
     }, [counter, speed, ranking, fetchData])
 
-
     if (exam === null || examProblems === null || ranking === null || colors === null) return null
 
     return (
         <div className="flex flex-col gap-4">
-            <div className='text-sm flex flex-row items-center gap-2'>
-                <div className='flex-grow' />
-                <div className='text-sm' >
-                    Refresh:
-                </div>
-                <Select onValueChange={setSpeed} defaultValue="0" >
-                    <SelectTrigger className="w-36" defaultValue="0" >
+            <div className="text-sm flex flex-row items-center gap-2">
+                <div className="flex-grow" />
+                <div className="text-sm">Refresh:</div>
+                <Select onValueChange={setSpeed} defaultValue="0">
+                    <SelectTrigger className="w-36" defaultValue="0">
                         <SelectValue placeholder="Speed" />
                     </SelectTrigger>
                     <SelectContent>
@@ -216,7 +218,7 @@ function ExamRankingView() {
                     </tbody>
                 </table>
             </div>
-        </div >
+        </div>
     )
 }
 

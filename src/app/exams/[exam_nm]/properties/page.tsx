@@ -18,7 +18,7 @@ import dayjs from 'dayjs'
 import { CalendarPlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { capitalize } from 'radash'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -50,17 +50,18 @@ function ExamPropertiesView() {
 
     const [courses, setCourses] = useState<Dict<InstructorBriefCourse>>({})
 
-    async function fetchData() {
+    const fetchData = useCallback(async () => {
         setCourses(await jutge.instructor.courses.index())
         setExam(await jutge.instructor.exams.get(exam_nm))
         setArchived((await jutge.instructor.exams.getArchived()).includes(exam_nm))
         setCompilers(await jutge.tables.getCompilers())
         setDocuments(await jutge.instructor.documents.index())
         setAvatarPacks(await jutge.misc.getAvatarPacks())
-    }
+    }, [exam_nm])
+
     useEffect(() => {
         fetchData()
-    }, [exam_nm])
+    }, [exam_nm, fetchData])
 
     if (!exam || !compilers || !documents) return <SimpleSpinner />
 

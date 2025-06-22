@@ -11,7 +11,7 @@ import { showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -39,17 +39,17 @@ function ListPropertiesView() {
     const [list, setList] = useState<InstructorList | null>(null)
     const [archived, setArchived] = useState(false)
 
-    async function fetchData() {
+    const fetchData = useCallback(async () => {
         const list = await jutge.instructor.lists.get(list_nm)
         setList(list)
         const archived = (await jutge.instructor.lists.getArchived()).includes(list_nm)
         setArchived(archived)
-    }
+    }, [list_nm])
 
     useEffect(() => {
         fetchData()
         jutge.problems.getAllAbstractProblems() // launch this in the background to cache the problems
-    }, [list_nm])
+    }, [list_nm, fetchData])
 
     if (list === null) return <SimpleSpinner size={64} className="pt-24" />
 

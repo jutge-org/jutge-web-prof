@@ -12,7 +12,7 @@ import { offerDownloadFile, showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { FileIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -38,14 +38,14 @@ function DocumentPropertiesView() {
     const { document_nm } = useParams<{ document_nm: string }>()
     const [document, setDocument] = useState<Document | null>(null)
 
-    async function fetchData() {
+    const fetchData = useCallback(async () => {
         const document = await jutge.instructor.documents.get(document_nm)
         setDocument(document)
-    }
+    }, [document_nm])
 
     useEffect(() => {
         fetchData()
-    }, [document_nm])
+    }, [document_nm, fetchData])
 
     if (!document) return <SimpleSpinner />
 

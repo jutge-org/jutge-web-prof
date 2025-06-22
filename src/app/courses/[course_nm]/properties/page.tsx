@@ -11,7 +11,7 @@ import { showError } from '@/lib/utils'
 import dayjs from 'dayjs'
 import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -39,16 +39,16 @@ function CoursePropertiesView() {
     const [course, setCourse] = useState<InstructorCourse | null>(null)
     const [archived, setArchived] = useState(false)
 
-    async function fetchData() {
+    const fetchData = useCallback(async () => {
         const course = await jutge.instructor.courses.get(course_nm)
         setCourse(course)
         const archived = (await jutge.instructor.courses.getArchived()).includes(course_nm)
         setArchived(archived)
-    }
+    }, [course_nm])
 
     useEffect(() => {
         fetchData()
-    }, [course_nm])
+    }, [course_nm, fetchData])
 
     if (course === null) return <SimpleSpinner />
 
