@@ -23,14 +23,8 @@ import {
 import { Dict } from '@/lib/utils'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import {
-    ArrowUpRightIcon,
-    CircleMinusIcon,
-    EyeIcon,
-    PlusCircleIcon,
-    SaveIcon,
-    XIcon,
-} from 'lucide-react'
+import { ArrowUpRightIcon, CircleMinusIcon, PlusCircleIcon, SaveIcon, XIcon } from 'lucide-react'
+import Link from 'next/link'
 import { redirect, useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -68,24 +62,27 @@ function CourseListView() {
     const [colDefs, setColDefs] = useState([
         {
             rowDrag: true,
-            field: 'title',
-            headerName: 'Lists',
-            flex: 2,
+            field: 'list_nm',
+            headerName: 'Id',
+            valueGetter: (p: any) => p.data.list_nm,
+            flex: 1,
             sortable: false,
-            //filter: true,
+            cellRenderer: (p: any) => (
+                <Link
+                    href="#"
+                    onClick={() => {
+                        showListAction(p.data.list_nm)
+                        return false
+                    }}
+                >
+                    {p.data.list_nm}
+                </Link>
+            ),
         },
         {
-            field: 'actions',
-            headerName: '',
-            width: 100,
-            cellRenderer: (p: any) => (
-                <span
-                    className="text-background my-action-button"
-                    onClick={() => showListAction(p.data.list_nm)}
-                >
-                    <EyeIcon size={18} strokeWidth={1.5} className="mt-[11px]" />
-                </span>
-            ),
+            field: 'title',
+            flex: 2,
+            sortable: false,
         },
     ])
 
@@ -206,7 +203,10 @@ function DialogToAddLists({
             }))
             .sort((a, b) => a.title.localeCompare(b.title)),
     )
-    const [colDefs, setColDefs] = useState([{ field: 'title', flex: 1, filter: true }])
+    const [colDefs, setColDefs] = useState([
+        { field: 'list_nm', headerName: 'Id', flex: 1, filter: true },
+        { field: 'title', flex: 2, filter: true },
+    ])
     const gridRef = useRef<AgGridReact<Item>>(null)
 
     const onGridReady = useCallback(() => {
@@ -228,7 +228,7 @@ function DialogToAddLists({
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent>
+            <DialogContent className="max-w-6xl">
                 <DialogDescription className="hidden">Add lists to course</DialogDescription>
                 <DialogHeader>
                     <DialogTitle>Add lists to course</DialogTitle>
