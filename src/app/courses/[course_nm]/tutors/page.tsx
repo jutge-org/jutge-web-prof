@@ -53,7 +53,7 @@ function CourseTutorsView() {
     useEffect(() => {
         async function fetchData() {
             const course = await jutge.instructor.courses.get(course_nm)
-            const profiles = await jutge.instructor.courses.getStudentProfiles(course_nm)
+            const profiles = await jutge.instructor.courses.getTutorProfiles(course_nm)
             setCourse(course)
             setProfiles(profiles)
         }
@@ -116,6 +116,8 @@ function CourseTutorsForm(props: CourseStudentProps) {
     }, [])
 
     function getRows(): Row[] {
+        console.log(props.course.tutors)
+        console.log(props.profiles)
         const rows = []
         for (const email of props.course.tutors.invited) {
             if (props.profiles[email]) {
