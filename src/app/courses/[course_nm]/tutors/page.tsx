@@ -66,13 +66,13 @@ function CourseTutorsView() {
     return <CourseTutorsForm user={auth.user} course={course} profiles={profiles} />
 }
 
-interface CourseStudentProps {
+interface CourseTutorsProps {
     user: Profile
     course: InstructorCourse
     profiles: Dict<StudentProfile>
 }
 
-function CourseTutorsForm(props: CourseStudentProps) {
+function CourseTutorsForm(props: CourseTutorsProps) {
     //
 
     type Row = { email: string; name: string; state: string }
@@ -216,7 +216,7 @@ function CourseTutorsForm(props: CourseStudentProps) {
             return
         }
         const blob = new Blob([csv], { type: 'text/csv' })
-        FileSaver.saveAs(blob, 'students.csv')
+        FileSaver.saveAs(blob, 'tutors.csv')
     }
 
     async function copyEmails() {
