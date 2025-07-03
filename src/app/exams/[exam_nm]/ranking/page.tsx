@@ -183,7 +183,7 @@ function ExamRankingView() {
                                 {exam.avatars && (
                                     <td className="bg-neutral-100 border-2 border-white rounded-lg px-2 h-12 w-12">
                                         <Image
-                                            src={`https://jutge.org/img/examicons/${exam.avatars!}/${row.avatar}`}
+                                            src={`https://jutge.org/avatars/${exam.avatars!}/${row.avatar}`}
                                             alt={row.avatar || 'Avatar'}
                                             width={32}
                                             height={32}
