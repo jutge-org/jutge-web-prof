@@ -57,7 +57,6 @@ export function CommandKDialog(props: CommandKProps) {
 
     useEffect(() => {
         async function fetchData() {
-            if (!auth.user) return
             const data = await all({
                 courses: jutge.instructor.courses.index(),
                 lists: jutge.instructor.lists.index(),
@@ -82,8 +81,10 @@ export function CommandKDialog(props: CommandKProps) {
             setArchivedExams(data.archivedExams)
         }
 
-        fetchData()
-    }, [props.open, auth.user])
+        if (commandK.open && auth.user) {
+            fetchData()
+        }
+    }, [props.open, auth.user, commandK.open])
 
     function buildTitle(problem_nm: string) {
         const pbms = Object.values(problems[problem_nm].problems)
