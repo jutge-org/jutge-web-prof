@@ -12,11 +12,13 @@ const execAsync = util.promisify(exec)
 export type MakeExamPdfData = {
     exam_nm: string
     token: string
+    extra: string
 }
 
 const zMakeExamPdfData = z.object({
     exam_nm: z.string(),
     token: z.string(),
+    extra: z.string(),
 })
 
 export async function makeExamPdf(data: MakeExamPdfData): Promise<Blob> {
@@ -39,30 +41,49 @@ export async function makeExamPdf(data: MakeExamPdfData): Promise<Blob> {
     for (const examProblem of exam.problems) {
         const abstractProblem = await jutge.problems.getAbstractProblem(examProblem.problem_nm)
         for (const problem_id in abstractProblem.problems) {
-            if (
-                abstractProblem.problems[problem_id].original_language_id ===
-                abstractProblem.problems[problem_id].language_id
-            ) {
-                pdfs.push(problem_id)
-                const download = await jutge.problems.getPdfStatement(problem_id)
-                const path = `${tmp}/${problem_id}.pdf`
-                await writeFile(path, download.data)
-                break
-            }
+            pdfs.push(problem_id)
+            const download = await jutge.problems.getPdfStatement(problem_id)
+            const path = `${tmp}/${problem_id}.pdf`
+            await writeFile(path, download.data)
         }
     }
 
     // make cover page
-    const text = `
 
-${exam.title}
-${exam.course?.title}
+    let mdProblems = ''
+    for (const examProblem of exam.problems) {
+        mdProblems += `* **${examProblem.caption}:**\n`
+        const abstractProblem = await jutge.problems.getAbstractProblem(examProblem.problem_nm)
+        for (const problem_id in abstractProblem.problems) {
+            mdProblems += `  - [\`${problem_id}\`](https://jutge.org/problems/${problem_id}): ${abstractProblem.problems[problem_id].title}\n`
+        }
+        mdProblems += `\n`
+        mdProblems += `\n`
+    }
+
+    const markdown = `---
+mainfont: "Helvetica"
+fontsize: 12pt
+colorlinks: true
+---
+
+## ${exam.course?.title}
+
+# ${exam.title}
+
+${exam.description}
+
+${mdProblems}
+
+---
+
+${data.extra}
 
     `
-    await writeFile(`${tmp}/cover.txt`, text)
-    await execAsync(`iconv -c -f utf-8 -t latin1 ${tmp}/cover.txt > ${tmp}/cover.txt.iconv`)
-    await execAsync(`enscript ${tmp}/cover.txt.iconv -p ${tmp}/cover.ps --no-header --columns=1`)
-    await execAsync(`ps2pdf ${tmp}/cover.ps ${tmp}/cover.pdf`)
+
+    await writeFile(`${tmp}/cover.md`, markdown)
+    //await execAsync(`iconv -c -f utf-8 -t latin1 ${tmp}/cover.txt > ${tmp}/cover.txt.iconv`)
+    await execAsync(`pandoc  --variable mainfont="Palatino" ${tmp}/cover.md -o ${tmp}/cover.pdf`)
     pdfs.unshift('cover')
 
     // concatenate all the PDFs into a single PDF

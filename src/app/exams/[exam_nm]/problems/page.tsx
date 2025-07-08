@@ -28,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { useTextareaDialog } from '@/jutge-components/dialogs/TextareaDialog'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
@@ -46,6 +47,7 @@ import { saveAs } from 'file-saver'
 import {
     Check,
     CircleMinusIcon,
+    CloudDownloadIcon,
     EditIcon,
     FileTextIcon,
     PaintbrushIcon,
@@ -104,6 +106,13 @@ function ExamProblemsView() {
     const [dialogKey, setDialogKey] = useState<number | null>(null)
 
     const [problemToEdit, setProblemToEdit] = useState<InstructorExamProblem | null>(null)
+
+    const [runTextareaDialog, TextareaDialogComponent] = useTextareaDialog({
+        title: 'Get PDF of exam',
+        description: 'Extra text to include at end of cover page:',
+        buttonIcon: <CloudDownloadIcon />,
+        buttonLabel: 'Get PDF',
+    })
 
     const gridRef = useRef<AgGridReact<InstructorExamProblem>>(null)
 
@@ -246,7 +255,14 @@ function ExamProblemsView() {
     }
 
     async function print() {
-        const doc = await makeExamPdf({ exam_nm, token: localStorage.getItem('token') || '' })
+        const extra = await runTextareaDialog(`© ${auth.user?.name}\n\n`)
+        if (extra === null) return
+        toast.info('Generating PDF...')
+        const doc = await makeExamPdf({
+            exam_nm,
+            token: localStorage.getItem('token') || '',
+            extra,
+        })
         saveAs(doc, `${exam_nm}-${nanoid()}.pdf`)
     }
 
@@ -314,6 +330,7 @@ function ExamProblemsView() {
                 allAbstractProblems={allAbstractProblems}
                 problem={problemToEdit}
             />
+            <TextareaDialogComponent />
         </>
     )
 }
