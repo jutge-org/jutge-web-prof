@@ -65,6 +65,7 @@ export async function makeExamPdf(data: MakeExamPdfData): Promise<Blob> {
 mainfont: "Helvetica"
 fontsize: 12pt
 colorlinks: true
+geometry: a4paper
 ---
 
 ## ${exam.course?.title}
