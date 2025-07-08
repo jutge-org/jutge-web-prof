@@ -1,5 +1,6 @@
 'use client'
 
+import { makeExamPdf } from '@/actions/makeExamPdf'
 import { Button } from '@/components/ui/button'
 import {
     Command,
@@ -41,15 +42,18 @@ import {
 import { cn, Dict, mapmap, showError } from '@/lib/utils'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
+import { saveAs } from 'file-saver'
 import {
     Check,
     CircleMinusIcon,
     EditIcon,
+    FileTextIcon,
     PaintbrushIcon,
     PlusCircleIcon,
     SaveIcon,
     XCircleIcon,
 } from 'lucide-react'
+import { nanoid } from 'nanoid'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { capitalize } from 'radash'
@@ -187,13 +191,13 @@ function ExamProblemsView() {
         setRows(newRows)
     }
 
-    async function addAction() {
+    async function add() {
         setIsDialogOpen(true)
         setDialogKey(Math.random())
         setProblemToEdit(null)
     }
 
-    async function removeAction() {
+    async function remove() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         if (selectedRows.length === 0) {
@@ -204,7 +208,7 @@ function ExamProblemsView() {
         setRows(newRows)
     }
 
-    async function editAction() {
+    async function edit() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         if (selectedRows.length !== 1) {
@@ -217,7 +221,7 @@ function ExamProblemsView() {
         setDialogKey(Math.random())
     }
 
-    async function saveAction() {
+    async function save() {
         const problems: InstructorExamProblem[] = []
         gridRef.current!.api.forEachNode((rowNode, index) => {
             if (rowNode.data) problems.push(rowNode.data)
@@ -231,7 +235,7 @@ function ExamProblemsView() {
         }
     }
 
-    async function decorateAction() {
+    async function decorate() {
         const newRows = rows.map((row, index) => ({
             ...row,
             caption: row.caption || `P${index + 1}`,
@@ -239,6 +243,11 @@ function ExamProblemsView() {
             weight: row.weight || 1,
         }))
         setRows(newRows)
+    }
+
+    async function print() {
+        const doc = await makeExamPdf({ exam_nm, token: localStorage.getItem('token') || '' })
+        saveAs(doc, `${exam_nm}-${nanoid()}.pdf`)
     }
 
     if (auth.user === null || exam === null || usedAbstractProblems === null)
@@ -255,35 +264,40 @@ function ExamProblemsView() {
                 rowSelection={rowSelection}
             />
             <div className="mt-4 flex flex-row gap-2">
+                <Button
+                    className="w-28 justify-start"
+                    onClick={print}
+                    title="Get a PDF with a simple cover page and all problem statements"
+                    variant={'outline'}
+                >
+                    {' '}
+                    <FileTextIcon /> Get PDF
+                </Button>
                 <div className="flex-grow" />
-                <Button className="w-28 justify-start" onClick={addAction} title="Add a problem">
+                <Button className="w-28 justify-start" onClick={add} title="Add a problem">
                     {' '}
                     <PlusCircleIcon /> Add
                 </Button>
-                <Button
-                    className="w-28 justify-start"
-                    onClick={editAction}
-                    title="Edit selected problem"
-                >
+                <Button className="w-28 justify-start" onClick={edit} title="Edit selected problem">
                     <EditIcon /> Edit
                 </Button>
                 <Button
                     className="w-28 justify-start"
-                    onClick={removeAction}
+                    onClick={remove}
                     title="Remove all selected problems"
                 >
                     <CircleMinusIcon /> Remove
                 </Button>
                 <Button
                     className="w-28 justify-start"
-                    onClick={decorateAction}
+                    onClick={decorate}
                     title="Add captions, wieghts and icons to all problems"
                 >
                     <PaintbrushIcon /> Decorate
                 </Button>
                 <Button
                     className="w-28 justify-start"
-                    onClick={saveAction}
+                    onClick={save}
                     title="Save problems of the exam"
                 >
                     <SaveIcon /> Save
