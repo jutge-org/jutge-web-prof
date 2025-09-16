@@ -1,6 +1,6 @@
 'use client'
 
-import { array2csv } from '@/actions/csv'
+import { array2csv, csv2array } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
@@ -21,6 +21,7 @@ import {
     PlusCircleIcon,
     SaveIcon,
     SendHorizonalIcon,
+    UploadCloudIcon,
 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -136,8 +137,8 @@ function CourseStudentsForm(props: CourseStudentProps) {
         return rows
     }
 
-    async function add() {
-        const result = await runAddEmailsDialog([])
+    async function add(emails: string[] = []) {
+        const result = await runAddEmailsDialog(emails)
         if (!result) return
         if (result.wrongEmails.length !== 0) {
             toast.warning(`There are ${result.wrongEmails.length} invalid emails.`)
@@ -206,6 +207,25 @@ function CourseStudentsForm(props: CourseStudentProps) {
         }
     }
 
+    async function importFromRaco() {
+        const fileInput = document.createElement('input')
+        fileInput.type = 'file'
+        fileInput.onchange = (event: Event) => {
+            const file = (event.target as HTMLInputElement).files![0]
+            const reader = new FileReader()
+
+            reader.onload = async (e) => {
+                const contents = e.target!.result
+                const data = await csv2array(contents as string)
+                const emails = data.map((row) => row['Email']).sort()
+                await add(emails)
+            }
+
+            reader.readAsText(file) // or readAsArrayBuffer(), readAsDataURL()
+        }
+        fileInput.click()
+    }
+
     async function exportCsv() {
         const data = rows.map((row) => ({
             email: row.email,
@@ -266,12 +286,20 @@ function CourseStudentsForm(props: CourseStudentProps) {
                 <Button className="w-28 justify-start" onClick={remove} title="Remove students">
                     <CircleMinusIcon /> Remove
                 </Button>
-                <Button className="w-28 justify-start" onClick={add} title="Add students">
+                <Button className="w-28 justify-start" onClick={() => add()} title="Add students">
                     <PlusCircleIcon /> Add
                 </Button>
                 <div className="flex-grow" />
                 <div className="text-xs text-gray-500">{rows.length} students</div>
                 <div className="flex-grow" />
+                <Button
+                    className="w-36 justify-start"
+                    onClick={importFromRaco}
+                    title="Import students using a CSV from FIB's Racó"
+                    variant={'outline'}
+                >
+                    <UploadCloudIcon /> Import Racó
+                </Button>
                 <Button
                     className="w-36 justify-start"
                     onClick={copyEmails}
