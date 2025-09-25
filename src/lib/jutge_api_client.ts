@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-07-02T08:12:33.746Z
+ * This file has been automatically generated at 2025-09-25T06:19:20.252Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -687,7 +687,6 @@ export type ExamStatistics = {
 
 export type RankingResult = {
     problem_nm: string
-    historic: string
     submissions: number
     verdict: string | null
     score: number
@@ -841,6 +840,7 @@ export type UpcomingExam = {
     running_time: number
     students: number
     name: string
+    contest: number
 }
 
 export type UpcomingExams = UpcomingExam[]
@@ -3656,6 +3656,18 @@ class Module_admin_dashboard {
      */
     async getUpcomingExams(data: { daysBefore: number; daysAfter: number }): Promise<UpcomingExams> {
         const [output, ofiles] = await this.root.execute("admin.dashboard.getUpcomingExams", data)
+        return output
+    }
+
+    /**
+     * Get PM2 status
+     *
+     * 🔐 Authentication: admin
+     * No warnings
+     * This endpoint retrieves the status of PM2 processes as reported by `pm2 jlist`.
+     */
+    async getPM2Status(): Promise<any> {
+        const [output, ofiles] = await this.root.execute("admin.dashboard.getPM2Status", null)
         return output
     }
 }
