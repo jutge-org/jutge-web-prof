@@ -2,6 +2,7 @@
 
 import { array2csv, csv2array } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
@@ -11,10 +12,12 @@ import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/jutge_api_client'
 import { Dict, showError } from '@/lib/utils'
+import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import FileSaver from 'file-saver'
 import {
+    ChevronUpIcon,
     CircleMinusIcon,
     CopyIcon,
     DownloadCloudIcon,
@@ -110,7 +113,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     const gridRef = useRef<AgGridReact<CourseMembers>>(null)
 
-    const onGridReady = useCallback(() => {}, [])
+    const onGridReady = useCallback(() => { }, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: true }
@@ -208,6 +211,14 @@ function CourseStudentsForm(props: CourseStudentProps) {
     }
 
     async function importFromRaco() {
+        await importFromCSV("Email")
+    }
+
+    async function importFromAtenea() {
+        await importFromCSV("Adreça electrònica")
+    }
+
+    async function importFromCSV(emailField: string) {
         const fileInput = document.createElement('input')
         fileInput.type = 'file'
         fileInput.onchange = (event: Event) => {
@@ -217,11 +228,11 @@ function CourseStudentsForm(props: CourseStudentProps) {
             reader.onload = async (e) => {
                 const contents = e.target!.result
                 const data = await csv2array(contents as string)
-                const emails = data.map((row) => row['Email']).sort()
+                const emails = data.map((row) => row[emailField]).sort()
                 await add(emails)
             }
 
-            reader.readAsText(file) // or readAsArrayBuffer(), readAsDataURL()
+            reader.readAsText(file)
         }
         fileInput.click()
     }
@@ -292,30 +303,43 @@ function CourseStudentsForm(props: CourseStudentProps) {
                 <div className="flex-grow" />
                 <div className="text-xs text-gray-500">{rows.length} students</div>
                 <div className="flex-grow" />
+
+
                 <Button
-                    className="w-36 justify-start"
-                    onClick={importFromRaco}
-                    title="Import students using a CSV from FIB's Racó"
-                    variant={'outline'}
-                >
-                    <UploadCloudIcon /> Import Racó
-                </Button>
-                <Button
-                    className="w-36 justify-start"
+                    className="w-32 justify-start"
                     onClick={copyEmails}
                     title="Copy emails to clipboard"
                     variant={'outline'}
                 >
                     <CopyIcon /> Copy emails
                 </Button>
+
                 <Button
-                    className="w-36 justify-start"
+                    className="w-32 justify-start"
                     onClick={exportCsv}
                     title="Export to CSV"
                     variant={'outline'}
                 >
-                    <DownloadCloudIcon /> Export to CSV
+                    <DownloadCloudIcon /> Export
                 </Button>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button className="w-32 justify-start" variant={'outline'} title="Import from CSV">
+                            <UploadCloudIcon />
+                            Import
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onClick={importFromRaco}>
+                            Import CSV from Racó
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={importFromAtenea}>
+                            Import CSV from Atenea
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
             </div>
 
             <AddEmailsDialog />
