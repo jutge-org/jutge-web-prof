@@ -1,6 +1,6 @@
 'use client'
 
-import { array2csv, csv2array } from '@/actions/csv'
+import { array2csv, csv2array, xls2array } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
@@ -218,9 +218,30 @@ function CourseStudentsForm(props: CourseStudentProps) {
         await importFromCSV("Adreça electrònica")
     }
 
+    async function importFromPrisma() {
+        const fileInput = document.createElement('input')
+        fileInput.type = 'file'
+        fileInput.accept = '.xls,.xlsx'
+        fileInput.onchange = (event: Event) => {
+            const file = (event.target as HTMLInputElement).files![0]
+            const reader = new FileReader()
+
+            reader.onload = async (e) => {
+                const contents = e.target!.result
+                const data = await xls2array(contents as ArrayBuffer)
+                const emails = data.map((row) => row["Email"] || row["Adreça electrònica"] || row["Dirección electrónica"]).sort()
+                await add(emails)
+            }
+
+            reader.readAsArrayBuffer(file)
+        }
+        fileInput.click()
+    }
+
     async function importFromCSV(emailField: string) {
         const fileInput = document.createElement('input')
         fileInput.type = 'file'
+        fileInput.accept = '.csv'
         fileInput.onchange = (event: Event) => {
             const file = (event.target as HTMLInputElement).files![0]
             const reader = new FileReader()
@@ -336,6 +357,9 @@ function CourseStudentsForm(props: CourseStudentProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={importFromAtenea}>
                             Import CSV from Atenea
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={importFromPrisma}>
+                            Import XLS from Prisma
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

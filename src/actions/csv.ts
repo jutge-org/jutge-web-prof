@@ -1,8 +1,10 @@
 'use server'
-// because fast-cvs does not work on the browser, we need to use it on the server side
+
+// because fast-csv and xlsx do not work on the browser, we need to use it on the server side
 
 import { writeToString } from '@fast-csv/format'
 import { parseString } from '@fast-csv/parse'
+import { read, utils } from 'xlsx'
 
 export async function array2csv(data: any[]) {
     return await writeToString(data, {
@@ -32,4 +34,22 @@ function parse(csvString: string): Promise<CsvRow[]> {
 
 export async function csv2array(csvString: string): Promise<CsvRow[]> {
     return await parse(csvString)
+}
+
+export async function xls2array(xlsBuffer: ArrayBuffer): Promise<any[]> {
+    const workbook = read(xlsBuffer, { type: 'array' })
+    const sheetName = workbook.SheetNames[0]
+    const worksheet = workbook.Sheets[sheetName]
+    const data = utils.sheet_to_json(worksheet)
+
+    // Make it serializable - convert to plain objects and handle dates
+    const plainData = data.map(row => {
+        const plainRow: any = {}
+        for (const [key, value] of Object.entries(row as any)) {
+            plainRow[key] = value
+        }
+        return plainRow
+    })
+
+    return plainData
 }
