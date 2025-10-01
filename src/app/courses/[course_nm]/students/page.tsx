@@ -2,7 +2,12 @@
 
 import { array2csv, csv2array, xls2array } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
@@ -12,12 +17,10 @@ import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/jutge_api_client'
 import { Dict, showError } from '@/lib/utils'
-import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import FileSaver from 'file-saver'
 import {
-    ChevronUpIcon,
     CircleMinusIcon,
     CopyIcon,
     DownloadCloudIcon,
@@ -113,7 +116,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     const gridRef = useRef<AgGridReact<CourseMembers>>(null)
 
-    const onGridReady = useCallback(() => { }, [])
+    const onGridReady = useCallback(() => {}, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: true }
@@ -158,7 +161,9 @@ function CourseStudentsForm(props: CourseStudentProps) {
             newRows.push({ email, name: '', state: 'invited' })
         }
         setRows([...rows, ...newRows])
-        toast.success(`Added ${newRows.length} students.`)
+        toast.success(
+            `Added ${newRows.length} students. Remember to click the Save button to commit the changes!`,
+        )
     }
 
     async function remove() {
@@ -179,7 +184,9 @@ function CourseStudentsForm(props: CourseStudentProps) {
         const originalLength = rows.length
         const newRows = rows.filter((row) => !result.validEmails.includes(row.email))
         setRows(newRows)
-        toast.success(`Removed ${originalLength - newRows.length} students.`)
+        toast.success(
+            `Removed ${originalLength - newRows.length} students. Remember to click the Save button to commit the changes!`,
+        )
     }
 
     async function save() {
@@ -211,11 +218,11 @@ function CourseStudentsForm(props: CourseStudentProps) {
     }
 
     async function importFromRaco() {
-        await importFromCSV("Email")
+        await importFromCSV('Email')
     }
 
     async function importFromAtenea() {
-        await importFromCSV("Adreça electrònica")
+        await importFromCSV('Adreça electrònica')
     }
 
     async function importFromPrisma() {
@@ -229,7 +236,14 @@ function CourseStudentsForm(props: CourseStudentProps) {
             reader.onload = async (e) => {
                 const contents = e.target!.result
                 const data = await xls2array(contents as ArrayBuffer)
-                const emails = data.map((row) => row["Email"] || row["Adreça electrònica"] || row["Dirección electrónica"]).sort()
+                const emails = data
+                    .map(
+                        (row) =>
+                            row['Email'] ||
+                            row['Adreça electrònica'] ||
+                            row['Dirección electrónica'],
+                    )
+                    .sort()
                 await add(emails)
             }
 
@@ -325,7 +339,6 @@ function CourseStudentsForm(props: CourseStudentProps) {
                 <div className="text-xs text-gray-500">{rows.length} students</div>
                 <div className="flex-grow" />
 
-
                 <Button
                     className="w-32 justify-start"
                     onClick={copyEmails}
@@ -346,7 +359,11 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button className="w-32 justify-start" variant={'outline'} title="Import from CSV">
+                        <Button
+                            className="w-32 justify-start"
+                            variant={'outline'}
+                            title="Import from CSV"
+                        >
                             <UploadCloudIcon />
                             Import
                         </Button>
@@ -363,7 +380,6 @@ function CourseStudentsForm(props: CourseStudentProps) {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-
             </div>
 
             <AddEmailsDialog />

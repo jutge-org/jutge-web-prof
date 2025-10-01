@@ -156,7 +156,9 @@ function CourseTutorsForm(props: CourseTutorsProps) {
             newRows.push({ email, name: '', state: 'invited' })
         }
         setRows([...rows, ...newRows])
-        toast.success(`Added ${newRows.length} tutors.`)
+        toast.success(
+            `Added ${newRows.length} tutors.  Remember to click the Save button to commit the changes!`,
+        )
     }
 
     async function remove() {
@@ -177,7 +179,9 @@ function CourseTutorsForm(props: CourseTutorsProps) {
         const originalLength = rows.length
         const newRows = rows.filter((row) => !result.validEmails.includes(row.email))
         setRows(newRows)
-        toast.success(`Removed ${originalLength - newRows.length} tutors.`)
+        toast.success(
+            `Removed ${originalLength - newRows.length} tutors.  Remember to click the Save button to commit the changes!`,
+        )
     }
 
     async function save() {
