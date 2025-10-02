@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2Icon, LogInIcon, SquareXIcon } from 'lucide-react'
+import { FileIcon, Loader2Icon, LogInIcon, SquareXIcon } from 'lucide-react'
 import Image from 'next/image'
 import { FormEvent, useState } from 'react'
 import { useAuth } from '../jutge-components/layouts/court/lib/Auth'
@@ -44,6 +44,22 @@ export default function LoginForm() {
                     alt="Teacher"
                     priority={true}
                 />
+                <Card className="w-72 mb-6">
+                    <CardHeader>
+                        <CardTitle className="text-2xl">Nou curs!</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-6">
+                        <p>Curs a l&apos;ICE sobre Jutge.org per a professors.</p>
+                        <p>
+                            <a href="https://formacio.ice.upc.edu/cat/estudis/formacio/curs/722470/curs-galaxia-aprenentatge-incorporar-plataforma-jutgeorg-docencia-eina-millorar-practica-algorismica-programacio/">
+                                <Button className="w-full" variant="destructive">
+                                    <FileIcon />
+                                    Informació i inscripcions
+                                </Button>
+                            </a>
+                        </p>
+                    </CardContent>
+                </Card>
                 <Card className="w-72">
                     <CardHeader>
                         <CardTitle className="text-2xl">Sign in</CardTitle>
