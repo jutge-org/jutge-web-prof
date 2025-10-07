@@ -240,7 +240,8 @@ function ExamStudentsView() {
             />
             <div className="mt-4 flex flex-row-reverse gap-2 items-center">
                 <Button className="w-36 justify-start" onClick={saveHandle} title="Save changes">
-                    <SaveIcon /> Save
+                    <SaveIcon className={changes ? 'animate-pulse' : ''} />
+                    Save
                 </Button>
                 <Button
                     className="w-36 justify-start"

@@ -168,7 +168,8 @@ function CourseListView() {
             </div>
             <div className="mt-4 flex flex-row-reverse gap-2">
                 <Button className="w-28 justify-start" onClick={saveAction}>
-                    <SaveIcon /> Save
+                    <SaveIcon className={changes ? 'animate-pulse' : ''} />
+                    Save
                 </Button>
                 <Button className="w-28 justify-start" onClick={deleteAction}>
                     <CircleMinusIcon /> Remove

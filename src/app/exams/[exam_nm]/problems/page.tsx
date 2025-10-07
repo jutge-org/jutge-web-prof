@@ -327,7 +327,8 @@ function ExamProblemsView() {
                     onClick={save}
                     title="Save problems of the exam"
                 >
-                    <SaveIcon /> Save
+                    <SaveIcon className={changes ? 'animate-pulse' : ''} />
+                    Save
                 </Button>
             </div>
             <ProblemDialog

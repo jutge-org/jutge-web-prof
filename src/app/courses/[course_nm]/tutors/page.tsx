@@ -264,7 +264,8 @@ function CourseTutorsForm(props: CourseTutorsProps) {
 
             <div className="mt-4 flex flex-row-reverse gap-2 items-center">
                 <Button className="w-28 justify-start" onClick={save} title="Save changes">
-                    <SaveIcon /> Save
+                    <SaveIcon className={changes ? 'animate-pulse' : ''} />
+                    Save
                 </Button>
                 <Button
                     className="w-28 justify-start"
