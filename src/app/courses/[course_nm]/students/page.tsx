@@ -119,7 +119,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     const gridRef = useRef<AgGridReact<CourseMembers>>(null)
 
-    const onGridReady = useCallback(() => { }, [])
+    const onGridReady = useCallback(() => {}, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: true }
@@ -163,7 +163,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
             if (props.course.students.enrolled.includes(email)) continue
             newRows.push({ email, name: '', state: 'invited' })
         }
-        setRows(oldRows => [...oldRows, ...newRows])
+        setRows((oldRows) => [...oldRows, ...newRows])
         setChanges(true)
         toast.success(
             `Added ${newRows.length} students. Remember to click the Save button to commit the changes!`,
@@ -185,7 +185,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
             return
         }
 
-        setRows(oldRows => {
+        setRows((oldRows) => {
             const originalLength = oldRows.length
             const newRows = oldRows.filter((row) => !result.validEmails.includes(row.email))
             toast.success(
@@ -315,7 +315,6 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     return (
         <>
-            {changes ? "There are changes" : ""}
             <AgTableFull
                 rowData={rows}
                 columnDefs={colDefs}
@@ -329,7 +328,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
             <div className="mt-4 flex flex-row-reverse gap-2 items-center">
                 <Button className="w-28 justify-start" onClick={save} title="Save changes">
-                    <SaveIcon /> Save
+                    <SaveIcon className={changes ? 'animate-pulse' : ''} /> Save
                 </Button>
                 <Button
                     className="w-28 justify-start"
