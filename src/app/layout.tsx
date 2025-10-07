@@ -3,6 +3,7 @@ import AuthProvider from '@/jutge-components/layouts/court/lib/Auth'
 import { ThemeProvider } from '@/jutge-components/layouts/court/lib/Theme'
 import type { Metadata } from 'next'
 import { ReactNode } from 'react'
+import { NavigationGuardProvider } from 'next-navigation-guard'
 
 import '@/jutge-components/layouts/court/themes.css'
 import './globals.css'
@@ -21,12 +22,14 @@ export default function RootLayout(props: RootLayoutProps): ReactNode {
         <html lang="en" suppressHydrationWarning>
             <head />
             <body>
-                <ThemeProvider>
-                    <AuthProvider>
-                        {props.children}
-                        <Toaster richColors expand={true} />
-                    </AuthProvider>
-                </ThemeProvider>
+                <NavigationGuardProvider>
+                    <ThemeProvider>
+                        <AuthProvider>
+                            {props.children}
+                            <Toaster richColors expand={true} />
+                        </AuthProvider>
+                    </ThemeProvider>
+                </NavigationGuardProvider>
             </body>
         </html>
     )

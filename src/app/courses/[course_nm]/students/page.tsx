@@ -8,6 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { usePageChanges } from '@/hooks/use-page-changes'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
@@ -84,6 +85,8 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     type Row = { email: string; name: string; state: string }
 
+    const [changes, setChanges] = usePageChanges()
+
     const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
         title: 'Invite',
         acceptLabel: 'Yes, send',
@@ -116,7 +119,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     const gridRef = useRef<AgGridReact<CourseMembers>>(null)
 
-    const onGridReady = useCallback(() => {}, [])
+    const onGridReady = useCallback(() => { }, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: true }
@@ -160,7 +163,8 @@ function CourseStudentsForm(props: CourseStudentProps) {
             if (props.course.students.enrolled.includes(email)) continue
             newRows.push({ email, name: '', state: 'invited' })
         }
-        setRows([...rows, ...newRows])
+        setRows(oldRows => [...oldRows, ...newRows])
+        setChanges(true)
         toast.success(
             `Added ${newRows.length} students. Remember to click the Save button to commit the changes!`,
         )
@@ -181,12 +185,15 @@ function CourseStudentsForm(props: CourseStudentProps) {
             return
         }
 
-        const originalLength = rows.length
-        const newRows = rows.filter((row) => !result.validEmails.includes(row.email))
-        setRows(newRows)
-        toast.success(
-            `Removed ${originalLength - newRows.length} students. Remember to click the Save button to commit the changes!`,
-        )
+        setRows(oldRows => {
+            const originalLength = oldRows.length
+            const newRows = oldRows.filter((row) => !result.validEmails.includes(row.email))
+            toast.success(
+                `Removed ${originalLength - newRows.length} students. Remember to click the Save button to commit the changes!`,
+            )
+            return newRows
+        })
+        setChanges(true)
     }
 
     async function save() {
@@ -195,6 +202,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
         try {
             await jutge.instructor.courses.update(course)
             toast.success(`Students saved.`)
+            setChanges(false)
         } catch (error) {
             showError(error)
         }
@@ -307,6 +315,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     return (
         <>
+            {changes ? "There are changes" : ""}
             <AgTableFull
                 rowData={rows}
                 columnDefs={colDefs}
