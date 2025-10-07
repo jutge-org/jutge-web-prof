@@ -2,8 +2,8 @@ import { Toaster } from '@/components/ui/sonner'
 import AuthProvider from '@/jutge-components/layouts/court/lib/Auth'
 import { ThemeProvider } from '@/jutge-components/layouts/court/lib/Theme'
 import type { Metadata } from 'next'
-import { ReactNode } from 'react'
 import { NavigationGuardProvider } from 'next-navigation-guard'
+import { ReactNode } from 'react'
 
 import '@/jutge-components/layouts/court/themes.css'
 import './globals.css'
@@ -26,7 +26,7 @@ export default function RootLayout(props: RootLayoutProps): ReactNode {
                     <ThemeProvider>
                         <AuthProvider>
                             {props.children}
-                            <Toaster richColors expand={true} />
+                            <Toaster richColors expand={true} position="bottom-left" closeButton />
                         </AuthProvider>
                     </ThemeProvider>
                 </NavigationGuardProvider>
