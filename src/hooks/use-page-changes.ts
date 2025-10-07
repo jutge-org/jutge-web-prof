@@ -20,7 +20,6 @@ export function usePageChanges(): [boolean, Dispatch<SetStateAction<boolean>>] {
 
     useEffect(() => {
         if (changes) {
-            console.log('add listener!')
             window.addEventListener('beforeunload', onBeforeUnload)
             return () => {
                 window.removeEventListener('beforeunload', onBeforeUnload)

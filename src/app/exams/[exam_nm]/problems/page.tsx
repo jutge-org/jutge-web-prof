@@ -28,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { usePageChanges } from '@/hooks/use-page-changes'
 import { useTextareaDialog } from '@/jutge-components/dialogs/TextareaDialog'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import Page from '@/jutge-components/layouts/court/Page'
@@ -82,6 +83,8 @@ export default function ExamProblemsPage() {
 
 function ExamProblemsView() {
     //
+
+    const [changes, setChanges] = usePageChanges()
 
     const { exam_nm } = useParams<{ exam_nm: string }>()
 
@@ -173,7 +176,8 @@ function ExamProblemsView() {
         setUsedAbstractProblems(usedAbstractProblems)
         setRows(exam.problems)
         setColDefs(defs)
-    }, [exam_nm, auth.user, allAbstractProblems])
+        setChanges(false)
+    }, [exam_nm, auth.user, allAbstractProblems, setChanges])
 
     const fetchProblems = useCallback(async () => {
         const allAbstractProblems = await jutge.problems.getAllAbstractProblems()
@@ -190,6 +194,7 @@ function ExamProblemsView() {
 
     async function addCallback(problem: InstructorExamProblem) {
         setRows((oldRows) => [...oldRows, problem])
+        setChanges(true)
     }
 
     async function editCallback(problem: InstructorExamProblem) {
@@ -198,12 +203,14 @@ function ExamProblemsView() {
         const newRows = [...rows]
         newRows[index] = problem
         setRows(newRows)
+        setChanges(true)
     }
 
     async function add() {
         setIsDialogOpen(true)
         setDialogKey(Math.random())
         setProblemToEdit(null)
+        setChanges(true)
     }
 
     async function remove() {
@@ -215,6 +222,7 @@ function ExamProblemsView() {
         }
         const newRows = rows.filter((_, index) => !selectedRows.includes(index))
         setRows(newRows)
+        setChanges(true)
     }
 
     async function edit() {
@@ -228,6 +236,7 @@ function ExamProblemsView() {
         setProblemToEdit(problem)
         setIsDialogOpen(true)
         setDialogKey(Math.random())
+        setChanges(true)
     }
 
     async function save() {
@@ -238,6 +247,7 @@ function ExamProblemsView() {
         try {
             await jutge.instructor.exams.updateProblems({ exam_nm, problems })
             toast.success(`Problems of the exam saved.`)
+            setChanges(false)
             await fetchData()
         } catch (error) {
             showError(error)
@@ -252,6 +262,7 @@ function ExamProblemsView() {
             weight: row.weight || 1,
         }))
         setRows(newRows)
+        setChanges(true)
     }
 
     async function print() {

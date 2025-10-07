@@ -2,6 +2,7 @@
 
 import { array2csv } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
+import { usePageChanges } from '@/hooks/use-page-changes'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
@@ -46,6 +47,8 @@ type Item = { title: string; list_nm: string }
 function ExamStudentsView() {
     //
 
+    const [changes, setChanges] = usePageChanges()
+
     const { exam_nm } = useParams<{ exam_nm: string }>()
 
     const [exam, setExam] = useState<InstructorExam | null>(null)
@@ -81,7 +84,9 @@ function ExamStudentsView() {
         },
         { field: 'banned', width: 90, cellRenderer: (p: any) => (p.data.banned ? 'Yes' : 'No') },
         {
-            field: 'invited', width: 90, cellRenderer: (p: any) => (p.data.invited ? 'Yes' : 'No'),
+            field: 'invited',
+            width: 90,
+            cellRenderer: (p: any) => (p.data.invited ? 'Yes' : 'No'),
             hide: true, // Only show if contest is enabled
         },
     ])
@@ -112,7 +117,8 @@ function ExamStudentsView() {
         setExam(exam)
         setRows(rows)
         gridRef.current!.api.setColumnsVisible(['invited'], exam.contest == 1)
-    }, [exam_nm])
+        setChanges(false)
+    }, [exam_nm, setChanges])
 
     useEffect(() => {
         fetchData()
@@ -146,6 +152,7 @@ function ExamStudentsView() {
             invited: 0,
         }))
         setRows([...rows, ...newRows])
+        setChanges(true)
     }
 
     async function removeHandle() {
@@ -165,6 +172,7 @@ function ExamStudentsView() {
 
         const emailsToRemove = result.validEmails
         setRows((rows) => rows.filter((row) => !emailsToRemove.includes(row.email)))
+        setChanges(true)
     }
 
     async function saveHandle() {
@@ -174,6 +182,7 @@ function ExamStudentsView() {
                 students: rows,
             })
             toast.success('Students of the exam saved.')
+            setChanges(false)
             await fetchData()
         } catch (error) {
             showError(error)

@@ -2,6 +2,7 @@
 
 import { array2csv } from '@/actions/csv'
 import { Button } from '@/components/ui/button'
+import { usePageChanges } from '@/hooks/use-page-changes'
 import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
 import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
@@ -76,6 +77,8 @@ function CourseTutorsForm(props: CourseTutorsProps) {
     //
 
     type Row = { email: string; name: string; state: string }
+
+    const [changes, setChanges] = usePageChanges()
 
     const [runConfirmDialog, ConfirmDialogComponent] = useConfirmDialog({
         title: 'Invite',
@@ -155,7 +158,8 @@ function CourseTutorsForm(props: CourseTutorsProps) {
             if (props.course.tutors.enrolled.includes(email)) continue
             newRows.push({ email, name: '', state: 'invited' })
         }
-        setRows([...rows, ...newRows])
+        setRows((oldRows) => [...oldRows, ...newRows])
+        setChanges(true)
         toast.success(
             `Added ${newRows.length} tutors.  Remember to click the Save button to commit the changes!`,
         )
@@ -176,12 +180,15 @@ function CourseTutorsForm(props: CourseTutorsProps) {
             return
         }
 
-        const originalLength = rows.length
-        const newRows = rows.filter((row) => !result.validEmails.includes(row.email))
-        setRows(newRows)
-        toast.success(
-            `Removed ${originalLength - newRows.length} tutors.  Remember to click the Save button to commit the changes!`,
-        )
+        setRows((oldRows) => {
+            const originalLength = oldRows.length
+            const newRows = oldRows.filter((row) => !result.validEmails.includes(row.email))
+            toast.success(
+                `Removed ${originalLength - newRows.length} tutors. Remember to click the Save button to commit the changes!`,
+            )
+            return newRows
+        })
+        setChanges(true)
     }
 
     async function save() {
@@ -190,6 +197,7 @@ function CourseTutorsForm(props: CourseTutorsProps) {
         try {
             await jutge.instructor.courses.update(course)
             toast.success(`Tutors saved.`)
+            setChanges(false)
         } catch (error) {
             showError(error)
         }

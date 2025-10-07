@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { usePageChanges } from '@/hooks/use-page-changes'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
@@ -53,6 +54,8 @@ function ListProblemView() {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
     const gridRef = useRef<AgGridReact<Item>>(null)
 
+    const [changes, setChanges] = usePageChanges()
+
     const [colDefs, setColDefs] = useState([
         {
             rowDrag: true,
@@ -95,10 +98,11 @@ function ListProblemView() {
             setList(list)
             setProblems(problems)
             setItems(items)
+            setChanges(false)
         }
 
         fetchData()
-    }, [list_nm, auth])
+    }, [list_nm, auth, setChanges])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: true }
@@ -125,6 +129,7 @@ function ListProblemView() {
         const newList = { ...list, items }
         await jutge.instructor.lists.update(newList)
         toast.success(`Problems updated.`)
+        setChanges(false)
     }
 
     async function addProblemsCallback(problemsToAdd: string[]) {
@@ -137,6 +142,7 @@ function ListProblemView() {
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const index = selectedRows.length > 0 ? Math.max(...selectedRows) : items.length
         grid.applyTransaction({ add: itemsToAdd, addIndex: index })
+        setChanges(true)
     }
 
     async function addSeparatorCallback(separator: string) {
@@ -149,13 +155,18 @@ function ListProblemView() {
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         const index = selectedRows.length > 0 ? Math.max(...selectedRows) : items.length
         grid.applyTransaction({ add: [itemToAdd], addIndex: index })
+        setChanges(true)
     }
 
     async function deleteAction() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedRows()
-        if (selectedRows.length === 0) toast.warning('Select the items to delete.')
+        if (selectedRows.length === 0) {
+            toast.warning('Select the items to delete.')
+            return
+        }
         grid.applyTransaction({ remove: selectedRows })
+        setChanges(true)
     }
 
     if (list === null) return <SimpleSpinner />

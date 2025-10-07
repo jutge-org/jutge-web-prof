@@ -9,6 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import { usePageChanges } from '@/hooks/use-page-changes'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import Page from '@/jutge-components/layouts/court/Page'
 import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
@@ -51,6 +52,7 @@ export default function CourseListPage() {
 
 function CourseListView() {
     const { course_nm } = useParams<{ course_nm: string }>()
+
     const [course, setCourse] = useState<InstructorCourse | null>(null)
     const [lists, setLists] = useState<Record<string, InstructorBriefList>>({})
     const [items, setItems] = useState<Item[]>([])
@@ -58,6 +60,8 @@ function CourseListView() {
     const [isShowListDialogOpen, setIsShowListDialogOpen] = useState(false)
     const [listToShow, setListToShow] = useState<string | null>(null)
     const gridRef = useRef<AgGridReact<Item>>(null)
+
+    const [changes, setChanges] = usePageChanges()
 
     const [colDefs, setColDefs] = useState([
         {
@@ -94,10 +98,11 @@ function CourseListView() {
             setLists(lists)
             setCourse(course)
             setItems(items)
+            setChanges(false)
         }
 
         fetchCourse()
-    }, [course_nm])
+    }, [course_nm, setChanges])
 
     useEffect(() => {
         // launch this in the background to cache the problems
@@ -117,6 +122,7 @@ function CourseListView() {
         const newCourse = { ...course, lists }
         await jutge.instructor.courses.update(newCourse)
         toast.success(`Lists saved.`)
+        setChanges(false)
     }
 
     async function addCallback(listsToAdd: string[]) {
@@ -128,6 +134,7 @@ function CourseListView() {
             add: itemsToAdd,
             addIndex: index,
         })
+        setChanges(true)
     }
 
     async function deleteAction() {
@@ -137,6 +144,7 @@ function CourseListView() {
         grid.applyTransaction({
             remove: selectedRows,
         })
+        setChanges(true)
     }
 
     async function showListAction(list_nm: string) {
