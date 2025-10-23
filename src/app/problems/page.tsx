@@ -3,13 +3,14 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useIsMobile } from '@/hooks/use-mobile'
 import Page from '@/jutge-components/layouts/court/Page'
 import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { mapmap } from '@/lib/utils'
 import dayjs from 'dayjs'
-import { SquarePlusIcon, WrenchIcon } from 'lucide-react'
+import { BotIcon, MenuIcon, SquarePlusIcon, WrenchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -79,6 +80,7 @@ function ProblemsListView() {
                         (problem_id, problem) => problem.language_id,
                     ),
                     passcode: ownProblemsWithPasscode.includes(problem_nm),
+                    abstractProblems,
                 }
             })
 
@@ -134,9 +136,54 @@ function ProblemsListView() {
             filter: true,
             cellRenderer: (p: any) =>
                 p.data.languages.map((language: string) => (
-                    <Badge key={language} variant="secondary" className="mr-1 px-2">
-                        {language}
-                    </Badge>
+                    <div key={language}>
+                        {p.data.abstractProblems[p.data.problem_nm]?.problems[
+                            `${p.data.problem_nm}_${language}`
+                        ].summary ? (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge variant="secondary" className="mr-1 px-2">
+                                            {language} <MenuIcon size={12} className="ml-1" />
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="flex flex-col w-64 gap-2">
+                                        <p className="font-bold">
+                                            {
+                                                p.data.abstractProblems[p.data.problem_nm].problems[
+                                                    `${p.data.problem_nm}_${language}`
+                                                ].summary.summary_1s
+                                            }
+                                        </p>
+                                        <p>
+                                            {
+                                                p.data.abstractProblems[p.data.problem_nm].problems[
+                                                    `${p.data.problem_nm}_${language}`
+                                                ].summary.summary_1p
+                                            }
+                                        </p>
+                                        <p>
+                                            {p.data.abstractProblems[p.data.problem_nm].problems[
+                                                `${p.data.problem_nm}_${language}`
+                                            ].summary.keywords.replaceAll(',', ', ')}
+                                        </p>
+                                        <p className="flex gap-1">
+                                            <BotIcon size={14} className="" />
+                                            {
+                                                p.data.abstractProblems[p.data.problem_nm].problems[
+                                                    `${p.data.problem_nm}_${language}`
+                                                ].summary.model
+                                            }
+                                        </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        ) : (
+                            <Badge variant="secondary" className="mr-1 px-2">
+                                {language}
+                            </Badge>
+                        )}
+                    </div>
                 )),
             valueGetter: (p: any) => p.data.languages.join(', '),
         },
