@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-10-23T10:43:44.178Z
+ * This file has been automatically generated at 2025-10-23T14:48:28.641Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -113,6 +113,20 @@ export type AllTables = {
     proglangs: Record<string, Proglang>
 }
 
+export type ProblemSummary = {
+    summary_1s: string
+    summary_1p: string
+    keywords: string
+    model: string
+    duration: number
+}
+
+export type SolutionTags = {
+    tags: string
+    model: string
+    duration: number
+}
+
 export type BriefAbstractProblem = {
     problem_nm: string
     author: string | null
@@ -125,6 +139,7 @@ export type BriefAbstractProblem = {
     deprecation: string | null
     created_at: string | string | string | number
     updated_at: string | string | string | number
+    solution_tags: SolutionTags | null
 }
 
 export type BriefProblem = {
@@ -136,13 +151,7 @@ export type BriefProblem = {
     translator: string | null
     translator_email: string | null
     checked: number | null
-    summary: {
-        summary_1s: string
-        summary_1p: string
-        keywords: string
-        model: string
-        duration: number
-    } | null
+    summary: ProblemSummary | null
 }
 
 export type BriefProblemDict = Record<string, BriefProblem>
@@ -159,6 +168,7 @@ export type AbstractProblem = {
     deprecation: string | null
     created_at: string | string | string | number
     updated_at: string | string | string | number
+    solution_tags: SolutionTags | null
     problems: BriefProblemDict
 }
 
@@ -183,13 +193,7 @@ export type Problem = {
     translator: string | null
     translator_email: string | null
     checked: number | null
-    summary: {
-        summary_1s: string
-        summary_1p: string
-        keywords: string
-        model: string
-        duration: number
-    } | null
+    summary: ProblemSummary | null
     abstract_problem: BriefAbstractProblem
 }
 
@@ -208,13 +212,7 @@ export type ProblemRich = {
     translator: string | null
     translator_email: string | null
     checked: number | null
-    summary: {
-        summary_1s: string
-        summary_1p: string
-        keywords: string
-        model: string
-        duration: number
-    } | null
+    summary: ProblemSummary | null
     abstract_problem: BriefAbstractProblem
     sample_testcases: Testcase[]
     html_statement: string
@@ -899,20 +897,6 @@ export type UserRanking = UserRankingEntry[]
 export type DateRange = {
     start: string
     end: string
-}
-
-export type ProblemSummary = {
-    summary_1s: string
-    summary_1p: string
-    keywords: string
-    model: string
-    duration: number
-}
-
-export type AbstractProblemTag = {
-    tags: string
-    model: string
-    duration: number
 }
 
 export type TwoFloats = {
@@ -1690,18 +1674,7 @@ class Module_problems {
      * No warnings
      * Includes abstract problem.
      */
-    async getProblem(problem_id: string): Promise<{
-        problem_id: string
-        problem_nm: string
-        language_id: string
-        title: string
-        original_language_id: string
-        translator: string | null
-        translator_email: string | null
-        checked: number | null
-        summary: ProblemSummary | null
-        abstract_problem: BriefAbstractProblem
-    }> {
+    async getProblem(problem_id: string): Promise<Problem> {
         const [output, ofiles] = await this.root.execute('problems.getProblem', problem_id)
         return output
     }
@@ -1713,20 +1686,7 @@ class Module_problems {
      * No warnings
      * Includes abstract problem, which includes statements, testcases, etc.
      */
-    async getProblemRich(problem_id: string): Promise<{
-        problem_id: string
-        problem_nm: string
-        language_id: string
-        title: string
-        original_language_id: string
-        translator: string | null
-        translator_email: string | null
-        checked: number | null
-        summary: ProblemSummary | null
-        abstract_problem: BriefAbstractProblem
-        sample_testcases: Testcase[]
-        html_statement: string
-    }> {
+    async getProblemRich(problem_id: string): Promise<ProblemRich> {
         const [output, ofiles] = await this.root.execute('problems.getProblemRich', problem_id)
         return output
     }
@@ -4483,63 +4443,65 @@ class Module_admin_problems {
     }
 
     /**
-     * Compute AI tags for an abstract problem.
+     * Compute solution tags for an abstract problem.
      *
      * 🔐 Authentication: admin
      * No warnings
      *
      */
-    async computeAbstractProblemTag(data: {
+    async computeAbstractProblemSolutionTags(data: {
         problem_nm: string
         model: string
-    }): Promise<AbstractProblemTag> {
+    }): Promise<SolutionTags> {
         const [output, ofiles] = await this.root.execute(
-            'admin.problems.computeAbstractProblemTag',
+            'admin.problems.computeAbstractProblemSolutionTags',
             data,
         )
         return output
     }
 
     /**
-     * Get AI tags for an abstract problem.
+     * Get solution tags for an abstract problem.
      *
      * 🔐 Authentication: admin
      * No warnings
      *
      */
-    async getAbstractProblemTag(data: { problem_nm: string }): Promise<AbstractProblemTag | null> {
+    async getAbstractProblemSolutionTags(data: {
+        problem_nm: string
+    }): Promise<SolutionTags | null> {
         const [output, ofiles] = await this.root.execute(
-            'admin.problems.getAbstractProblemTag',
+            'admin.problems.getAbstractProblemSolutionTags',
             data,
         )
         return output
     }
 
     /**
-     * Get list of abstract problems with AI tags.
+     * Get list of abstract problems with solution tags.
      *
      * 🔐 Authentication: admin
      * No warnings
      *
      */
-    async getAbstractProblemsWithTag(): Promise<string[]> {
+    async getAbstractProblemsWithSolutionTags(): Promise<string[]> {
         const [output, ofiles] = await this.root.execute(
-            'admin.problems.getAbstractProblemsWithTag',
+            'admin.problems.getAbstractProblemsWithSolutionTags',
             null,
         )
         return output
     }
 
     /**
-     * Get list of abstract problems without AI tags.
+     * Get list of abstract problems without solution tags.
      *
      * 🔐 Authentication: admin
      * No warnings
      *
      */
-    async getAbstractProblemsWithoutTag(): Promise<string[]> {
+    async getAbstractProblemsWithoutSolutionTags(): Promise<string[]> {
         const [output, ofiles] = await this.root.execute(
-            'admin.problems.getAbstractProblemsWithoutTag',
+            'admin.problems.getAbstractProblemsWithoutSolutionTags',
             null,
         )
         return output

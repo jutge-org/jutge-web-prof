@@ -10,7 +10,7 @@ import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { mapmap } from '@/lib/utils'
 import dayjs from 'dayjs'
-import { BotIcon, MenuIcon, SquarePlusIcon, WrenchIcon } from 'lucide-react'
+import { BotIcon, BotMessageSquareIcon, SquarePlusIcon, WrenchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -144,11 +144,12 @@ function ProblemsListView() {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Badge variant="secondary" className="mr-1 px-2">
-                                            {language} <MenuIcon size={12} className="ml-1" />
+                                            {language}{' '}
+                                            <BotMessageSquareIcon size={12} className="ml-1" />
                                         </Badge>
                                     </TooltipTrigger>
                                     <TooltipContent className="flex flex-col w-64 gap-2">
-                                        <p className="font-bold">
+                                        <p className="font-semibold">
                                             {
                                                 p.data.abstractProblems[p.data.problem_nm].problems[
                                                     `${p.data.problem_nm}_${language}`
@@ -173,6 +174,19 @@ function ProblemsListView() {
                                                 p.data.abstractProblems[p.data.problem_nm].problems[
                                                     `${p.data.problem_nm}_${language}`
                                                 ].summary.model
+                                            }
+                                        </p>
+                                        <hr />
+                                        <p>
+                                            {p.data.abstractProblems[
+                                                p.data.problem_nm
+                                            ].solution_tags?.tags.replaceAll(',', ', ')}
+                                        </p>
+                                        <p className="flex gap-1">
+                                            <BotIcon size={14} className="" />
+                                            {
+                                                p.data.abstractProblems[p.data.problem_nm]
+                                                    .solution_tags?.model
                                             }
                                         </p>
                                     </TooltipContent>

@@ -3,6 +3,7 @@
 import Page from '@/jutge-components/layouts/court/Page'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import { menus } from '@/lib/menus'
+import { BotMessageSquareIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -20,7 +21,27 @@ export default function HomePage() {
 
         return (
             <Page pageContext={{ menu: 'user', current: 'home', title: 'Home' }}>
-                <div className="w-full pt-8 sm:pt-32 flex flex-row justify-center">
+                <div className="pt-8" />
+                <div className="mx-auto w-96 text-sm border-primary border-2 rounded-lg">
+                    <div className="p-6 flex flex-col gap-1">
+                        <div>
+                            <BotMessageSquareIcon size={64} strokeWidth={0.8} className="ml-2" />
+                        </div>
+                        <div>
+                            Hello! I&apos;m Lex<sup>AI</sup>, the bot for Jutge.org.
+                        </div>
+                        <div>You will see some content of mine properly marked.</div>
+                        <div>
+                            To start, I have prepared nice summaries of your problem statements and
+                            solutions. These are not yet automatically updated.
+                        </div>
+                        <div>
+                            Also, click <span className="border rounded-md p-1 mx-1">⌘K</span> and I
+                            will help you navigating and searching.
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-8 w-full pt-8 flex flex-row justify-center">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
                         {Object.entries(menu)
                             .filter(([key, item]) => key != 'home')
@@ -32,12 +53,6 @@ export default function HomePage() {
                                     href={item.href}
                                 />
                             ))}
-                    </div>
-                </div>
-                <div className="hidden sm:block">
-                    <div className="text-center text-xs opacity-50">
-                        Use <span className="border rounded-md p-1 mx-1">⌘K</span> to navigate and
-                        search
                     </div>
                 </div>
             </Page>

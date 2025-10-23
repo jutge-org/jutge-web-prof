@@ -23,6 +23,7 @@ import { mapmap, offerDownloadFile } from '@/lib/utils'
 import dayjs from 'dayjs'
 import LocalizedFormat from 'dayjs/plugin/localizedFormat'
 import {
+    BotIcon,
     CloudDownloadIcon,
     CloudUploadIcon,
     LockIcon,
@@ -210,6 +211,19 @@ function EditProblemForm({ info }: ProblemFormProps) {
                 </Button>
             ),
         },
+        solution_tags: {
+            type: 'input',
+            label: (
+                <div
+                    className="flex justify-end flex-row gap-2  items-center"
+                    title={`Solution tags by ${info.abstractProblem.solution_tags?.model}.`}
+                >
+                    Solution tags <BotIcon size={16} className="-mt-1" />
+                </div>
+            ),
+            value: info.abstractProblem.solution_tags?.tags.replaceAll(',', ', ') || '—',
+        },
+
         sep: {
             type: 'separator',
         },
