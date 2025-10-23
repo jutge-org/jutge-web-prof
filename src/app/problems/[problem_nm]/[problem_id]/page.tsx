@@ -199,6 +199,7 @@ function EditProblemForm({ info }: ProblemFormProps) {
                 </div>
             ),
             value: info.problem.summary?.summary_1s || '—',
+            setValue: () => {},
         },
 
         keywords: {
