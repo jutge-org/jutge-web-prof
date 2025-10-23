@@ -17,7 +17,14 @@ import Markdown from '@/jutge-components/wrappers/Markdown'
 import jutge from '@/lib/jutge'
 import { BriefAbstractProblem, Problem, ProblemSuppl } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'
-import { FileCodeIcon, FileTerminalIcon, FileTextIcon, FileTypeIcon, XIcon } from 'lucide-react'
+import {
+    BotIcon,
+    FileCodeIcon,
+    FileTerminalIcon,
+    FileTextIcon,
+    FileTypeIcon,
+    XIcon,
+} from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { all } from 'radash'
 import { JSX, useEffect, useState } from 'react'
@@ -167,6 +174,46 @@ function EditProblemForm({ info }: ProblemFormProps) {
                 </div>
             ),
         },
+
+        summary_1s: {
+            type: 'input',
+            label: (
+                <div
+                    className="flex justify-end flex-row gap-2  items-center"
+                    title={`Summary in one sentence by ${info.problem.summary?.model}.`}
+                >
+                    Summary 1S <BotIcon size={16} className="-mt-1" />
+                </div>
+            ),
+            value: info.problem.summary?.summary_1s || '—',
+        },
+
+        summary_1p: {
+            type: 'textarea',
+            label: (
+                <div
+                    className="flex justify-end flex-row gap-2  items-center"
+                    title={`Summary in one paragraph by ${info.problem.summary?.model}.`}
+                >
+                    Summary 1P <BotIcon size={16} className="-mt-1" />
+                </div>
+            ),
+            value: info.problem.summary?.summary_1s || '—',
+        },
+
+        keywords: {
+            type: 'input',
+            label: (
+                <div
+                    className="flex justify-end flex-row gap-2  items-center"
+                    title={`Keywords by ${info.problem.summary?.model}.`}
+                >
+                    Keywords <BotIcon size={16} className="-mt-1" />
+                </div>
+            ),
+            value: info.problem.summary?.keywords.replaceAll(',', ', ') || '—',
+        },
+
         view: {
             type: 'free',
             label: 'View',
