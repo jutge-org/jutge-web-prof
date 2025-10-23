@@ -33,11 +33,13 @@ export default function HomePage() {
                         <div>You will see some content of mine properly marked.</div>
                         <div>
                             To start, I have prepared nice summaries of your problem statements and
-                            solutions. These are not yet automatically updated.
+                            solutions. These are shown in the Problems section and, in the future,
+                            will be shown in others parts as well.
                         </div>
                         <div>
-                            Also, click <span className="border rounded-md p-1 mx-1">⌘K</span> and I
-                            will help you navigating and searching.
+                            Also, remember to click{' '}
+                            <span className="border rounded-md p-1 mx-1">⌘K</span> and I will help
+                            you navigating and searching this web.
                         </div>
                     </div>
                 </div>
