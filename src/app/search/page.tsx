@@ -158,7 +158,12 @@ function Result(props: ResultProps) {
                     <div className="w-8">
                         <SignatureIcon className="inline-block mr-1 mb-1" size={16} />
                     </div>
-                    <div className="w-full">{abspbm.author}</div>
+                    <div className="w-full">
+                        {abspbm.author}
+                        {pbm.translator && pbm.translator != abspbm.author && (
+                            <span> (translated by {pbm.translator})</span>
+                        )}
+                    </div>
                 </div>
                 <div className="w-full flex flex-row ">
                     <div className="w-8">
