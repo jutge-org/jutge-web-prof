@@ -14,9 +14,9 @@ import {
     InfoIcon,
     ListIcon,
     PuzzleIcon,
+    SearchIcon,
     SquareCodeIcon,
     TableIcon,
-    TagsIcon,
 } from 'lucide-react'
 
 export const shortTitle = 'prof.jutge.org'
@@ -80,12 +80,12 @@ export const menus: Record<string, Menu> = {
             icon2xl: <PuzzleIcon size={52} strokeWidth={0.8} />,
             shortcut: 'P',
         },
-        tags: {
-            href: '/tags',
-            name: 'Tags',
-            icon: <TagsIcon />,
-            icon2xl: <TagsIcon size={52} strokeWidth={0.8} />,
-            shortcut: 'T',
+        search: {
+            href: '/search',
+            name: 'Search',
+            icon: <SearchIcon />,
+            icon2xl: <SearchIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'S',
         },
         docs: {
             href: '/docs',
@@ -199,6 +199,14 @@ export const menus: Record<string, Menu> = {
     },
 
     tags: {
+        up: {
+            href: '.',
+            name: 'Up',
+            icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
+        },
+    },
+
+    search: {
         up: {
             href: '.',
             name: 'Up',

@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-10-23T14:48:28.641Z
+ * This file has been automatically generated at 2025-10-24T16:03:27.162Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -217,6 +217,8 @@ export type ProblemRich = {
     sample_testcases: Testcase[]
     html_statement: string
 }
+
+export type SemanticSearchResults = { problem_nm: string; similarity: number }[]
 
 export type AllKeys = {
     problems: string[]
@@ -996,7 +998,7 @@ export class JutgeApiClient {
     private cache: Map<string, CacheEntry> = new Map()
 
     /** URL to talk with the API */
-    JUTGE_API_URL = process.env.JUTGE_API_URL || 'https://api.jutge.org/api'
+    JUTGE_API_URL = process.env.JUTGE_API_URL || 'https://dev.api.jutge.org/api'
 
     /** Headers to include in the API requests */
     headers: Record<string, string> = {}
@@ -1814,6 +1816,18 @@ class Module_problems {
     async getTemplate(data: { problem_id: string; template: string }): Promise<Download> {
         const [output, ofiles] = await this.root.execute('problems.getTemplate', data)
         return ofiles[0]
+    }
+
+    /**
+     * Get results for a semantic search for statement problems. The array is sorted by similarity (highest first).
+     *
+     * 🔐 Authentication: any
+     * No warnings
+     *
+     */
+    async semanticSearch(data: { query: string; limit: number }): Promise<SemanticSearchResults> {
+        const [output, ofiles] = await this.root.execute('problems.semanticSearch', data)
+        return output
     }
 }
 
