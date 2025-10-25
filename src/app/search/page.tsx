@@ -14,11 +14,7 @@ import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import Markdown from '@/jutge-components/wrappers/Markdown'
 import jutge from '@/lib/jutge'
-import {
-    AbstractProblem,
-    AbstractProblemSuppl,
-    SemanticSearchResults,
-} from '@/lib/jutge_api_client'
+import { AbstractProblem, AbstractProblemSuppl, SearchResults } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'
 import {
     BookmarkIcon,
@@ -86,13 +82,22 @@ const samples = [
 function SearchView(props: SearchViewProps) {
     const [query, setQuery] = useState(samples[Math.floor(Math.random() * samples.length)])
     const [searching, setSearching] = useState(false)
-    const [results, setResults] = useState<SemanticSearchResults | undefined>(undefined)
+    const [results, setResults] = useState<SearchResults | undefined>(undefined)
 
-    async function search() {
+    async function semanticSearch() {
         if (searching) return
         setSearching(true)
         setResults(undefined)
         const results = await jutge.problems.semanticSearch({ query, limit: 25 })
+        setResults(results)
+        setSearching(false)
+    }
+
+    async function fullTextSearch() {
+        if (searching) return
+        setSearching(true)
+        setResults(undefined)
+        const results = await jutge.problems.fullTextSearch({ query, limit: 25 })
         setResults(results)
         setSearching(false)
     }
@@ -105,11 +110,17 @@ function SearchView(props: SearchViewProps) {
             setValue: setQuery,
             placeHolder: 'Type your search query here',
         },
-        button: {
+        button1: {
             type: 'button',
             text: 'Semantic search',
             icon: <SearchIcon />,
-            action: search,
+            action: semanticSearch,
+        },
+        button2: {
+            type: 'button',
+            text: 'Full text search',
+            icon: <SearchIcon />,
+            action: fullTextSearch,
         },
     }
 
@@ -128,13 +139,15 @@ function SearchView(props: SearchViewProps) {
 
             {results && props.allAbstractProblems && (
                 <div className="flex flex-col gap-4">
-                    {results.map((result) => (
-                        <Result
-                            key={result.problem_nm}
-                            result={result}
-                            allAbstractProblems={props.allAbstractProblems!}
-                        />
-                    ))}
+                    {results
+                        .filter((result) => result.problem_nm in props.allAbstractProblems!)
+                        .map((result) => (
+                            <Result
+                                key={result.problem_nm}
+                                result={result}
+                                allAbstractProblems={props.allAbstractProblems!}
+                            />
+                        ))}
                 </div>
             )}
         </div>
@@ -144,7 +157,7 @@ function SearchView(props: SearchViewProps) {
 type ResultProps = {
     result: {
         problem_nm: string
-        similarity: number
+        score: number
     }
     allAbstractProblems: Record<string, AbstractProblem>
 }
@@ -238,7 +251,7 @@ function Result(props: ResultProps) {
                 )}
                 <div className="text-gray-400 text-xs mt-1.5">
                     <CircleGaugeIcon className="inline-block mr-1 mb-1" size={16} />
-                    {props.result.similarity.toFixed(2)}
+                    {props.result.score.toFixed(2)}
                 </div>
             </div>
             <div className="space-y-1" />

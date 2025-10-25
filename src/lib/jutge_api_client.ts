@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-10-25T09:41:08.198Z
+ * This file has been automatically generated at 2025-10-25T16:22:54.596Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -218,7 +218,7 @@ export type ProblemRich = {
     html_statement: string
 }
 
-export type SemanticSearchResults = { problem_nm: string; similarity: number }[]
+export type SearchResults = { problem_nm: string; score: number }[]
 
 export type AllKeys = {
     problems: string[]
@@ -1819,14 +1819,26 @@ class Module_problems {
     }
 
     /**
-     * Get results for a semantic search for statement problems. The array is sorted by similarity (highest first).
+     * Get results for a semantic search for statement problems. The array is sorted by score (better at the top).
      *
      * 🔐 Authentication: any
      * No warnings
      *
      */
-    async semanticSearch(data: { query: string; limit: number }): Promise<SemanticSearchResults> {
+    async semanticSearch(data: { query: string; limit: number }): Promise<SearchResults> {
         const [output, ofiles] = await this.root.execute('problems.semanticSearch', data)
+        return output
+    }
+
+    /**
+     * Get results for a full text search for statement problems. The array is sorted by score (better at the top). Queries are matched against titles and statements and can use boolean operators.
+     *
+     * 🔐 Authentication: any
+     * No warnings
+     *
+     */
+    async fullTextSearch(data: { query: string; limit: number }): Promise<SearchResults> {
+        const [output, ofiles] = await this.root.execute('problems.fullTextSearch', data)
         return output
     }
 }
