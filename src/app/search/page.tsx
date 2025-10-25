@@ -117,8 +117,8 @@ function SearchView(props: SearchViewProps) {
         <div>
             <div className="border rounded-lg px-4 py-3 mb-4 flex flex-col text-sm">
                 <p>
-                    This page is still under development. You can use it to search for problems
-                    semantically using Lex<sup>AI</sup>.
+                    This page is still under development, some bugs still exist. You can use it to
+                    search for problems semantically using Jutge<sup>AI</sup>.
                 </p>
             </div>
 
@@ -211,7 +211,7 @@ function Result(props: ResultProps) {
                     href={`https://jutge.org/problems/${props.result.problem_nm}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-bold"
+                    className="font-bold text-primary hover:underline"
                 >
                     {props.result.problem_nm}
                     <SquareArrowOutUpRightIcon className="inline-block ml-1 mb-1" size={16} />

@@ -28,7 +28,7 @@ export default function HomePage() {
                             <BotMessageSquareIcon size={64} strokeWidth={0.8} className="ml-2" />
                         </div>
                         <div>
-                            Hello! I&apos;m Lex<sup>AI</sup>, the bot for Jutge.org.
+                            Hello! I&apos;m Jutge<sup>AI</sup>, the bot for Jutge.org.
                         </div>
                         <div>You will see some content of mine properly marked.</div>
                         <div>
