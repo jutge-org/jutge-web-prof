@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-10-24T16:03:27.162Z
+ * This file has been automatically generated at 2025-10-25T09:41:08.198Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -998,7 +998,7 @@ export class JutgeApiClient {
     private cache: Map<string, CacheEntry> = new Map()
 
     /** URL to talk with the API */
-    JUTGE_API_URL = process.env.JUTGE_API_URL || 'https://dev.api.jutge.org/api'
+    JUTGE_API_URL = process.env.JUTGE_API_URL || 'https://api.jutge.org/api'
 
     /** Headers to include in the API requests */
     headers: Record<string, string> = {}
