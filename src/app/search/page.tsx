@@ -517,7 +517,7 @@ interface VoiceInputProps {
     className?: string
 }
 
-export function VoiceInput({
+function VoiceInput({
     value,
     onChange,
     type,
