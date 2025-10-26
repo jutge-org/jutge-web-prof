@@ -22,19 +22,18 @@ export default function HomePage() {
         return (
             <Page pageContext={{ menu: 'user', current: 'home', title: 'Home' }}>
                 <div className="pt-8" />
-                <div className="mx-auto w-96 text-sm border-primary border-2 rounded-lg">
-                    <div className="p-6 flex flex-col gap-1">
+                <div className="w-full md:w-1/2 mx-auto border-primary border-2 rounded-lg">
+                    <div className="p-6 flex flex-col gap-1 text-sm">
                         <div>
                             <BotMessageSquareIcon size={64} strokeWidth={0.8} className="ml-2" />
                         </div>
                         <div>
-                            Hello! I&apos;m Jutge<sup>AI</sup>, the bot for Jutge.org.
+                            <b>Hello instructor!</b> &nbsp; I&apos;m Jutge<sup>AI</sup>, the bot for
+                            Jutge.org.
                         </div>
-                        <div>You will see some content of mine properly marked.</div>
                         <div>
-                            To start, I have prepared nice summaries of your problem statements and
-                            solutions. These are shown in the Problems section and, in the future,
-                            will be shown in others parts as well.
+                            I prepare nice summaries of your problem statements and solutions. These
+                            are shown in the Problems section and used in the new Search section.
                         </div>
                         <div>
                             Also, remember to click{' '}

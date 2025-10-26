@@ -9,8 +9,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
 import Markdown from '@/jutge-components/wrappers/Markdown'
 import jutge from '@/lib/jutge'
@@ -19,7 +20,6 @@ import { offerDownloadFile } from '@/lib/utils'
 import {
     BookmarkIcon,
     BotIcon,
-    CircleGaugeIcon,
     CircleMinusIcon,
     CirclePlusIcon,
     CogIcon,
@@ -28,17 +28,18 @@ import {
     FileTextIcon,
     FileTypeIcon,
     MedalIcon,
+    Mic,
+    MicOff,
     ScrollIcon,
     ScrollTextIcon,
     SearchIcon,
     SignatureIcon,
     SkullIcon,
     SquareArrowOutUpRightIcon,
-    StarIcon,
     TagsIcon,
     XIcon,
 } from 'lucide-react'
-import { JSX, useEffect, useState } from 'react'
+import { JSX, useEffect, useRef, useState } from 'react'
 
 export default function SearchPage() {
     const [allAbstractProblems, setAllAbstractProblems] = useState<Record<
@@ -80,15 +81,17 @@ const samples = [
 ]
 
 function SearchView(props: SearchViewProps) {
-    const [query, setQuery] = useState(samples[Math.floor(Math.random() * samples.length)])
     const [searching, setSearching] = useState(false)
     const [results, setResults] = useState<SearchResults | undefined>(undefined)
+
+    const [semanticQuery, setSemanticQuery] = useState('')
+    const [fullTextQuery, setFullTextQuery] = useState('')
 
     async function semanticSearch() {
         if (searching) return
         setSearching(true)
         setResults(undefined)
-        const results = await jutge.problems.semanticSearch({ query, limit: 25 })
+        const results = await jutge.problems.semanticSearch({ query: semanticQuery, limit: 50 })
         setResults(results)
         setSearching(false)
     }
@@ -97,45 +100,29 @@ function SearchView(props: SearchViewProps) {
         if (searching) return
         setSearching(true)
         setResults(undefined)
-        const results = await jutge.problems.fullTextSearch({ query, limit: 25 })
+        const results = await jutge.problems.fullTextSearch({ query: fullTextQuery, limit: 50 })
         setResults(results)
         setSearching(false)
     }
 
-    const fields: JFormFields = {
-        query: {
-            type: 'input',
-            label: 'Query',
-            value: query,
-            setValue: setQuery,
-            placeHolder: 'Type your search query here',
-        },
-        button1: {
-            type: 'button',
-            text: 'Semantic search',
-            icon: <SearchIcon />,
-            action: semanticSearch,
-        },
-        button2: {
-            type: 'button',
-            text: 'Full text search',
-            icon: <SearchIcon />,
-            action: fullTextSearch,
-        },
-    }
-
     return (
         <div>
-            <div className="border rounded-lg px-4 py-3 mb-4 flex flex-col text-sm">
-                <p>
-                    This page is still under development, some bugs still exist. You can use it to
-                    search for problems semantically using Jutge<sup>AI</sup>.
-                </p>
-            </div>
-
-            <JForm fields={fields} />
+            <SearchTabsComponent
+                semanticQuery={semanticQuery}
+                setSemanticQuery={setSemanticQuery}
+                fullTextQuery={fullTextQuery}
+                setFullTextQuery={setFullTextQuery}
+                handleSemanticSearch={semanticSearch}
+                handleFullTextSearch={fullTextSearch}
+            />
 
             {searching && <Searching />}
+
+            {results && results.length === 0 && (
+                <div className="border rounded-lg p-8 mb-4 flex flex-col justify-center items-center">
+                    <div className="text-sm">No results found</div>
+                </div>
+            )}
 
             {results && props.allAbstractProblems && (
                 <div className="flex flex-col gap-4">
@@ -244,15 +231,6 @@ function Result(props: ResultProps) {
                     ))}
                 <div />
                 <div className="flex-grow" />
-                {abspbm.official && (
-                    <div className="text-gray-400 text-xs mt-1.5">
-                        <StarIcon className="inline-block mr-1 mb-1" size={16} />
-                    </div>
-                )}
-                <div className="text-gray-400 text-xs mt-1.5">
-                    <CircleGaugeIcon className="inline-block mr-1 mb-1" size={16} />
-                    {props.result.score.toFixed(2)}
-                </div>
             </div>
             <div className="space-y-1" />
             <div className="flex flex-row">
@@ -439,8 +417,181 @@ function StatementDialog({
 function Searching() {
     return (
         <div className="border rounded-lg p-8 mb-4 flex flex-col justify-center items-center">
-            <BotIcon size={48} className="animate-bounce" strokeWidth={1} />
+            <CogIcon size={48} className="animate-spin" strokeWidth={1} />
             <div className="animate-pulse text-sm">Searching</div>
+        </div>
+    )
+}
+
+type SearchTabsComponentProps = {
+    semanticQuery: string
+    setSemanticQuery: (query: string) => void
+    fullTextQuery: string
+    setFullTextQuery: (query: string) => void
+    handleSemanticSearch: () => void
+    handleFullTextSearch: () => void
+}
+
+function SearchTabsComponent(props: SearchTabsComponentProps) {
+    return (
+        <div className="w-full border rounded-lg p-6 mb-4">
+            <div className="w-full sm:w-3/4 mx-auto">
+                <Tabs defaultValue="semantic" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="semantic">
+                            <BotIcon className="mr-2 -mt-1" size={16} />
+                            Semantic search
+                        </TabsTrigger>
+                        <TabsTrigger value="fulltext">
+                            <SearchIcon className="mr-2 -mt-1" size={16} />
+                            Text search
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="semantic" className="space-y-4 mt-4">
+                        <div className="flex gap-2">
+                            <VoiceInput
+                                type="text"
+                                placeholder="Your query"
+                                value={props.semanticQuery}
+                                onChange={(e) => props.setSemanticQuery(e.target.value)}
+                                onKeyPress={(e) =>
+                                    e.key === 'Enter' && props.handleSemanticSearch()
+                                }
+                                className="flex-1"
+                            />
+                            <Button
+                                onClick={props.handleSemanticSearch}
+                                size="icon"
+                                className="shrink-0"
+                            >
+                                <BotIcon className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground text-justify">
+                            Semantic search understands the meaning, language and context of your
+                            query to find relevant results about problems. Problems are reindexed
+                            each night.
+                        </p>
+                    </TabsContent>
+
+                    <TabsContent value="fulltext" className="space-y-4 mt-4">
+                        <div className="flex gap-2">
+                            <VoiceInput
+                                type="text"
+                                placeholder="Your query"
+                                value={props.fullTextQuery}
+                                onChange={(e) => props.setFullTextQuery(e.target.value)}
+                                onKeyPress={(e) =>
+                                    e.key === 'Enter' && props.handleFullTextSearch()
+                                }
+                                className="flex-1"
+                            />
+                            <Button
+                                onClick={props.handleFullTextSearch}
+                                size="icon"
+                                className="shrink-0"
+                            >
+                                <SearchIcon className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground text-justify">
+                            Full-text search looks for exact keyword matches in the title,
+                            statement, keywords and summaries of problems. Use boolean operators
+                            (AND, OR, NOT) and parentheses for more precise results. Use quotes for
+                            exact phrases. Problems are reindexed each night.
+                        </p>
+                    </TabsContent>
+                </Tabs>
+            </div>
+        </div>
+    )
+}
+
+interface VoiceInputProps {
+    value: string
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    type?: string
+    placeholder?: string
+    onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+    className?: string
+}
+
+export function VoiceInput({
+    value,
+    onChange,
+    type,
+    placeholder,
+    onKeyPress,
+    className,
+}: VoiceInputProps) {
+    const [isListening, setIsListening] = useState(false)
+    const recognitionRef = useRef<any>(null)
+
+    const startListening = () => {
+        const SpeechRecognition =
+            (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+
+        if (!SpeechRecognition) {
+            alert('Speech recognition is not supported in your browser')
+            return
+        }
+
+        recognitionRef.current = new SpeechRecognition()
+        recognitionRef.current.continuous = true
+        recognitionRef.current.interimResults = true
+
+        recognitionRef.current.onresult = (event: any) => {
+            const transcript = Array.from(event.results)
+                .map((result: any) => result[0].transcript)
+                .join('')
+
+            // Create a synthetic event to match Input's onChange signature
+            const syntheticEvent = {
+                target: { value: transcript },
+                currentTarget: { value: transcript },
+            } as React.ChangeEvent<HTMLInputElement>
+
+            onChange(syntheticEvent)
+        }
+
+        recognitionRef.current.start()
+        setIsListening(true)
+    }
+
+    const stopListening = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop()
+            setIsListening(false)
+        }
+    }
+
+    const handleBlur = () => {
+        if (isListening) {
+            stopListening()
+        }
+    }
+
+    return (
+        <div className="w-full relative" onBlur={handleBlur}>
+            <Input
+                value={value}
+                onChange={onChange}
+                type={type}
+                placeholder={placeholder}
+                onKeyPress={onKeyPress}
+                className={`pr-10 ${className || ''}`}
+            />
+            <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className={`absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 ${isListening ? 'text-red-500' : ''}`}
+                onClick={isListening ? stopListening : startListening}
+                title={isListening ? 'Stop listening' : 'Start voice input'}
+            >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
         </div>
     )
 }
