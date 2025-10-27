@@ -253,7 +253,7 @@ function Result(props: ResultProps) {
                         onClick={() => setDetailsOpen(true)}
                     />
                 )}
-                <div className="font-bold">{pbm.title}</div>
+                <div className="font-bold">{pbm.title || 'Untitled problem'}</div>
             </div>
 
             <div className="mt-1 ml-6 text-sm flex flex-col gap-1">
