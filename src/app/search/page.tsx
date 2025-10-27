@@ -89,20 +89,26 @@ function SearchView(props: SearchViewProps) {
 
     async function semanticSearch() {
         if (searching) return
-        setSearching(true)
-        setResults(undefined)
-        const results = await jutge.problems.semanticSearch({ query: semanticQuery, limit: 50 })
-        setResults(results)
-        setSearching(false)
+        setResults((old) => undefined)
+        const query = semanticQuery.trim()
+        setSemanticQuery((old) => query)
+        if (query.length === 0) return
+        setSearching((old) => true)
+        const results = await jutge.problems.semanticSearch({ query, limit: 50 })
+        setSearching((old) => false)
+        setResults((old) => results)
     }
 
     async function fullTextSearch() {
         if (searching) return
+        setResults((old) => undefined)
+        const query = fullTextQuery.trim()
+        setFullTextQuery((old) => query)
+        if (query.length === 0) return
         setSearching(true)
-        setResults(undefined)
-        const results = await jutge.problems.fullTextSearch({ query: fullTextQuery, limit: 50 })
-        setResults(results)
-        setSearching(false)
+        const results = await jutge.problems.fullTextSearch({ query, limit: 50 })
+        setSearching((old) => false)
+        setResults((old) => results)
     }
 
     return (
@@ -496,10 +502,10 @@ function SearchTabsComponent(props: SearchTabsComponentProps) {
                             </Button>
                         </div>
                         <p className="text-sm text-muted-foreground text-justify">
-                            Full-text search looks for exact keyword matches in the title,
-                            statement, keywords and summaries of problems. Use boolean operators
-                            (AND, OR, NOT) and parentheses for more precise results. Use quotes for
-                            exact phrases. Problems are reindexed each night.
+                            Text search looks for exact keyword matches in the title, statement,
+                            keywords and summaries of problems. Use boolean operators (AND, OR, NOT)
+                            and parentheses for more precise results. Use quotes for exact phrases.
+                            Problems are reindexed each night.
                         </p>
                     </TabsContent>
                 </Tabs>
