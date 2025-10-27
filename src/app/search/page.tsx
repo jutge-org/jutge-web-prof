@@ -257,17 +257,19 @@ function Result(props: ResultProps) {
             </div>
 
             <div className="mt-1 ml-6 text-sm flex flex-col gap-1">
-                <div className="w-full flex flex-row">
-                    <div className="w-8">
-                        <SignatureIcon className="inline-block mr-1 mb-1" size={16} />
+                {abspbm.author && (
+                    <div className="w-full flex flex-row">
+                        <div className="w-8">
+                            <SignatureIcon className="inline-block mr-1 mb-1" size={16} />
+                        </div>
+                        <div className="w-full">
+                            {abspbm.author}
+                            {pbm.translator && pbm.translator != abspbm.author && (
+                                <span> (translated by {pbm.translator})</span>
+                            )}
+                        </div>
                     </div>
-                    <div className="w-full">
-                        {abspbm.author}
-                        {pbm.translator && pbm.translator != abspbm.author && (
-                            <span> (translated by {pbm.translator})</span>
-                        )}
-                    </div>
-                </div>
+                )}
                 {pbm.summary && (
                     <div className="w-full flex flex-row">
                         <div className="w-8">
