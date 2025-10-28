@@ -52,19 +52,25 @@ function ExamPropertiesView() {
 
     const fetchData = useCallback(async () => {
         const data = await all({
-            course: jutge.instructor.courses.index(),
+            courses: jutge.instructor.courses.index(),
             exam: jutge.instructor.exams.get(exam_nm),
             archived: jutge.instructor.exams.getArchived(),
             compilers: jutge.tables.getCompilers(),
             documents: jutge.instructor.documents.index(),
             avatarPacks: jutge.misc.getAvatarPacks(),
         })
-        setCourses(data.course)
+        setCourses(data.courses)
         setExam(data.exam)
         setArchived(data.archived.includes(exam_nm))
         setCompilers(data.compilers)
         setDocuments(data.documents)
         setAvatarPacks(data.avatarPacks)
+
+        if (data.exam.course.course_nm === 'All') {
+            toast.error(
+                `Warning: Exam ${exam_nm} is not associated with a course. You may not start it!`,
+            )
+        }
     }, [exam_nm])
 
     useEffect(() => {
