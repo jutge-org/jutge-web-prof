@@ -1,14 +1,8 @@
 'use client'
 
+import StatementDialog from '@/components/StatementDialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import Page from '@/jutge-components/layouts/court/Page'
@@ -17,14 +11,7 @@ import Markdown from '@/jutge-components/wrappers/Markdown'
 import jutge from '@/lib/jutge'
 import { BriefAbstractProblem, Problem, ProblemSuppl } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'
-import {
-    BotIcon,
-    FileCodeIcon,
-    FileTerminalIcon,
-    FileTextIcon,
-    FileTypeIcon,
-    XIcon,
-} from 'lucide-react'
+import { BotIcon, FileCodeIcon, FileTerminalIcon, FileTextIcon, FileTypeIcon } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { all } from 'radash'
 import { JSX, useEffect, useState } from 'react'
@@ -245,7 +232,7 @@ function EditProblemForm({ info }: ProblemFormProps) {
         const htmlStatement = await jutge.problems.getHtmlStatement(info.problem.problem_id)
         setStatement(
             <div
-                className="border rounded-lg p-4 w-full h-96 scroll-auto"
+                className="border rounded-lg p-4 w-full h-96 overflow-y-auto"
                 dangerouslySetInnerHTML={{ __html: htmlStatement }}
             />,
         )
@@ -261,7 +248,7 @@ function EditProblemForm({ info }: ProblemFormProps) {
     async function markdownAction() {
         const markdownStatement = await jutge.problems.getMarkdownStatement(info.problem.problem_id)
         setStatement(
-            <div className="text-sm border rounded-lg p-4 w-full h-96 scroll-auto">
+            <div className="text-sm border rounded-lg p-4 w-full h-96 overflow-y-auto">
                 <Markdown markdown={markdownStatement} className="prose-sm" />
             </div>,
         )
@@ -278,36 +265,6 @@ function EditProblemForm({ info }: ProblemFormProps) {
                 setIsOpen={setIsStatementDialogOpen}
             />
         </>
-    )
-}
-
-function StatementDialog({
-    isOpen,
-    setIsOpen,
-    problem_id,
-    content,
-}: {
-    isOpen: boolean
-    setIsOpen: (open: boolean) => void
-    problem_id: string
-    content: JSX.Element | string | null
-}) {
-    return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent>
-                <DialogDescription className="hidden">Statement for {problem_id}</DialogDescription>
-                <DialogHeader>
-                    <DialogTitle>Statement for {problem_id}</DialogTitle>
-                    <DialogDescription className="flex flex-col gap-4">
-                        {content}
-                        <Button onClick={() => setIsOpen(false)}>
-                            <XIcon />
-                            Close
-                        </Button>
-                    </DialogDescription>
-                </DialogHeader>
-            </DialogContent>
-        </Dialog>
     )
 }
 

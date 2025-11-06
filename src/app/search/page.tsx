@@ -1,14 +1,8 @@
 'use client'
 
+import StatementDialog from '@/components/StatementDialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
@@ -37,7 +31,6 @@ import {
     SkullIcon,
     SquareArrowOutUpRightIcon,
     TagsIcon,
-    XIcon,
 } from 'lucide-react'
 import { JSX, useEffect, useRef, useState } from 'react'
 
@@ -187,7 +180,7 @@ function Result(props: ResultProps) {
         const htmlStatement = await jutge.problems.getHtmlStatement(pbm.problem_id)
         setStatement(
             <div
-                className="border rounded-lg p-4 w-full h-96 scroll-auto"
+                className="border rounded-lg p-4 w-full h-96 overflow-y-auto"
                 dangerouslySetInnerHTML={{ __html: htmlStatement }}
             />,
         )
@@ -203,7 +196,7 @@ function Result(props: ResultProps) {
     async function markdownFile() {
         const markdownStatement = await jutge.problems.getMarkdownStatement(pbm.problem_id)
         setStatement(
-            <div className="text-sm border rounded-lg p-4 w-full h-96 scroll-auto">
+            <div className="text-sm border rounded-lg p-4 w-full h-96 overflow-y-auto">
                 <Markdown markdown={markdownStatement} className="prose-sm" />
             </div>,
         )
@@ -389,36 +382,6 @@ function Result(props: ResultProps) {
                 setIsOpen={setIsStatementDialogOpen}
             />
         </div>
-    )
-}
-
-function StatementDialog({
-    isOpen,
-    setIsOpen,
-    problem_id,
-    content,
-}: {
-    isOpen: boolean
-    setIsOpen: (open: boolean) => void
-    problem_id: string
-    content: JSX.Element | string | null
-}) {
-    return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent>
-                <DialogDescription className="hidden">Statement for {problem_id}</DialogDescription>
-                <DialogHeader>
-                    <DialogTitle>Statement for {problem_id}</DialogTitle>
-                    <DialogDescription className="flex flex-col gap-4">
-                        {content}
-                        <Button onClick={() => setIsOpen(false)}>
-                            <XIcon />
-                            Close
-                        </Button>
-                    </DialogDescription>
-                </DialogHeader>
-            </DialogContent>
-        </Dialog>
     )
 }
 
