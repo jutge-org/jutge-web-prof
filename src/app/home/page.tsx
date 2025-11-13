@@ -3,7 +3,7 @@
 import Page from '@/jutge-components/layouts/court/Page'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import { menus } from '@/lib/menus'
-import { BotMessageSquareIcon } from 'lucide-react'
+import { BotMessageSquareIcon, RssIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -21,7 +21,21 @@ export default function HomePage() {
 
         return (
             <Page pageContext={{ menu: 'user', current: 'home', title: 'Home' }}>
-                <div className="pt-8" />
+                <div className="mt-8 w-full pt-8 flex flex-row justify-center">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
+                        {Object.entries(menu)
+                            .filter(([key, item]) => key != 'home')
+                            .map(([key, item]) => (
+                                <Option
+                                    key={key}
+                                    icon={item.icon2xl}
+                                    title={item.name}
+                                    href={item.href}
+                                />
+                            ))}
+                    </div>
+                </div>
+
                 <div className="w-full md:w-1/2 mx-auto border-primary border-2 rounded-lg">
                     <div className="p-6 flex flex-col gap-1 text-sm">
                         <div>
@@ -42,18 +56,26 @@ export default function HomePage() {
                         </div>
                     </div>
                 </div>
-                <div className="mt-8 w-full pt-8 flex flex-row justify-center">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
-                        {Object.entries(menu)
-                            .filter(([key, item]) => key != 'home')
-                            .map(([key, item]) => (
-                                <Option
-                                    key={key}
-                                    icon={item.icon2xl}
-                                    title={item.name}
-                                    href={item.href}
-                                />
-                            ))}
+
+                <div className="mt-8 w-full md:w-1/2 mx-auto border-primary border-2 rounded-lg">
+                    <div className="p-6 flex flex-col gap-1 text-sm">
+                        <div>
+                            <RssIcon size={64} strokeWidth={0.8} className="" />
+                        </div>
+                        <div>
+                            <b>News</b>
+                        </div>
+                        <ul className="mt-4 list-disc list-inside">
+                            <li>
+                                2025-11-13: PDF exams include version with duplex pages for easier
+                                printing.
+                            </li>
+                            <li>
+                                2025-11-13: It is possible to change (or remove) the password of an
+                                exam.
+                            </li>
+                            <li>2025-10-26: Full text and semantic search functionality added.</li>
+                        </ul>
                     </div>
                 </div>
             </Page>
