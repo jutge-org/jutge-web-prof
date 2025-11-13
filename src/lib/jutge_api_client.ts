@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-10-26T17:17:16.281Z
+ * This file has been automatically generated at 2025-11-13T11:47:50.708Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -4076,6 +4076,37 @@ class Module_admin_tasks {
         const [output, ofiles] = await this.root.execute('admin.tasks.resubmitPendings', null)
         return output
     }
+
+    /**
+     * Get full text search database status.
+     *
+     * 🔐 Authentication: admin
+     * No warnings
+     *
+     */
+    async getFullTextSearchDatabase(): Promise<Download> {
+        const [output, ofiles] = await this.root.execute(
+            'admin.tasks.getFullTextSearchDatabase',
+            null,
+        )
+        return ofiles[0]
+    }
+
+    /**
+     * Update semantic search database.
+     *
+     * 🔐 Authentication: admin
+     * No warnings
+     *
+     */
+    async updateSemanticSearchDatabase(data: string, ifile: File): Promise<void> {
+        const [output, ofiles] = await this.root.execute(
+            'admin.tasks.updateSemanticSearchDatabase',
+            data,
+            [ifile],
+        )
+        return output
+    }
 }
 
 /**
@@ -4406,18 +4437,18 @@ class Module_admin_problems {
     }
 
     /**
-     * Compute summary for a problem.
+     * Prepare summary for a problem.
      *
      * 🔐 Authentication: admin
      * No warnings
      *
      */
-    async computeProblemSummary(data: {
+    async prepareProblemSummary(data: {
         problem_id: string
         model: string
     }): Promise<ProblemSummary> {
         const [output, ofiles] = await this.root.execute(
-            'admin.problems.computeProblemSummary',
+            'admin.problems.prepareProblemSummary',
             data,
         )
         return output
@@ -4469,18 +4500,18 @@ class Module_admin_problems {
     }
 
     /**
-     * Compute solution tags for an abstract problem.
+     * Prepare solution tags for an abstract problem.
      *
      * 🔐 Authentication: admin
      * No warnings
      *
      */
-    async computeAbstractProblemSolutionTags(data: {
+    async prepareAbstractProblemSolutionTags(data: {
         problem_nm: string
         model: string
     }): Promise<SolutionTags> {
         const [output, ofiles] = await this.root.execute(
-            'admin.problems.computeAbstractProblemSolutionTags',
+            'admin.problems.prepareAbstractProblemSolutionTags',
             data,
         )
         return output

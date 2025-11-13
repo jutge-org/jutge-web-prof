@@ -237,6 +237,8 @@ function EditExamForm(props: ExamFormProps) {
             type: 'input',
             label: 'Exam password',
             value: code,
+            setValue: setCode,
+            placeHolder: 'No password',
         },
         contest: {
             type: 'switch',
