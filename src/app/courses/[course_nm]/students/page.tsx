@@ -23,7 +23,7 @@ import { AgGridReact } from 'ag-grid-react'
 import FileSaver from 'file-saver'
 import {
     CircleMinusIcon,
-    CopyIcon,
+    ClipboardCopyIcon,
     DownloadCloudIcon,
     PlusCircleIcon,
     SaveIcon,
@@ -119,7 +119,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     const gridRef = useRef<AgGridReact<CourseMembers>>(null)
 
-    const onGridReady = useCallback(() => {}, [])
+    const onGridReady = useCallback(() => { }, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: true }
@@ -353,7 +353,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
                     title="Copy emails to clipboard"
                     variant={'outline'}
                 >
-                    <CopyIcon /> Copy emails
+                    <ClipboardCopyIcon /> Copy emails
                 </Button>
 
                 <Button

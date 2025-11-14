@@ -15,7 +15,7 @@ import { AgGridReact } from 'ag-grid-react'
 import FileSaver from 'file-saver'
 import {
     CircleMinusIcon,
-    CopyIcon,
+    ClipboardCopyIcon,
     DownloadCloudIcon,
     PlusCircleIcon,
     SaveIcon,
@@ -262,7 +262,7 @@ function ExamStudentsView() {
                     title="Copy emails to clipboard"
                     variant={'outline'}
                 >
-                    <CopyIcon /> Copy emails
+                    <ClipboardCopyIcon /> Copy emails
                 </Button>
                 <Button
                     className="w-36 justify-start"

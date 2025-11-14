@@ -67,6 +67,9 @@ export default function HomePage() {
                         </div>
                         <ul className="mt-4 list-disc list-inside">
                             <li>
+                                2025-11-14: Exam problems can be copied and pasted through the clipboard.
+                            </li>
+                            <li>
                                 2025-11-13: PDF exams include version with duplex pages for easier
                                 printing.
                             </li>

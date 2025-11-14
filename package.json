@@ -5,7 +5,7 @@
     "scripts": {
         "format": "bun prettier src --write",
         "lint": "next lint",
-        "dev": "next dev --turbopack",
+        "dev": "bun --bun next dev",
         "start": "next start",
         "build": "next build",
         "depcheck": "bunx depcheck --ignores='bun,bun:test,eslint,eslint-config-next,prettier-plugin-organize-imports,typescript'",

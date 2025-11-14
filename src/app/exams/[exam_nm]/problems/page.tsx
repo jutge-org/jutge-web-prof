@@ -44,11 +44,15 @@ import {
 import { cn, Dict, mapmap, showError } from '@/lib/utils'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
+import { th } from 'date-fns/locale'
 import { saveAs } from 'file-saver'
 import {
     Check,
     CircleMinusIcon,
+    ClipboardCopyIcon,
+    ClipboardPasteIcon,
     CloudDownloadIcon,
+    CopyIcon,
     EditIcon,
     FileTextIcon,
     PaintbrushIcon,
@@ -277,6 +281,43 @@ function ExamProblemsView() {
         saveAs(doc, `${exam_nm}-${nanoid()}.pdf`)
     }
 
+    async function copyProblemsHandle() {
+        if (rows.length === 0) {
+            toast.error('No problems to copy')
+            return
+        }
+        const data = {
+            type: 'exam_problems_clipboard',
+            problems: rows,
+        }
+        try {
+            const text = JSON.stringify(data, null, 2)
+            await navigator.clipboard.writeText(text)
+            toast.success('Problems copied to clipboard')
+        } catch (error) {
+            toast.error('Error copying problems to clipboard')
+            console.error('Error copying problems to clipboard:', error)
+        }
+    }
+
+    async function pasteProblemsHandle() {
+        try {
+            const text = await navigator.clipboard.readText()
+            const data = JSON.parse(text)
+            console.log('Pasted data:', data)
+            if (data.type !== 'exam_problems_clipboard' || !Array.isArray(data.problems)) {
+                throw new Error('Invalid data')
+            }
+            const problems: InstructorExamProblem[] = data.problems
+            setRows([...rows, ...problems])
+            setChanges(true)
+            toast.success('Problems pasted from clipboard')
+        } catch (error) {
+            toast.error('Clipboard does not contain valid exam problems data')
+        }
+    }
+
+
     if (auth.user === null || exam === null || usedAbstractProblems === null)
         return <SimpleSpinner />
 
@@ -292,7 +333,7 @@ function ExamProblemsView() {
             />
             <div className="mt-4 flex flex-row gap-2">
                 <Button
-                    className="w-28 justify-start"
+                    className="w-40 justify-start"
                     onClick={print}
                     title="Get a PDF with a simple cover page and all problem statements"
                     variant={'outline'}
@@ -300,6 +341,23 @@ function ExamProblemsView() {
                     {' '}
                     <FileTextIcon /> Get PDF
                 </Button>
+                <Button
+                    className="w-40 justify-start"
+                    onClick={copyProblemsHandle}
+                    title="Copy problems to clipboard"
+                    variant={'outline'}
+                >
+                    <ClipboardCopyIcon /> Copy problems
+                </Button>
+                <Button
+                    className="w-40 justify-start"
+                    onClick={pasteProblemsHandle}
+                    title="Paste problems from clipboard"
+                    variant={'outline'}
+                >
+                    <ClipboardPasteIcon /> Paste problems
+                </Button>
+
                 <div className="flex-grow" />
                 <Button className="w-28 justify-start" onClick={add} title="Add a problem">
                     {' '}
