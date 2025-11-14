@@ -216,6 +216,11 @@ function ProblemsListView() {
                         Toolkit
                     </Button>
                 </a>
+                <Link href="/problems/aigen">
+                    <Button className="w-36 justify-start">
+                        <BotIcon /> Gen problem
+                    </Button>
+                </Link>
                 <Link href="/problems/new">
                     <Button className="w-36 justify-start">
                         <SquarePlusIcon /> New problem
