@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-11-13T11:47:50.708Z
+ * This file has been automatically generated at 2025-11-15T10:33:24.683Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -732,6 +732,12 @@ export type Ranking = RankingRow[]
 export type WebStream = {
     title: string
     id: string
+}
+
+export type ProblemGenerationInfo = {
+    title: string
+    prompt: string
+    model: string
 }
 
 export type SubmissionQuery = {
@@ -3545,6 +3551,21 @@ class Module_instructor_problems {
             [ifile],
         )
         return output
+    }
+
+    /**
+     * Generate a problem with JutgeAI
+     *
+     * 🔐 Authentication: instructor
+     * ❌ Warning: experimental
+     *
+     */
+    async generateProblemWithJutgeAI(data: ProblemGenerationInfo): Promise<Download> {
+        const [output, ofiles] = await this.root.execute(
+            'instructor.problems.generateProblemWithJutgeAI',
+            data,
+        )
+        return ofiles[0]
     }
 }
 
