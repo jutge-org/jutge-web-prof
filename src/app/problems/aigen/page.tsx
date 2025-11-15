@@ -1,14 +1,12 @@
 'use client'
 
-
-import { Progress } from "@/components/ui/progress"
+import { Progress } from '@/components/ui/progress'
 import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
 import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
 import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
 import { offerDownloadFile } from '@/lib/utils'
-import { set } from 'date-fns'
-import { BotIcon, Languages } from 'lucide-react'
+import { BotIcon, BotMessageSquareIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -17,10 +15,10 @@ export default function ProblemsGenPage() {
     return (
         <Page
             pageContext={{
-                title: 'Gen problem',
+                title: 'Generate problem',
                 menu: 'user',
                 current: 'problems',
-                subTitle: 'Gen problem',
+                subTitle: 'Generate problem',
             }}
         >
             <ProblemsGenView />
@@ -34,28 +32,20 @@ function ProblemsGenView() {
 
     const [state, setState] = useState<'idle' | 'generating' | 'done'>('idle')
     const [title, setTitle] = useState('Is it prime?')
-    const [authorship, setAuthorship] = useState((auth.user?.name || 'Unknown') + ' with JutgeAI')
-    const [prompt, setPrompt] = useState('Write a problem where the goal is to read a sequence of numbers and, for each one, tell if it is prime or not. Add a short cute story to the problem about a girl named Clara who loves math.')
-    const [language, setLanguage] = useState<string>('en')
-    const [solution, setSolution] = useState<string>('Python3')
-    const [accept, setAccept] = useState(false)
+    const [prompt, setPrompt] = useState(
+        'Write a problem where the goal is to read a sequence of numbers and, for each one, tell if it is prime or not. Add a short cute story to the problem about a girl named Clara who loves math.',
+    )
+    const [model, setModel] = useState('google/gemini-2.5-flash-lite')
+    const [accept, setAccept] = useState(true)
     const [progress, setProgress] = useState(0)
+    const [downloadName, setDownloadName] = useState('')
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setProgress(old => old <= 99 ? old + 1 : 0)
+            setProgress((old) => (old <= 99 ? old + 1 : 0))
         }, 500)
         return () => clearTimeout(timer)
     }, [state, progress])
-
-    async function validateForm() {
-        let valid = true
-        if (title.length < 8) {
-            toast.error('Title must be at least 8 characters long')
-            valid = false
-        }
-        return valid
-    }
 
     const fields: JFormFields = {
         header: {
@@ -67,8 +57,16 @@ function ProblemsGenView() {
                         <BotIcon size={64} strokeWidth={0.8} className="ml-2" />
                     </div>
                     <p>
-                        This page will help you generating a new problem using Jutge<sup>AI</sup>. Please provide
-                        the necessary information in the form below and click the &quot;Generate problem&quot; button. TODO: multiple languages and solutions.
+                        This page will help you generating a new problem using Jutge<sup>AI</sup>.
+                    </p>
+                    <p>
+                        The problem will be generated in English, Catalan and Spanish and will
+                        include solutions in Python and C++. A README.md file will be also generated
+                        with comments and cost estimates.
+                    </p>
+                    <p>
+                        The current implementation may timeout generation takes a long time. In that
+                        case, use a less powerful model.
                     </p>
                 </div>
             ),
@@ -87,46 +85,35 @@ function ProblemsGenView() {
             value: prompt,
             setValue: setPrompt,
             validator: z.string().min(32),
-            placeHolder: 'Description of the problem to be generated. Eg: Write a problem where the goal is to read a sequence of numbers and, for each one, tell if it is prime or not. Add a cute story to the problem about a girl named Clara who loves math.',
+            placeHolder:
+                'Description of the problem to be generated. Eg: Write a problem where the goal is to read a sequence of numbers and, for each one, tell if it is prime or not. Add a cute story to the problem about a girl named Clara who loves math.',
+            rows: 6,
         },
-        authorship: {
-            type: 'input',
-            label: 'Authorship',
-            value: authorship,
-            setValue: setAuthorship,
-            validator: z.string().min(8),
-            placeHolder: 'Authorship of the problem',
-        },
-        language: {
+        model: {
             type: 'select',
-            label: 'Language',
-            value: language,
-            setValue: setLanguage,
+            label: 'Model',
+            value: model,
+            setValue: (v: string | null) => setModel(v || ''),
             options: [
-                { label: 'Catalan', value: 'ca' },
-                { label: 'Spanish', value: 'es' },
-                { label: 'English', value: 'en' },
-                { label: 'French', value: 'fr' },
-                { label: 'German', value: 'de' },
-            ],
-        },
-        solution: {
-            type: 'select',
-            label: 'Solution',
-            value: solution,
-            setValue: setSolution,
-            options: [
-                { label: 'C++', value: 'C++' },
-                { label: 'Python3', value: 'Python3' },
-                { label: 'Haskell', value: 'Haskell' },
-                { label: 'Clojure', value: 'Clojure' },
+                { value: 'google/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite' },
+                { value: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+                { value: 'openai/gpt-5-mini', label: 'GPT-5 Mini' },
+                { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano' },
             ],
         },
         accept: {
             type: 'switch',
-            label: <div className='font-normal'>I understand that the problem generated by Jutge<sup>AI</sup> may require further editing and careful review before being published.</div>,
+            label: (
+                <div className="font-normal">
+                    I understand that the problem generated by Jutge<sup>AI</sup> may require
+                    further editing and careful review before being published.
+                </div>
+            ),
             value: accept,
             setValue: setAccept,
+            validator: z.literal(true, {
+                errorMap: () => ({ message: 'You must accept the terms to proceed' }),
+            }),
         },
         sep: { type: 'separator' },
         add: {
@@ -145,22 +132,30 @@ function ProblemsGenView() {
     async function genAction() {
         setState('generating')
         setProgress(0)
-        jutge.instructor.problems.generateProblem({
-            title,
-            author: authorship,
-            prompt,
-            language,
-            proglang: solution,
-            model: 'openai/gpt-5-mini',
-        }).then((download) => {
-            setState('done')
-            new Audio('/notification.mp3').play()
-            toast.success('Problem generated successfully!')
-            offerDownloadFile(download, download.name)
-        }).catch((e) => {
-            toast.error('Error generating problem: ' + e.message)
-            setState('idle')
-        })
+        if (model != 'google/gemini-2.5-flash-lite') {
+            toast.warning(
+                'Using a powerful model may timeout the page. If that happens, try again with a less powerful model such as Gemini 2.5 Flash Lite. We have to fix this in future versions.',
+                { duration: 15000 },
+            )
+        }
+        jutge.instructor.problems
+            .generateProblemWithJutgeAI({
+                title,
+                prompt,
+                model,
+            })
+            .then((download) => {
+                setState('done')
+                const audio = new Audio('/notification.mp3')
+                void audio.play()
+                toast.success('Problem generated successfully!')
+                offerDownloadFile(download, download.name)
+                setDownloadName(download.name)
+            })
+            .catch((e) => {
+                toast.error('Error generating problem: ' + e.message)
+                setState('idle')
+            })
     }
 
     if (state === 'idle') {
@@ -175,6 +170,17 @@ function ProblemsGenView() {
             </div>
         )
     } else {
-        return <div>Done!</div>
+        return (
+            <div className="border rounded-lg p-8 mb-4 flex flex-col justify-center items-center gap-4">
+                <div className="text-sm">
+                    Problem generated successfully by Jutge<sup>AI</sup>.
+                </div>
+                <BotMessageSquareIcon size={96} strokeWidth={0.5} />
+                <div className="text-sm">
+                    Look for <code className="text-xs">{downloadName}</code> in your downloads
+                    folder.
+                </div>
+            </div>
+        )
     }
 }

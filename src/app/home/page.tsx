@@ -49,6 +49,7 @@ export default function HomePage() {
                             I prepare nice summaries of your problem statements and solutions. These
                             are shown in the Problems section and used in the new Search section.
                         </div>
+                        <div>And now I can even also help you generating new problems!</div>
                         <div>
                             Also, remember to click{' '}
                             <span className="border rounded-md p-1 mx-1">⌘K</span> and I will help
@@ -65,9 +66,14 @@ export default function HomePage() {
                         <div>
                             <b>News</b>
                         </div>
-                        <ul className="mt-4 list-disc list-inside">
+                        <ul className="ml-4 mt-4 list-disc list-outside space-y-2">
                             <li>
-                                2025-11-14: Exam problems can be copied and pasted through the clipboard.
+                                2025-11-15: First version of automatic problem generation powered
+                                with Jutge<sup>AI</sup>.
+                            </li>
+                            <li>
+                                2025-11-14: Exam problems can be copied and pasted through the
+                                clipboard.
                             </li>
                             <li>
                                 2025-11-13: PDF exams include version with duplex pages for easier
@@ -77,7 +83,7 @@ export default function HomePage() {
                                 2025-11-13: It is possible to change (or remove) the password of an
                                 exam.
                             </li>
-                            <li>2025-10-26: Full text and semantic search functionality added.</li>
+                            <li>2025-10-26: Full text and semantic search functionality added. </li>
                         </ul>
                     </div>
                 </div>
