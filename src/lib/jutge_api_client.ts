@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2025-11-15T10:33:24.683Z
+ * This file has been automatically generated at 2025-11-16T09:33:31.472Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -3554,18 +3554,18 @@ class Module_instructor_problems {
     }
 
     /**
-     * Generate a problem with JutgeAI
+     * Generate a problem with JutgeAI. The result is sent by email when ready.
      *
      * 🔐 Authentication: instructor
      * ❌ Warning: experimental
      *
      */
-    async generateProblemWithJutgeAI(data: ProblemGenerationInfo): Promise<Download> {
+    async generateProblemWithJutgeAI(data: ProblemGenerationInfo): Promise<string> {
         const [output, ofiles] = await this.root.execute(
             'instructor.problems.generateProblemWithJutgeAI',
             data,
         )
-        return ofiles[0]
+        return output
     }
 }
 
