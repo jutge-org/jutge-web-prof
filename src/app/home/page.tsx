@@ -68,6 +68,9 @@ export default function HomePage() {
                         </div>
                         <ul className="ml-4 mt-4 list-disc list-outside space-y-2">
                             <li>
+                                2025-11-27: Allow filtering for problem codes on add problem dialog.
+                            </li>
+                            <li>
                                 2025-11-15: First version of automatic problem generation powered
                                 with Jutge<sup>AI</sup>.
                             </li>

@@ -235,6 +235,7 @@ function DialogToAddProblems({
             field: 'problem_nm',
             headerName: 'Problem',
             width: 120,
+            filter: true,
             cellRenderer: (p: any) => (
                 <a target="_blank" href={`https://jutge.org/problems/${p.data.problem_nm}`}>
                     {p.data.problem_nm}↗
