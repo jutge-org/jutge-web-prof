@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { JutgeApiClient } from '@/lib/jutge_api_client'
 import { Loader2Icon, LogInIcon, SquareXIcon } from 'lucide-react'
 import Image from 'next/image'
 import { FormEvent, useState } from 'react'
+import { toast } from 'sonner'
 import { useAuth } from '../jutge-components/layouts/court/lib/Auth'
 
 export default function LoginForm() {
@@ -23,6 +25,24 @@ export default function LoginForm() {
         const password = formData.get('password') as string | null
         if (email === null || password === null) return
         setLoading(true)
+
+        {
+            // check connectivity to Jutge.org
+            const jutge = new JutgeApiClient()
+            const url = jutge.JUTGE_API_URL
+            try {
+                const response = await fetch(url, {
+                    method: 'HEAD', // HEAD is lighter than GET
+                    signal: AbortSignal.timeout(5000), // 5 second timeout
+                })
+            } catch (err: unknown) {
+                setLoading(false)
+                setError(`Could not connect to ${url}`)
+                toast.error(`Could not connect to ${url}`)
+                return
+            }
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 500)) // just to see the spinning icon
         const ok = await auth.login({ email, password })
         setLoading(false)

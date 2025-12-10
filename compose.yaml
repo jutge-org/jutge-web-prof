@@ -1,0 +1,6 @@
+services:
+    web-prof:
+        image: 'web-prof:latest'
+        network_mode: host
+        container_name: 'web-prof'
+        restart: always
