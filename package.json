@@ -1,5 +1,5 @@
 {
-    "name": "jutge-web-admin",
+    "name": "jutge-web-prof",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -11,9 +11,9 @@
         "depcheck": "bunx depcheck --ignores='@types/node' .",
         "update-jutge-client": "(cd src/lib ; rm -f jutge_api_client.ts ; https --download https://api.jutge.org/clients/download/typescript)",
         "deploy": "ssh -t jutge@jutge.org 'cd git/jutge-web-prof ; git pull --recurse-submodules ; rm -rf .next ; bun install ; bun run build ; pm2 restart web-prof'",
-        "docker-build": "docker build -t web-admin .",
-        "docker-build-amd64": "docker build --platform linux/amd64/v2 -t web-admin .",
-        "docker-run": "docker run web-admin"
+        "docker-build": "docker build -t web-prof .",
+        "docker-build-amd64": "docker build --platform linux/amd64/v2 -t web-prof .",
+        "docker-run": "docker run web-prof"
     },
     "dependencies": {
         "@fast-csv/format": "^5.0.5",
