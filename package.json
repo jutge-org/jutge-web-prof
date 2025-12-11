@@ -13,7 +13,7 @@
         "deploy": "ssh -t jutge@jutge.org 'cd git/jutge-web-prof ; git pull --recurse-submodules ; rm -rf .next ; bun install ; bun run build ; pm2 restart web-prof'",
         "docker-build": "docker build -t web-prof .",
         "docker-build-amd64": "docker build --platform linux/amd64/v2 -t web-prof .",
-        "docker-run": "docker run web-prof"
+        "docker-run": "docker run -p 8011:8011 web-prof"
     },
     "dependencies": {
         "@fast-csv/format": "^5.0.5",
@@ -72,14 +72,14 @@
         "lucide-react": "^0.483.0",
         "marked": "^15.0.12",
         "nanoid": "^5.1.5",
-        "next": "16.0.7",
+        "next": "16.0.8",
         "next-navigation-guard": "^0.2.0",
         "next-themes": "^0.4.6",
         "prettier-plugin-organize-imports": "^4.3.0",
         "radash": "^12.1.0",
-        "react": "^19.1.0",
+        "react": "^19.2.1",
         "react-day-picker": "8.10.1",
-        "react-dom": "^19.1.0",
+        "react-dom": "^19.2.1",
         "react-highlight": "^0.15.0",
         "react-hook-form": "^7.57.0",
         "react-resizable-panels": "^2.1.9",

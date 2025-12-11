@@ -9,13 +9,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function download2src(download: Download) {
-    return URL.createObjectURL(new Blob([download.data], { type: 'image/png' }))
+    return URL.createObjectURL(new Blob([new Uint8Array(download.data)], { type: 'image/png' }))
 }
 
 /* offer the browser to download a file */
 export function offerDownloadFile(download: Download, filename?: string) {
     if (filename === undefined) filename = download.name
-    const doc = new Blob([download.data], { type: download.type })
+    const doc = new Blob([new Uint8Array(download.data)], { type: download.type })
     saveAs(doc, filename)
 }
 

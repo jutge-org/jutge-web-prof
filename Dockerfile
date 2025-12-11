@@ -18,6 +18,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Set environment variable for standalone build
+ENV DOCKER_BUILD=true
+
 # Build the Next.js app
 RUN bun run build
 

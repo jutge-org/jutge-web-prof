@@ -158,7 +158,7 @@ function EditDocumentForm(props: DocumentFormProps) {
                 title: title,
                 description: description,
             }
-            const newFile = file ? file : new File([download.data], download.name)
+            const newFile = file ? file : new File([new Uint8Array(download.data)], download.name)
 
             await jutge.instructor.documents.update(newDocument, newFile)
         } catch (error) {

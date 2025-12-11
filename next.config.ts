@@ -1,7 +1,9 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-    output: 'standalone',
+    // Only use standalone when building for Docker
+    output: process.env.DOCKER_BUILD === 'true' ? 'standalone' : undefined,
+
     images: {
         remotePatterns: [
             {
