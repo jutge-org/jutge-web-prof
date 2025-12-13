@@ -13,7 +13,8 @@
         "deploy": "(docker save web-prof | ssh jutge@jutge.org 'docker load') && ssh jutge@jutge.org 'docker compose restart web-prof'",
         "docker-build": "docker build -t web-prof .",
         "docker-build-amd64": "docker build --platform linux/amd64/v2 -t web-prof .",
-        "docker-run": "docker run -p 8011:8011 web-prof"
+        "docker-run": "docker run -p 8011:8011 web-prof",
+        "clean": "rm -rf .next && rm -rf node_modules"
     },
     "dependencies": {
         "@fast-csv/format": "^5.0.5",
@@ -73,7 +74,6 @@
         "next": "16.0.10",
         "next-navigation-guard": "^0.2.0",
         "next-themes": "^0.4.6",
-        "prettier-plugin-organize-imports": "^4.3.0",
         "radash": "^12.1.0",
         "react": "^19.2.3",
         "react-day-picker": "8.10.1",
@@ -83,7 +83,6 @@
         "react-resizable-panels": "^2.1.9",
         "recharts": "^2.15.3",
         "shadcn-dropzone": "^0.2.1",
-        "slug": "^11.0.1",
         "sonner": "^1.7.4",
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",

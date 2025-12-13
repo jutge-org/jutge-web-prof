@@ -1,23 +1,42 @@
-import { FlatCompat } from '@eslint/eslintrc'
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
+// @ts-check
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+import eslint from '@eslint/js'
+import { globalIgnores } from 'eslint/config'
+import tseslint from 'typescript-eslint'
 
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-})
+export default tseslint.config(
+    eslint.configs.recommended,
+    tseslint.configs.recommended,
+    [
+        globalIgnores([
+            'components/ui/**',
+            'lib/jutge_api_client.ts',
+            '.next/**',
+            'postcss.config.mjs',
+            'eslint.config.mjs',
+        ]),
+    ],
 
-const eslintConfig = [
-    ...compat.config({
-        extends: ['next/core-web-vitals', 'next/typescript'],
-        rules: {
-            '@typescript-eslint/no-unused-vars': 'off',
-            '@typescript-eslint/no-explicit-any': 'off',
-            '@typescript-eslint/report-unused-disable-directives': 'off',
+    tseslint.configs.recommendedTypeChecked,
+    {
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
         },
-    }),
-]
-
-export default eslintConfig
+    },
+    {
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unused-vars': 'off',
+            '@typescript-eslint/no-unsafe-member-access': 'off',
+            '@typescript-eslint/no-unsafe-return': 'off',
+            '@typescript-eslint/no-unsafe-argument': 'off',
+            '@typescript-eslint/no-duplicate-type-constituents': 'off',
+            '@typescript-eslint/no-misused-promises': 'off',
+            '@typescript-eslint/no-floating-promises': 'off',
+        },
+    },
+)
