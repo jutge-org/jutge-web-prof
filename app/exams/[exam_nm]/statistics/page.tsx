@@ -10,13 +10,7 @@ import { Bar, BarChart, CartesianGrid, LabelList, Pie, PieChart, XAxis, YAxis } 
 import { useAuth } from '@/components/layout/lib/Auth'
 import Page from '@/components/layout/Page'
 import SimpleSpinner from '@/components/SimpleSpinner'
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     ChartConfig,
     ChartContainer,

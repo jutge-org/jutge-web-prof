@@ -24,12 +24,7 @@ import { Button } from '@/components/ui/button'
 import { AgTableFull } from '@/components/wrappers/AgTable'
 import { usePageChanges } from '@/hooks/use-page-changes'
 import jutge from '@/lib/jutge'
-import {
-    CourseMembers,
-    InstructorCourse,
-    Profile,
-    StudentProfile,
-} from '@/lib/jutge_api_client'
+import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/jutge_api_client'
 import { Dict, showError } from '@/lib/utils'
 
 export default function CourseTutorsPage() {
