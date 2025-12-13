@@ -22,17 +22,17 @@ import {
     TagsIcon,
 } from 'lucide-react'
 import { JSX, useEffect, useRef, useState } from 'react'
-import Page from '../../components/layout/Page'
-import StatementDialog from '../../components/StatementDialog'
-import { Badge } from '../../components/ui/badge'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { Textarea } from '../../components/ui/textarea'
-import Markdown from '../../components/wrappers/Markdown'
-import jutge from '../../lib/jutge'
-import { AbstractProblem, AbstractProblemSuppl, SearchResults } from '../../lib/jutge_api_client'
-import { offerDownloadFile } from '../../lib/utils'
+import Page from '@/components/layout/Page'
+import StatementDialog from '@/components/StatementDialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import Markdown from '@/components/wrappers/Markdown'
+import jutge from '@/lib/jutge'
+import { AbstractProblem, AbstractProblemSuppl, SearchResults } from '@/lib/jutge_api_client'
+import { offerDownloadFile } from '@/lib/utils'
 
 export default function SearchPage() {
     const [allAbstractProblems, setAllAbstractProblems] = useState<Record<
@@ -508,6 +508,7 @@ function VoiceInput({
             return
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         recognitionRef.current = new SpeechRecognition()
         recognitionRef.current.continuous = true
         recognitionRef.current.interimResults = true
@@ -526,12 +527,14 @@ function VoiceInput({
             onChange(syntheticEvent)
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         recognitionRef.current.start()
         setIsListening(true)
     }
 
     const stopListening = () => {
         if (recognitionRef.current) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             recognitionRef.current.stop()
             setIsListening(false)
         }

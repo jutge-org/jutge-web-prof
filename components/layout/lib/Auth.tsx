@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import jutge from '@/lib/jutge'
 import type { CredentialsIn, Download, Profile } from '@/lib/jutge_api_client'
+import { sleep } from 'radash'
 
 export interface AuthProviderProps {
     user: Profile | null
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthProviderProps>({
     user: null,
     avatar: null,
     login: async (): Promise<boolean> => {
+        await sleep(0) // to make it async
         return false
     },
     logout: async () => {},

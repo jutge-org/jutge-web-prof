@@ -18,6 +18,8 @@ import { AgTableFull } from '../../components/wrappers/AgTable'
 import { useIsMobile } from '../../hooks/use-mobile'
 import jutge from '../../lib/jutge'
 import { mapmap } from '../../lib/utils'
+import { ICellRendererParams } from 'ag-grid-community'
+import { AbstractProblem } from '@/lib/jutge_api_client'
 
 type ProblemRow = {
     problem_nm: string
@@ -27,6 +29,7 @@ type ProblemRow = {
     deprecated: boolean
     languages: string[]
     passcode: boolean
+    abstractProblems: Record<string, AbstractProblem>
 }
 
 export default function ProblemsListPage() {
@@ -106,12 +109,12 @@ function ProblemsListView() {
         {
             field: 'problem_nm',
             headerName: 'Id',
-            cellRenderer: (p: any) => (
-                <Link href={`problems/${p.data.problem_nm}`}>{p.data.problem_nm}</Link>
+            cellRenderer: (p: ICellRendererParams<ProblemRow>) => (
+                <Link href={`problems/${p.data!.problem_nm}`}>{p.data!.problem_nm}</Link>
             ),
             width: 100,
             filter: true,
-            valueGetter: (p: any) => p.data.problem_nm,
+            valueGetter: (p: ICellRendererParams<ProblemRow>) => p.data!.problem_nm,
         },
         { field: 'title', flex: 2, filter: true },
         {
@@ -119,14 +122,16 @@ function ProblemsListView() {
             headerName: 'Created',
             width: 140,
             filter: true,
-            valueGetter: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+            valueGetter: (p: ICellRendererParams<ProblemRow>) =>
+                dayjs(p.data!.created_at).format('YYYY-MM-DD'),
         },
         {
             field: 'updated_at',
             headerName: 'Updated',
             width: 140,
             filter: true,
-            valueGetter: (p: any) => dayjs(p.data.updated_at).format('YYYY-MM-DD'),
+            valueGetter: (p: ICellRendererParams<ProblemRow>) =>
+                dayjs(p.data!.updated_at).format('YYYY-MM-DD'),
             sort: 'desc',
         },
         {
@@ -139,11 +144,11 @@ function ProblemsListView() {
             field: 'languages',
             width: 150,
             filter: true,
-            cellRenderer: (p: any) =>
-                p.data.languages.map((language: string) => (
+            cellRenderer: (p: ICellRendererParams<ProblemRow>) =>
+                p.data!.languages.map((language: string) => (
                     <div key={language}>
-                        {p.data.abstractProblems[p.data.problem_nm]?.problems[
-                            `${p.data.problem_nm}_${language}`
+                        {p.data!.abstractProblems[p.data!.problem_nm]?.problems[
+                            `${p.data!.problem_nm}_${language}`
                         ].summary ? (
                             <TooltipProvider>
                                 <Tooltip>
@@ -156,41 +161,41 @@ function ProblemsListView() {
                                     <TooltipContent className="flex flex-col w-64 gap-2">
                                         <p className="font-semibold">
                                             {
-                                                p.data.abstractProblems[p.data.problem_nm].problems[
-                                                    `${p.data.problem_nm}_${language}`
-                                                ].summary.summary_1s
+                                                p.data!.abstractProblems[p.data!.problem_nm]
+                                                    .problems[`${p.data!.problem_nm}_${language}`]
+                                                    ?.summary?.summary_1s
                                             }
                                         </p>
                                         <p>
                                             {
-                                                p.data.abstractProblems[p.data.problem_nm].problems[
-                                                    `${p.data.problem_nm}_${language}`
-                                                ].summary.summary_1p
+                                                p.data!.abstractProblems[p.data!.problem_nm]
+                                                    .problems[`${p.data!.problem_nm}_${language}`]
+                                                    ?.summary?.summary_1p
                                             }
                                         </p>
                                         <p>
-                                            {p.data.abstractProblems[p.data.problem_nm].problems[
-                                                `${p.data.problem_nm}_${language}`
-                                            ].summary.keywords.replaceAll(',', ', ')}
+                                            {p.data!.abstractProblems[p.data!.problem_nm].problems[
+                                                `${p.data!.problem_nm}_${language}`
+                                            ]?.summary?.keywords.replaceAll(',', ', ')}
                                         </p>
                                         <p className="flex gap-1">
                                             <BotIcon size={14} className="" />
                                             {
-                                                p.data.abstractProblems[p.data.problem_nm].problems[
-                                                    `${p.data.problem_nm}_${language}`
-                                                ].summary.model
+                                                p.data!.abstractProblems[p.data!.problem_nm]
+                                                    .problems[`${p.data!.problem_nm}_${language}`]
+                                                    ?.summary?.model
                                             }
                                         </p>
                                         <hr />
                                         <p>
-                                            {p.data.abstractProblems[
-                                                p.data.problem_nm
+                                            {p.data!.abstractProblems[
+                                                p.data!.problem_nm
                                             ].solution_tags?.tags.replaceAll(',', ', ')}
                                         </p>
                                         <p className="flex gap-1">
                                             <BotIcon size={14} className="" />
                                             {
-                                                p.data.abstractProblems[p.data.problem_nm]
+                                                p.data!.abstractProblems[p.data!.problem_nm]
                                                     .solution_tags?.model
                                             }
                                         </p>
@@ -204,7 +209,7 @@ function ProblemsListView() {
                         )}
                     </div>
                 )),
-            valueGetter: (p: any) => p.data.languages.join(', '),
+            valueGetter: (p: ICellRendererParams<ProblemRow>) => p.data!.languages.join(', '),
         },
     ])
 

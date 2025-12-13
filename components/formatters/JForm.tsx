@@ -37,6 +37,7 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Switch } from '../ui/switch'
 import { Textarea } from '../ui/textarea'
 import HtmlEditor from '../wrappers/HtmlEditor'
+import { sleep } from 'radash'
 
 export type JFormInputField = {
     type: 'input'
@@ -200,6 +201,7 @@ export function JForm(props: JFormProps) {
     const [errors, setErrors] = useState<Record<string, string | undefined>>({})
 
     async function validate(): Promise<boolean> {
+        await sleep(0) // to make it async
         let ok = true
         setErrors({})
         for (const fieldKey in props.fields) {

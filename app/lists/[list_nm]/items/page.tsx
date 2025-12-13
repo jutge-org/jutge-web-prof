@@ -22,11 +22,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AgTable, AgTableFull } from '@/components/wrappers/AgTable'
 import { usePageChanges } from '@/hooks/use-page-changes'
 import jutge, { getProblemTitle } from '@/lib/jutge'
-import {
-    AbstractProblem,
-    InstructorList,
-    InstructorListItem,
-} from '@/lib/jutge_api_client'
+import { AbstractProblem, InstructorList, InstructorListItem } from '@/lib/jutge_api_client'
+import { sleep } from 'radash'
 
 type Item = { description: string | null; problem_nm: string | null; title: string | null }
 type ProblemItem = { problem_nm: string; title: string }
@@ -137,6 +134,7 @@ function ListProblemView() {
     }
 
     async function addProblemsCallback(problemsToAdd: string[]) {
+        await sleep(0) // to make the function async
         const grid = gridRef.current!.api
         const itemsToAdd: Item[] = problemsToAdd.map((problem_nm) => ({
             problem_nm,
@@ -150,6 +148,7 @@ function ListProblemView() {
     }
 
     async function addSeparatorCallback(separator: string) {
+        await sleep(0) // to make the function async
         const grid = gridRef.current!.api
         const itemToAdd: Item = {
             problem_nm: null,
@@ -162,7 +161,7 @@ function ListProblemView() {
         setChanges(true)
     }
 
-    async function deleteAction() {
+    function deleteAction() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedRows()
         if (selectedRows.length === 0) {
@@ -258,7 +257,7 @@ function DialogToAddProblems({
         return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
-    async function addProblemsCallback() {
+    function addProblemsCallback() {
         const grid = gridRef.current!.api
         const selectedProblems = grid
             .getSelectedNodes()
@@ -267,7 +266,7 @@ function DialogToAddProblems({
         onProblemsAccept(selectedProblems)
     }
 
-    async function addSeparatorCallback() {
+    function addSeparatorCallback() {
         setIsOpen(false)
         onSeparatorAccept(separator)
     }

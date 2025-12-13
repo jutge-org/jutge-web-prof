@@ -29,6 +29,8 @@ import {
     InstructorListItem,
 } from '@/lib/jutge_api_client'
 import { Dict } from '@/lib/utils'
+import { sl } from 'date-fns/locale'
+import { sleep } from 'radash'
 
 type Item = { title: string; list_nm: string }
 
@@ -126,6 +128,7 @@ function CourseListView() {
     }
 
     async function addCallback(listsToAdd: string[]) {
+        await sleep(0) // to make it async
         const grid = gridRef.current!.api
         const itemsToAdd = listsToAdd.map((list_nm) => ({ list_nm, title: lists[list_nm].title }))
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
@@ -137,7 +140,7 @@ function CourseListView() {
         setChanges(true)
     }
 
-    async function deleteAction() {
+    function deleteAction() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedRows()
         if (selectedRows.length === 0) toast.warning('No lists selected to remove.')
@@ -147,7 +150,7 @@ function CourseListView() {
         setChanges(true)
     }
 
-    async function showListAction(list_nm: string) {
+    function showListAction(list_nm: string) {
         setListToShow(list_nm)
         setIsShowListDialogOpen(true)
     }
@@ -226,7 +229,7 @@ function DialogToAddLists({
         return { mode: 'multiRow', headerCheckbox: true }
     }, [])
 
-    async function addCallback() {
+    function addCallback() {
         const grid = gridRef.current!.api
         const selectedLists = grid.getSelectedNodes().map((node) => node.data?.list_nm) as string[]
         setIsOpen(false)

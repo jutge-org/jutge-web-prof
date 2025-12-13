@@ -4,9 +4,11 @@
 
 import { writeToString } from '@fast-csv/format'
 import { parseString } from '@fast-csv/parse'
+import { sleep } from 'radash'
 import { read, utils } from 'xlsx'
 
 export async function array2csv(data: any[]) {
+    await sleep(0) // to make it async
     return await writeToString(data, {
         headers: true,
         delimiter: ',',
@@ -37,13 +39,14 @@ export async function csv2array(csvString: string): Promise<CsvRow[]> {
 }
 
 export async function xls2array(xlsBuffer: ArrayBuffer): Promise<any[]> {
+    await sleep(0) // to make it async
     const workbook = read(xlsBuffer, { type: 'array' })
     const sheetName = workbook.SheetNames[0]
     const worksheet = workbook.Sheets[sheetName]
     const data = utils.sheet_to_json(worksheet)
 
     // Make it serializable - convert to plain objects and handle dates
-    const plainData = data.map(row => {
+    const plainData = data.map((row) => {
         const plainRow: any = {}
         for (const [key, value] of Object.entries(row as any)) {
             plainRow[key] = value

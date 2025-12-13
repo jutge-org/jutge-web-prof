@@ -31,13 +31,9 @@ import {
 import { AgTableFull } from '@/components/wrappers/AgTable'
 import { usePageChanges } from '@/hooks/use-page-changes'
 import jutge from '@/lib/jutge'
-import {
-    CourseMembers,
-    InstructorCourse,
-    Profile,
-    StudentProfile,
-} from '@/lib/jutge_api_client'
+import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/jutge_api_client'
 import { Dict, showError } from '@/lib/utils'
+import { sleep } from 'radash'
 
 export default function CourseStudentsPage() {
     const { course_nm } = useParams<{ course_nm: string }>()
@@ -239,6 +235,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
     }
 
     async function importFromPrisma() {
+        await sleep(0) // to make it async
         const fileInput = document.createElement('input')
         fileInput.type = 'file'
         fileInput.accept = '.xls,.xlsx'
@@ -266,6 +263,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
     }
 
     async function importFromCSV(emailField: string) {
+        await sleep(0) // to make it async
         const fileInput = document.createElement('input')
         fileInput.type = 'file'
         fileInput.accept = '.csv'

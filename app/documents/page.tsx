@@ -11,6 +11,7 @@ import { useIsMobile } from '../../hooks/use-mobile'
 import jutge from '../../lib/jutge'
 import { Document } from '../../lib/jutge_api_client'
 import { offerDownloadFile } from '../../lib/utils'
+import { ICellRendererParams } from 'ag-grid-community'
 
 export default function DocumentsListPage() {
     return (
@@ -39,8 +40,8 @@ function DocumentsListView() {
         {
             field: 'document_nm',
             headerName: 'Id',
-            cellRenderer: (p: any) => (
-                <Link href={`documents/${p.data.document_nm}`}>{p.data.document_nm}</Link>
+            cellRenderer: (p: ICellRendererParams<Document>) => (
+                <Link href={`documents/${p.data!.document_nm}`}>{p.data!.document_nm}</Link>
             ),
             width: 200,
             filter: true,
@@ -49,14 +50,16 @@ function DocumentsListView() {
         {
             field: 'created_at',
             width: 120,
-            cellRenderer: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD'),
+            cellRenderer: (p: ICellRendererParams<Document>) =>
+                dayjs(p.data!.created_at).format('YYYY-MM-DD'),
             headerName: 'Created',
         },
         {
             field: 'updated_at',
             width: 120,
             sort: 'desc',
-            cellRenderer: (p: any) => dayjs(p.data.updated_at).format('YYYY-MM-DD'),
+            cellRenderer: (p: ICellRendererParams<Document>) =>
+                dayjs(p.data!.updated_at).format('YYYY-MM-DD'),
             headerName: 'Updated',
         },
         // { field: 'annotation', flex: 2, filter: true },
@@ -64,12 +67,12 @@ function DocumentsListView() {
             field: 'pdf',
             width: 100,
             filter: false,
-            cellRenderer: (p: any) => (
+            cellRenderer: (p: ICellRendererParams<Document>) => (
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                        downloadPdf(p.data.document_nm)
+                        downloadPdf(p.data!.document_nm)
                         p.api.deselectAll() // no funciona
                     }}
                 >

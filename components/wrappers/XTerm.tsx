@@ -14,6 +14,8 @@ Sorry.
 
 */
 
+/* eslint-disable @typescript-eslint/unbound-method */
+
 'use client'
 
 import {

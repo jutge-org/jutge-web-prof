@@ -49,7 +49,7 @@ export default function LoginForm() {
         if (!ok) setError('Invalid credentials')
     }
 
-    async function clearError() {
+    function clearError() {
         setError(null)
     }
 

@@ -3,7 +3,7 @@
 import dayjs from 'dayjs'
 import { CalendarPlusIcon, SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
-import { all, capitalize } from 'radash'
+import { all, capitalize, sleep } from 'radash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -21,6 +21,7 @@ import {
     InstructorExamUpdate,
 } from '@/lib/jutge_api_client'
 import { Dict, mapmap, showError } from '@/lib/utils'
+import { sl } from 'date-fns/locale'
 
 export default function ExamPropertiesPage() {
     const { exam_nm } = useParams<{ exam_nm: string }>()
@@ -355,6 +356,7 @@ function EditExamForm(props: ExamFormProps) {
     }
 
     async function addToCalendar() {
+        await sleep(0) // to make the function async
         window.open(examToCalendarLink(props.exam))
     }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { RowSelectionOptions } from 'ag-grid-community'
+import { ICellRendererParams, RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import FileSaver from 'file-saver'
 import {
@@ -60,8 +60,8 @@ function ExamStudentsView() {
             field: 'email',
             flex: 4,
             filter: true,
-            cellRenderer: (p: any) => {
-                const parts = p.data.email.split('@')
+            cellRenderer: (p: ICellRendererParams<InstructorExamStudent>) => {
+                const parts = p.data!.email.split('@')
                 return (
                     <div>
                         {parts[0]}
