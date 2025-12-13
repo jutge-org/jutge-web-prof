@@ -1,7 +1,7 @@
 'use client'
 
-import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
-import Page from '@/jutge-components/layouts/court/Page'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layouts/court/Page'
 import jutge from '@/lib/jutge'
 import { InstructorBriefCourse, InstructorExamCreation } from '@/lib/jutge_api_client'
 import { Dict, mapmap, showError } from '@/lib/utils'

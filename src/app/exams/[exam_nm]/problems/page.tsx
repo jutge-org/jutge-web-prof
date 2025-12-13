@@ -1,6 +1,10 @@
 'use client'
 
 import { makeExamPdf } from '@/actions/makeExamPdf'
+import { useTextareaDialog } from '@/components/dialogs/TextareaDialog'
+import { useAuth } from '@/components/layouts/court/lib/Auth'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import { Button } from '@/components/ui/button'
 import {
     Command,
@@ -28,12 +32,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { AgTableFull } from '@/components/wrappers/AgTable'
 import { usePageChanges } from '@/hooks/use-page-changes'
-import { useTextareaDialog } from '@/jutge-components/dialogs/TextareaDialog'
-import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
-import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
@@ -44,7 +44,6 @@ import {
 import { cn, Dict, mapmap, showError } from '@/lib/utils'
 import { RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { th } from 'date-fns/locale'
 import { saveAs } from 'file-saver'
 import {
     Check,
@@ -52,7 +51,6 @@ import {
     ClipboardCopyIcon,
     ClipboardPasteIcon,
     CloudDownloadIcon,
-    CopyIcon,
     EditIcon,
     FileTextIcon,
     PaintbrushIcon,
@@ -316,7 +314,6 @@ function ExamProblemsView() {
             toast.error('Clipboard does not contain valid exam problems data')
         }
     }
-
 
     if (auth.user === null || exam === null || usedAbstractProblems === null)
         return <SimpleSpinner />

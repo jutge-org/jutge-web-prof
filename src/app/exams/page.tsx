@@ -1,10 +1,10 @@
 'use client'
 
+import Page from '@/components/layouts/court/Page'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { AgTableFull } from '@/components/wrappers/AgTable'
 import { useIsMobile } from '@/hooks/use-mobile'
-import Page from '@/jutge-components/layouts/court/Page'
-import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { InstructorBriefExam } from '@/lib/jutge_api_client'
 import dayjs from 'dayjs'

@@ -1,5 +1,8 @@
 'use client'
 
+import { useAuth } from '@/components/layouts/court/lib/Auth'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     ChartConfig,
@@ -11,10 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
-import { Warning } from '@/jutge-components/ui/Warning'
+import { Warning } from '@/components/ui/Warning'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,

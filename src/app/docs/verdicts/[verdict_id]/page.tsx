@@ -1,8 +1,8 @@
 'use client'
 
-import { JTable, JTableItems } from '@/jutge-components/formatters/JTable'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
+import { JTable, JTableItems } from '@/components/formatters/JTable'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { Verdict } from '@/lib/jutge_api_client'
 import 'highlight.js/styles/default.css'

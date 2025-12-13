@@ -1,6 +1,6 @@
 'use client'
 
-import Page from '@/jutge-components/layouts/court/Page'
+import Page from '@/components/layouts/court/Page'
 import { menus } from '@/lib/menus'
 import Link from 'next/link'
 import { useState } from 'react'

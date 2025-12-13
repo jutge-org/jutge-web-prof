@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuth } from '@/components/layouts/court/lib/Auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -9,7 +10,6 @@ import { Loader2Icon, LogInIcon, SquareXIcon } from 'lucide-react'
 import Image from 'next/image'
 import { FormEvent, useState } from 'react'
 import { toast } from 'sonner'
-import { useAuth } from '../jutge-components/layouts/court/lib/Auth'
 
 export default function LoginForm() {
     //

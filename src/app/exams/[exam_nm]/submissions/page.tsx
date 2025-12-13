@@ -1,9 +1,9 @@
 'use client'
 
-import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
-import { Warning } from '@/jutge-components/ui/Warning'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Warning } from '@/components/ui/Warning'
 import jutge from '@/lib/jutge'
 import { InstructorExam, InstructorExamSubmissionsOptions } from '@/lib/jutge_api_client'
 import {

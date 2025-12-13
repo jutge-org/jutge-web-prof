@@ -1,5 +1,8 @@
 'use client'
 
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,9 +17,6 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
-import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import { AbstractProblem } from '@/lib/jutge_api_client'
 import { mapmap, offerDownloadFile } from '@/lib/utils'

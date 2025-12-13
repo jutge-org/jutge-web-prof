@@ -1,6 +1,11 @@
 'use client'
 
 import { array2csv, csv2array, xls2array } from '@/actions/csv'
+import { useConfirmDialog } from '@/components/dialogs/ConfirmDialog'
+import { useEmailsDialog } from '@/components/dialogs/EmailsDialog'
+import { useAuth } from '@/components/layouts/court/lib/Auth'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -8,13 +13,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { AgTableFull } from '@/components/wrappers/AgTable'
 import { usePageChanges } from '@/hooks/use-page-changes'
-import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
-import { useEmailsDialog } from '@/jutge-components/dialogs/EmailsDialog'
-import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
-import { AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge from '@/lib/jutge'
 import { CourseMembers, InstructorCourse, Profile, StudentProfile } from '@/lib/jutge_api_client'
 import { Dict, showError } from '@/lib/utils'
@@ -119,7 +119,7 @@ function CourseStudentsForm(props: CourseStudentProps) {
 
     const gridRef = useRef<AgGridReact<CourseMembers>>(null)
 
-    const onGridReady = useCallback(() => { }, [])
+    const onGridReady = useCallback(() => {}, [])
 
     const rowSelection = useMemo<RowSelectionOptions | 'single' | 'multiple'>(() => {
         return { mode: 'multiRow', headerCheckbox: true }

@@ -1,9 +1,9 @@
 'use client'
 
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import { useAuth } from '@/components/layouts/court/lib/Auth'
+import Page from '@/components/layouts/court/Page'
 import { Button } from '@/components/ui/button'
-import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
-import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
-import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
 import { BotIcon, BotMessageSquareIcon, HomeIcon } from 'lucide-react'
 import Link from 'next/link'

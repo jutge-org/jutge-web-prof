@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu } from '@/jutge-components/layouts/court/lib/Menu'
+import { Menu } from '@/components/layouts/court/lib/Menu'
 import {
     BoxesIcon,
     CableIcon,

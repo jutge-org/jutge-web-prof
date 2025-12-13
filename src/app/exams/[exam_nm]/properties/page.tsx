@@ -1,10 +1,10 @@
 'use client'
 
+import { useConfirmDialog } from '@/components/dialogs/ConfirmDialog'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import { useDynamic } from '@/hooks/use-dynamic'
-import { useConfirmDialog } from '@/jutge-components/dialogs/ConfirmDialog'
-import { JForm, JFormFields } from '@/jutge-components/formatters/JForm'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
 import jutge from '@/lib/jutge'
 import {
     Compiler,

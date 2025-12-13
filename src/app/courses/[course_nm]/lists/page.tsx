@@ -1,5 +1,8 @@
 'use client'
 
+import { useAuth } from '@/components/layouts/court/lib/Auth'
+import Page from '@/components/layouts/court/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -9,11 +12,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import { AgTable, AgTableFull } from '@/components/wrappers/AgTable'
 import { usePageChanges } from '@/hooks/use-page-changes'
-import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
-import Page from '@/jutge-components/layouts/court/Page'
-import SimpleSpinner from '@/jutge-components/spinners/SimpleSpinner'
-import { AgTable, AgTableFull } from '@/jutge-components/wrappers/AgTable'
 import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,

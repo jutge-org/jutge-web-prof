@@ -1,5 +1,6 @@
 'use client'
 
+import Page from '@/components/layouts/court/Page'
 import {
     Select,
     SelectContent,
@@ -7,7 +8,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import Page from '@/jutge-components/layouts/court/Page'
 import jutge from '@/lib/jutge'
 import {
     ColorMapping,

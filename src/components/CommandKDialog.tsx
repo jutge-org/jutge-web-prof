@@ -1,5 +1,7 @@
 'use client'
 
+import { useAuth } from '@/components/layouts/court/lib/Auth'
+import { CommandKProps, useCommandK } from '@/components/layouts/court/lib/CommandK'
 import {
     CommandDialog,
     CommandEmpty,
@@ -9,8 +11,6 @@ import {
     CommandList,
     CommandSeparator,
 } from '@/components/ui/command'
-import { useAuth } from '@/jutge-components/layouts/court/lib/Auth'
-import { CommandKProps, useCommandK } from '@/jutge-components/layouts/court/lib/CommandK'
 import jutge from '@/lib/jutge'
 import {
     AbstractProblem,

@@ -1,6 +1,6 @@
 'use client'
 
-import { OkDialogDemo } from '@/jutge-components/dialogs/OkDialog'
+import { OkDialogDemo } from '@/components/dialogs/OkDialog'
 
 export default function Page() {
     return (
