@@ -9,11 +9,12 @@
         "lint": "bun --bun run eslint",
         "format": "bun prettier --write --list-different .",
         "depcheck": "bunx depcheck --ignores='@types/node' .",
-        "update-jutge-client": "(cd src/lib ; rm -f jutge_api_client.ts ; https --download https://api.jutge.org/clients/download/typescript)",
+        "update-jutge-client": "(cd lib ; rm -f jutge_api_client.ts ; https --download https://api.jutge.org/clients/download/typescript)",
         "deploy": "(docker save web-prof | ssh jutge@jutge.org 'docker load') && ssh jutge@jutge.org 'docker compose restart web-prof'",
         "docker-build": "docker build -t web-prof .",
         "docker-build-amd64": "docker build --platform linux/amd64/v2 -t web-prof .",
-        "docker-run": "docker run -p 8011:8011 web-prof"
+        "docker-run": "docker run -p 8011:8011 web-prof",
+        "clean": "rm -rf .next && rm -rf node_modules"
     },
     "dependencies": {
         "@fast-csv/format": "^5.0.5",
@@ -63,8 +64,6 @@
         "devicon": "^2.16.0",
         "dompurify": "^3.2.6",
         "embla-carousel-react": "^8.6.0",
-        "eslint": "^9.36.0",
-        "eslint-config-next": "^15.5.4",
         "file-saver": "^2.0.5",
         "filesize": "^10.1.6",
         "highlight.js": "^11.11.1",
@@ -75,7 +74,6 @@
         "next": "16.0.10",
         "next-navigation-guard": "^0.2.0",
         "next-themes": "^0.4.6",
-        "prettier-plugin-organize-imports": "^4.3.0",
         "radash": "^12.1.0",
         "react": "^19.2.3",
         "react-day-picker": "8.10.1",
@@ -85,7 +83,6 @@
         "react-resizable-panels": "^2.1.9",
         "recharts": "^2.15.3",
         "shadcn-dropzone": "^0.2.1",
-        "slug": "^11.0.1",
         "sonner": "^1.7.4",
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
@@ -95,15 +92,14 @@
         "zod": "^3.25.64"
     },
     "devDependencies": {
-        "@eslint/eslintrc": "^3.3.1",
+        "@eslint/js": "^9.39.1",
+        "eslint": "^9.39.1",
+        "typescript-eslint": "^8.48.1",
         "@types/node": "^20.19.0",
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
         "prettier": "^3.5.3",
         "tailwindcss": "^3.4.17",
         "typescript": "^5.8.3"
-    },
-    "overrides": {
-        "react-is": "^19.0.0-rc-69d4b800-20241021"
     }
 }
