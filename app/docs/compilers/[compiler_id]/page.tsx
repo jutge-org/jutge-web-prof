@@ -3,14 +3,14 @@
 import 'highlight.js/styles/default.css'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { JTable, JTableItems } from '../../../../components/formatters/JTable'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
-import { Code } from '../../../../components/wrappers/Code'
-import { DevIcon } from '../../../../components/wrappers/DevIcon'
-import jutge from '../../../../lib/jutge'
-import { Compiler } from '../../../../lib/jutge_api_client'
-import { Dict } from '../../../../lib/utils'
+import { JTable, JTableItems } from '@/components/formatters/JTable'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Code } from '@/components/wrappers/Code'
+import { DevIcon } from '@/components/wrappers/DevIcon'
+import jutge from '@/lib/jutge'
+import { Compiler } from '@/lib/jutge_api_client'
+import { Dict } from '@/lib/utils'
 
 export default function CompilerPage() {
     const { compiler_id: encoded_compiler_id } = useParams<{ compiler_id: string }>()

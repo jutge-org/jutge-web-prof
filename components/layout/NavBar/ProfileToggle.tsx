@@ -2,8 +2,8 @@
 
 import { LogOutIcon, UserIcon } from 'lucide-react'
 import Image from 'next/image'
-import { download2src } from '../../../../lib/utils'
-import { Button } from '../../../ui/button'
+import { download2src } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
     Sheet,
     SheetContent,
@@ -11,8 +11,8 @@ import {
     SheetHeader,
     SheetTitle,
     SheetTrigger,
-} from '../../../ui/sheet'
-import Markdown from '../../../wrappers/Markdown'
+} from '@/components/ui/sheet'
+import Markdown from '@/components/wrappers/Markdown'
 import { useAuth } from '../lib/Auth'
 
 export default function ProfileToggle() {

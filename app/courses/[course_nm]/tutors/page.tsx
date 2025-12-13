@@ -14,23 +14,23 @@ import {
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { array2csv } from '../../../../actions/csv'
-import { useConfirmDialog } from '../../../../components/dialogs/ConfirmDialog'
-import { useEmailsDialog } from '../../../../components/dialogs/EmailsDialog'
-import { useAuth } from '../../../../components/layouts/court/lib/Auth'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
-import { Button } from '../../../../components/ui/button'
-import { AgTableFull } from '../../../../components/wrappers/AgTable'
-import { usePageChanges } from '../../../../hooks/use-page-changes'
-import jutge from '../../../../lib/jutge'
+import { array2csv } from '@/actions/csv'
+import { useConfirmDialog } from '@/components/dialogs/ConfirmDialog'
+import { useEmailsDialog } from '@/components/dialogs/EmailsDialog'
+import { useAuth } from '@/components/layout/lib/Auth'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Button } from '@/components/ui/button'
+import { AgTableFull } from '@/components/wrappers/AgTable'
+import { usePageChanges } from '@/hooks/use-page-changes'
+import jutge from '@/lib/jutge'
 import {
     CourseMembers,
     InstructorCourse,
     Profile,
     StudentProfile,
-} from '../../../../lib/jutge_api_client'
-import { Dict, showError } from '../../../../lib/utils'
+} from '@/lib/jutge_api_client'
+import { Dict, showError } from '@/lib/utils'
 
 export default function CourseTutorsPage() {
     const { course_nm } = useParams<{ course_nm: string }>()

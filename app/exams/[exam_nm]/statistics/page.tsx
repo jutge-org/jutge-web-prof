@@ -7,28 +7,28 @@ import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { JSX, useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, LabelList, Pie, PieChart, XAxis, YAxis } from 'recharts'
-import { useAuth } from '../../../../components/layouts/court/lib/Auth'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
+import { useAuth } from '@/components/layout/lib/Auth'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '../../../../components/ui/card'
+} from '@/components/ui/card'
 import {
     ChartConfig,
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-} from '../../../../components/ui/chart'
-import { ScrollArea } from '../../../../components/ui/scroll-area'
-import { Table, TableBody, TableCell, TableRow } from '../../../../components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../../components/ui/tabs'
-import { ToggleGroup, ToggleGroupItem } from '../../../../components/ui/toggle-group'
-import { Warning } from '../../../../components/ui/Warning'
-import jutge, { getProblemTitle } from '../../../../lib/jutge'
+} from '@/components/ui/chart'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Warning } from '@/components/ui/Warning'
+import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
     ColorMapping,
@@ -37,8 +37,8 @@ import {
     InstructorExam,
     InstructorExamProblem,
     Profile,
-} from '../../../../lib/jutge_api_client'
-import { Dict } from '../../../../lib/utils'
+} from '@/lib/jutge_api_client'
+import { Dict } from '@/lib/utils'
 
 dayjs.extend(duration)
 

@@ -1,7 +1,7 @@
 'use client'
 
-import Page from '../../../components/layouts/court/Page'
-import Markdown from '../../../components/wrappers/Markdown'
+import Page from '@/components/layout/Page'
+import Markdown from '@/components/wrappers/Markdown'
 
 export default function DocsPyLibsPage() {
     return (

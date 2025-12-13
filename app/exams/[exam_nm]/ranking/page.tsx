@@ -4,22 +4,22 @@ import { PauseIcon, RabbitIcon, SnailIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import Page from '../../../../components/layouts/court/Page'
+import Page from '@/components/layout/Page'
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '../../../../components/ui/select'
-import jutge from '../../../../lib/jutge'
+} from '@/components/ui/select'
+import jutge from '@/lib/jutge'
 import {
     ColorMapping,
     InstructorBriefExam,
     InstructorExamProblem,
     Ranking,
     RankingResult,
-} from '../../../../lib/jutge_api_client'
+} from '@/lib/jutge_api_client'
 
 export default function ExamRankingPage() {
     const { exam_nm } = useParams<{ exam_nm: string }>()

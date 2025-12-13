@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import Page from '../../components/layouts/court/Page'
+import Page from '../../components/layout/Page'
 import { AgTableFull } from '../../components/wrappers/AgTable'
 import jutge from '../../lib/jutge'
 

@@ -22,12 +22,12 @@ import { useParams } from 'next/navigation'
 import { capitalize } from 'radash'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { makeExamPdf } from '../../../../actions/makeExamPdf'
-import { useTextareaDialog } from '../../../../components/dialogs/TextareaDialog'
-import { useAuth } from '../../../../components/layouts/court/lib/Auth'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
-import { Button } from '../../../../components/ui/button'
+import { makeExamPdf } from '@/actions/makeExamPdf'
+import { useTextareaDialog } from '@/components/dialogs/TextareaDialog'
+import { useAuth } from '@/components/layout/lib/Auth'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Button } from '@/components/ui/button'
 import {
     Command,
     CommandEmpty,
@@ -35,7 +35,7 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-} from '../../../../components/ui/command'
+} from '@/components/ui/command'
 import {
     Dialog,
     DialogContent,
@@ -43,27 +43,27 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '../../../../components/ui/dialog'
-import { Input } from '../../../../components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '../../../../components/ui/popover'
-import { ScrollArea } from '../../../../components/ui/scroll-area'
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '../../../../components/ui/select'
-import { AgTableFull } from '../../../../components/wrappers/AgTable'
-import { usePageChanges } from '../../../../hooks/use-page-changes'
-import jutge, { getProblemTitle } from '../../../../lib/jutge'
+} from '@/components/ui/select'
+import { AgTableFull } from '@/components/wrappers/AgTable'
+import { usePageChanges } from '@/hooks/use-page-changes'
+import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
     InstructorExam,
     InstructorExamProblem,
     Profile,
-} from '../../../../lib/jutge_api_client'
-import { cn, Dict, mapmap, showError } from '../../../../lib/utils'
+} from '@/lib/jutge_api_client'
+import { cn, Dict, mapmap, showError } from '@/lib/utils'
 
 export default function ExamProblemsPage() {
     const { exam_nm } = useParams<{ exam_nm: string }>()
@@ -194,12 +194,12 @@ function ExamProblemsView() {
         fetchData()
     }, [exam_nm, fetchData])
 
-    async function addCallback(problem: InstructorExamProblem) {
+    function addCallback(problem: InstructorExamProblem) {
         setRows((oldRows) => [...oldRows, problem])
         setChanges(true)
     }
 
-    async function editCallback(problem: InstructorExamProblem) {
+    function editCallback(problem: InstructorExamProblem) {
         const index = rows.findIndex((p) => p.problem_nm === problem.problem_nm)
         if (index === -1) return
         const newRows = [...rows]
@@ -208,14 +208,14 @@ function ExamProblemsView() {
         setChanges(true)
     }
 
-    async function add() {
+    function add() {
         setIsDialogOpen(true)
         setDialogKey(Math.random())
         setProblemToEdit(null)
         setChanges(true)
     }
 
-    async function remove() {
+    function remove() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         if (selectedRows.length === 0) {
@@ -227,7 +227,7 @@ function ExamProblemsView() {
         setChanges(true)
     }
 
-    async function edit() {
+    function edit() {
         const grid = gridRef.current!.api
         const selectedRows = grid.getSelectedNodes().map((node) => node.rowIndex) as number[]
         if (selectedRows.length !== 1) {
@@ -256,7 +256,7 @@ function ExamProblemsView() {
         }
     }
 
-    async function decorate() {
+    function decorate() {
         const newRows = rows.map((row, index) => ({
             ...row,
             caption: row.caption || `P${index + 1}`,
@@ -438,7 +438,7 @@ function ProblemDialog(props: ProblemDialogProps) {
         props.problem === null ? null : props.problem.icon,
     )
 
-    async function acceptAction() {
+    function acceptAction() {
         if (problem_nm === null) {
             toast.info('Select a problem.')
             return

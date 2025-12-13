@@ -2,13 +2,13 @@
 
 import { CheckIcon, PaletteIcon } from 'lucide-react'
 import { capitalize } from 'radash'
-import { Button } from '../../../ui/button'
+import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '../../../ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import { availablePalettes, useTheme } from '../lib/Theme'
 
 export function PaletteToggle() {

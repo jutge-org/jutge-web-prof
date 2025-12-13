@@ -4,11 +4,11 @@ import 'highlight.js/styles/default.css'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { JTable, JTableItems } from '../../../../components/formatters/JTable'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
-import jutge from '../../../../lib/jutge'
-import { Verdict } from '../../../../lib/jutge_api_client'
+import { JTable, JTableItems } from '@/components/formatters/JTable'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import jutge from '@/lib/jutge'
+import { Verdict } from '@/lib/jutge_api_client'
 
 export default function VerdictPage() {
     const { verdict_id } = useParams<{ verdict_id: string }>()

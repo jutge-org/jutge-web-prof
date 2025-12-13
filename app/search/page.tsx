@@ -22,7 +22,7 @@ import {
     TagsIcon,
 } from 'lucide-react'
 import { JSX, useEffect, useRef, useState } from 'react'
-import Page from '../../components/layouts/court/Page'
+import Page from '../../components/layout/Page'
 import StatementDialog from '../../components/StatementDialog'
 import { Badge } from '../../components/ui/badge'
 import { Button } from '../../components/ui/button'

@@ -3,8 +3,8 @@
 import { BotMessageSquareIcon, RssIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import Page from '../../components/layouts/court/Page'
-import { useAuth } from '../../components/layouts/court/lib/Auth'
+import Page from '../../components/layout/Page'
+import { useAuth } from '../../components/layout/lib/Auth'
 import { menus } from '../../lib/menus'
 
 export default function HomePage() {

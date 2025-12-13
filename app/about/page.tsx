@@ -5,8 +5,8 @@ import { GithubIcon, GripIcon } from 'lucide-react'
 import { Card, CardContent } from '../../components/ui/card'
 import { Prose } from '../../components/wrappers/Prose'
 
-import Page from '../../components/layouts/court/Page'
-import { useAuth } from '../../components/layouts/court/lib/Auth'
+import Page from '../../components/layout/Page'
+import { useAuth } from '../../components/layout/lib/Auth'
 
 export default function AboutPage() {
     const auth = useAuth()

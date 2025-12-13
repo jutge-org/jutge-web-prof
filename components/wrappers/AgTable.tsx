@@ -8,7 +8,7 @@ import {
     themeQuartz,
 } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { useTheme } from '../layouts/court/lib/Theme'
+import { useTheme } from '../layout/lib/Theme'
 
 ModuleRegistry.registerModules([AllCommunityModule])
 

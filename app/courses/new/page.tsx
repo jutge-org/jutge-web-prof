@@ -5,11 +5,11 @@ import { redirect } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { JForm, JFormFields } from '../../../components/formatters/JForm'
-import Page from '../../../components/layouts/court/Page'
-import jutge from '../../../lib/jutge'
-import { InstructorCourseCreation } from '../../../lib/jutge_api_client'
-import { showError } from '../../../lib/utils'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layout/Page'
+import jutge from '@/lib/jutge'
+import { InstructorCourseCreation } from '@/lib/jutge_api_client'
+import { showError } from '@/lib/utils'
 
 export default function CoursesNewPage() {
     return (

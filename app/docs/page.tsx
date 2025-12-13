@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import Page from '../../components/layouts/court/Page'
+import Page from '../../components/layout/Page'
 import { menus } from '../../lib/menus'
 
 export default function DocsPage() {
@@ -11,7 +11,7 @@ export default function DocsPage() {
         <Page pageContext={{ menu: 'user', current: 'docs', title: 'Docs' }}>
             <div className="w-full pt-8 sm:pt-32 flex flex-row justify-center">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
-                    {Object.entries(menu).map(([key, item]) => (
+                    {Object.entries(menu).map(([key, item]: [string, (typeof menu)[string]]) => (
                         <Option key={key} icon={item.icon2xl} title={item.name} href={item.href} />
                     ))}
                 </div>

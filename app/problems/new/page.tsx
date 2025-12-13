@@ -5,9 +5,9 @@ import { redirect } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { JForm, JFormFields } from '../../../components/formatters/JForm'
-import Page from '../../../components/layouts/court/Page'
-import jutge from '../../../lib/jutge'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layout/Page'
+import jutge from '@/lib/jutge'
 
 export default function ProblemsNewPage() {
     return (

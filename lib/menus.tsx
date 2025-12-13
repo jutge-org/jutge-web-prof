@@ -17,7 +17,7 @@ import {
     SquareCodeIcon,
     TableIcon,
 } from 'lucide-react'
-import { Menu } from '../components/layouts/court/lib/Menu'
+import { Menu } from '@/components/layout/lib/Menu'
 
 export const shortTitle = 'prof.jutge.org'
 

@@ -7,10 +7,10 @@ import Link from 'next/link'
 import { redirect, useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useAuth } from '../../../../components/layouts/court/lib/Auth'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
-import { Button } from '../../../../components/ui/button'
+import { useAuth } from '@/components/layout/lib/Auth'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Button } from '@/components/ui/button'
 import {
     Dialog,
     DialogContent,
@@ -18,17 +18,17 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '../../../../components/ui/dialog'
-import { AgTable, AgTableFull } from '../../../../components/wrappers/AgTable'
-import { usePageChanges } from '../../../../hooks/use-page-changes'
-import jutge, { getProblemTitle } from '../../../../lib/jutge'
+} from '@/components/ui/dialog'
+import { AgTable, AgTableFull } from '@/components/wrappers/AgTable'
+import { usePageChanges } from '@/hooks/use-page-changes'
+import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
     InstructorBriefList,
     InstructorCourse,
     InstructorListItem,
-} from '../../../../lib/jutge_api_client'
-import { Dict } from '../../../../lib/utils'
+} from '@/lib/jutge_api_client'
+import { Dict } from '@/lib/utils'
 
 type Item = { title: string; list_nm: string }
 

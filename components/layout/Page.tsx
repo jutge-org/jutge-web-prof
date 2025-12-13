@@ -1,8 +1,8 @@
 'use client'
 
 import { JSX, ReactNode } from 'react'
-import { CommandKDialog } from '../../CommandKDialog'
-import LoginForm from '../../LoginForm'
+import { CommandKDialog } from '@/components/CommandKDialog'
+import LoginForm from '@/components/LoginForm'
 import { useAuth } from './lib/Auth'
 import CommandKProvider, { useCommandK } from './lib/CommandK'
 import NavBar from './NavBar'

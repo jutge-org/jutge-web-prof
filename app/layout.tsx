@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import { NavigationGuardProvider } from 'next-navigation-guard'
 import { ReactNode } from 'react'
-import AuthProvider from '../components/layouts/court/lib/Auth'
-import { ThemeProvider } from '../components/layouts/court/lib/Theme'
+import AuthProvider from '../components/layout/lib/Auth'
+import { ThemeProvider } from '../components/layout/lib/Theme'
 import { Toaster } from '../components/ui/sonner'
 
-import '@/components/layouts/court/themes.css'
+import '@/components/layout/themes.css'
 import './globals.css'
 
 export const metadata: Metadata = {

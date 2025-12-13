@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
-import { JForm, JFormFields } from '../../../components/formatters/JForm'
-import { useAuth } from '../../../components/layouts/court/lib/Auth'
-import Page from '../../../components/layouts/court/Page'
-import { Button } from '../../../components/ui/button'
-import jutge from '../../../lib/jutge'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import { useAuth } from '@/components/layout/lib/Auth'
+import Page from '@/components/layout/Page'
+import { Button } from '@/components/ui/button'
+import jutge from '@/lib/jutge'
 
 export default function ProblemsGenPage() {
     return (

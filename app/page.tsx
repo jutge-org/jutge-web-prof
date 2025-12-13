@@ -1,8 +1,8 @@
 'use client'
 
 import { redirect } from 'next/navigation'
-import Page from '../components/layouts/court/Page'
-import { useAuth } from '../components/layouts/court/lib/Auth'
+import Page from '../components/layout/Page'
+import { useAuth } from '../components/layout/lib/Auth'
 
 export default function HomePage() {
     const auth = useAuth()

@@ -15,8 +15,8 @@ import {
 } from '../lib/jutge_api_client'
 import { menus } from '../lib/menus'
 import { mapmap } from '../lib/utils'
-import { useAuth } from './layouts/court/lib/Auth'
-import { CommandKProps, useCommandK } from './layouts/court/lib/CommandK'
+import { useAuth } from './layout/lib/Auth'
+import { CommandKProps, useCommandK } from './layout/lib/CommandK'
 import {
     CommandDialog,
     CommandEmpty,

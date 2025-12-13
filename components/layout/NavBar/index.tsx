@@ -4,14 +4,14 @@ import { EllipsisVerticalIcon, MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import * as React from 'react'
-import { menus, shortTitle } from '../../../../lib/menus'
+import { menus, shortTitle } from '@/lib/menus'
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '../../../ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import { PageContext } from '../Page'
 import CommandKToggle from './CommandKToggle'
 import ModeToggle from './ModeToggle'

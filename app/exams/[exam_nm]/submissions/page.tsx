@@ -8,12 +8,12 @@ import {
 } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { JForm, JFormFields } from '../../../../components/formatters/JForm'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
-import { Warning } from '../../../../components/ui/Warning'
-import jutge from '../../../../lib/jutge'
-import { InstructorExam, InstructorExamSubmissionsOptions } from '../../../../lib/jutge_api_client'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Warning } from '@/components/ui/Warning'
+import jutge from '@/lib/jutge'
+import { InstructorExam, InstructorExamSubmissionsOptions } from '@/lib/jutge_api_client'
 
 export default function ExamSubmissionsPage() {
     const { exam_nm } = useParams<{ exam_nm: string }>()

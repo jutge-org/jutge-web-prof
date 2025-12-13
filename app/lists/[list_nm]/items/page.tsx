@@ -6,27 +6,27 @@ import { CircleMinusIcon, PlusCircleIcon, SaveIcon } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useAuth } from '../../../../components/layouts/court/lib/Auth'
-import Page from '../../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../../components/SimpleSpinner'
-import { Button } from '../../../../components/ui/button'
+import { useAuth } from '@/components/layout/lib/Auth'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Button } from '@/components/ui/button'
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '../../../../components/ui/dialog'
-import { Input } from '../../../../components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../../components/ui/tabs'
-import { AgTable, AgTableFull } from '../../../../components/wrappers/AgTable'
-import { usePageChanges } from '../../../../hooks/use-page-changes'
-import jutge, { getProblemTitle } from '../../../../lib/jutge'
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { AgTable, AgTableFull } from '@/components/wrappers/AgTable'
+import { usePageChanges } from '@/hooks/use-page-changes'
+import jutge, { getProblemTitle } from '@/lib/jutge'
 import {
     AbstractProblem,
     InstructorList,
     InstructorListItem,
-} from '../../../../lib/jutge_api_client'
+} from '@/lib/jutge_api_client'
 
 type Item = { description: string | null; problem_nm: string | null; title: string | null }
 type ProblemItem = { problem_nm: string; title: string }

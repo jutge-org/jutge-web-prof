@@ -4,9 +4,9 @@ import { CloudUploadIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { JForm, JFormFields } from '../../../../components/formatters/JForm'
-import Page from '../../../../components/layouts/court/Page'
-import jutge from '../../../../lib/jutge'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layout/Page'
+import jutge from '@/lib/jutge'
 
 export default function ProblemUpdatePage() {
     const { problem_nm } = useParams<{ problem_nm: string }>()

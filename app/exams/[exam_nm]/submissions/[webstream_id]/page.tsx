@@ -4,10 +4,10 @@ import { CloudDownloadIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import Page from '../../../../../components/layouts/court/Page'
-import { Button } from '../../../../../components/ui/button'
-import { useXTerm } from '../../../../../components/wrappers/XTerm'
-import jutge from '../../../../../lib/jutge'
+import Page from '@/components/layout/Page'
+import { Button } from '@/components/ui/button'
+import { useXTerm } from '@/components/wrappers/XTerm'
+import jutge from '@/lib/jutge'
 
 export default function ExamSubmissionsWebStreamPage() {
     const { exam_nm } = useParams<{ exam_nm: string }>()

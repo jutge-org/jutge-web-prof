@@ -2,13 +2,13 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import Page from '../../../components/layouts/court/Page'
-import { Switch } from '../../../components/ui/switch'
-import { AgTableFull } from '../../../components/wrappers/AgTable'
-import { DevIcon } from '../../../components/wrappers/DevIcon'
-import jutge from '../../../lib/jutge'
-import { Compiler } from '../../../lib/jutge_api_client'
-import { Dict } from '../../../lib/utils'
+import Page from '@/components/layout/Page'
+import { Switch } from '@/components/ui/switch'
+import { AgTableFull } from '@/components/wrappers/AgTable'
+import { DevIcon } from '@/components/wrappers/DevIcon'
+import jutge from '@/lib/jutge'
+import { Compiler } from '@/lib/jutge_api_client'
+import { Dict } from '@/lib/utils'
 
 export default function DocsCompilersPage() {
     return (

@@ -3,11 +3,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import Page from '../../../components/layouts/court/Page'
-import { AgTableFull } from '../../../components/wrappers/AgTable'
-import jutge from '../../../lib/jutge'
-import { Verdict } from '../../../lib/jutge_api_client'
-import { Dict } from '../../../lib/utils'
+import Page from '@/components/layout/Page'
+import { AgTableFull } from '@/components/wrappers/AgTable'
+import jutge from '@/lib/jutge'
+import { Verdict } from '@/lib/jutge_api_client'
+import { Dict } from '@/lib/utils'
 
 export default function DocsVerdictsPage() {
     return (

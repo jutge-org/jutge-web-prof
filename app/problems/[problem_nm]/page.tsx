@@ -16,26 +16,26 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import validator from 'validator'
-import { JForm, JFormFields } from '../../../components/formatters/JForm'
-import Page from '../../../components/layouts/court/Page'
-import SimpleSpinner from '../../../components/SimpleSpinner'
-import { Badge } from '../../../components/ui/badge'
-import { Button } from '../../../components/ui/button'
+import { JForm, JFormFields } from '@/components/formatters/JForm'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '../../../components/ui/dialog'
-import { Input } from '../../../components/ui/input'
-import { Label } from '../../../components/ui/label'
-import { Switch } from '../../../components/ui/switch'
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../../components/ui/table'
-import { Textarea } from '../../../components/ui/textarea'
-import jutge from '../../../lib/jutge'
-import { AbstractProblem } from '../../../lib/jutge_api_client'
-import { mapmap, offerDownloadFile } from '../../../lib/utils'
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
+import jutge from '@/lib/jutge'
+import { AbstractProblem } from '@/lib/jutge_api_client'
+import { mapmap, offerDownloadFile } from '@/lib/utils'
 
 dayjs.extend(LocalizedFormat)
 
@@ -275,7 +275,7 @@ function EditProblemForm({ info }: ProblemFormProps) {
         offerDownloadFile(download, download.name)
     }
 
-    async function updateAction() {
+    function updateAction() {
         toast.info('Nothing done.')
     }
 
@@ -365,7 +365,7 @@ function DeprecationDialog({
         setIsDeprecated(deprecation !== '')
     }, [isOpen, deprecation])
 
-    async function acceptAction() {
+    function acceptAction() {
         if (isDeprecated && content === '') {
             toast.error('You must provide a deprecation reason.')
             return
@@ -391,7 +391,7 @@ function DeprecationDialog({
                             className="w-full mb-2"
                             placeholder="Deprecation reason"
                             value={content}
-                            onChange={(e: any) => setContent(e.target.value.trim())}
+                            onChange={(e) => setContent(e.target.value.trim())}
                             disabled={!isDeprecated}
                         />
                         <Button onClick={acceptAction}>
@@ -427,7 +427,7 @@ function PasscodeDialog({
         setHasPasscode(passcode !== '')
     }, [isOpen, passcode])
 
-    async function acceptAction() {
+    function acceptAction() {
         if (hasPasscode && content === '') {
             toast.error('You must provide a passcode.')
             return
@@ -466,7 +466,7 @@ function PasscodeDialog({
                             className="w-full mt-4"
                             placeholder="Passcode"
                             value={content}
-                            onChange={(e: any) => onChangePasscode(e.target.value.trim())}
+                            onChange={(e) => onChangePasscode(e.target.value.trim())}
                             disabled={!hasPasscode}
                         />
                         {error && hasPasscode ? (
@@ -500,7 +500,7 @@ function DialogToShareProblem({
         setContent('')
     }, [isOpen])
 
-    async function addCallback() {
+    function addCallback() {
         const lines = content
             .split('\n')
             .map((line) => line.trim())

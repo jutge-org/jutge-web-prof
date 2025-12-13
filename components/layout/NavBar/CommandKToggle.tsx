@@ -1,7 +1,7 @@
 'use client'
 
 import { MenuIcon } from 'lucide-react'
-import { Button } from '../../../ui/button'
+import { Button } from '@/components/ui/button'
 import { useCommandK } from '../lib/CommandK'
 
 export default function CommandKToggle() {

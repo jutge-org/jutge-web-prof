@@ -2,8 +2,8 @@
 
 import dayjs from 'dayjs'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import jutge from '../../../../lib/jutge'
-import type { CredentialsIn, Download, Profile } from '../../../../lib/jutge_api_client'
+import jutge from '@/lib/jutge'
+import type { CredentialsIn, Download, Profile } from '@/lib/jutge_api_client'
 
 export interface AuthProviderProps {
     user: Profile | null
