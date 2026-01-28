@@ -33,7 +33,7 @@ export default function HomePage() {
                             </div>
                             <div>
                                 We expect the service to be restored by Monday, February 9th. We
-                                apologize for the inconvenience.
+                                apologize for the inconvenience. Thank you for your patience.
                             </div>
                         </div>
                     </div>
