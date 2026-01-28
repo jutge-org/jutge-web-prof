@@ -10,7 +10,7 @@
         "format": "bun prettier --write --list-different .",
         "depcheck": "bunx depcheck --ignores='@types/node' .",
         "update-jutge-client": "(cd lib ; rm -f jutge_api_client.ts ; https --download https://api.jutge.org/clients/download/typescript)",
-        "deploy": "(docker save web-prof | ssh jutge@jutge.org 'docker load') && ssh jutge@jutge.org 'docker compose restart web-prof'",
+        "deploy": "(docker save web-prof | ssh jutge@jutge.org 'docker load') && ssh jutge@jutge.org 'docker compose up -d --force-recreate'",
         "docker-build": "docker build -t web-prof .",
         "docker-build-amd64": "docker build --platform linux/amd64/v2 -t web-prof .",
         "docker-run": "docker run -p 8011:8011 web-prof",
