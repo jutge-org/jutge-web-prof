@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2Icon, LogInIcon, SquareXIcon } from 'lucide-react'
+import { FileIcon, Loader2Icon, LogInIcon, SquareXIcon } from 'lucide-react'
 import Image from 'next/image'
 import { FormEvent, useState } from 'react'
 import { toast } from 'sonner'
@@ -10,6 +10,30 @@ import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
+
+function Announcement() {
+    return (
+        <Card className="w-72 mb-6">
+            <CardHeader>
+                <CardTitle className="text-2xl">Nou curs!</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6">
+                <p>
+                    Curs a l&apos;ICE sobre Jutge.org per a professors. Dijous 5 i divendres 6 de
+                    febrer de 10 a 13.
+                </p>
+                <p>
+                    <a href="https://formacio.ice.upc.edu/cat/estudis/formacio/curs/722471/curs-pid-incorporar-plataforma-jutgeorg-docencia-eina-millorar-practica-algorismica-programacio/ ">
+                        <Button className="w-full">
+                            <FileIcon />
+                            Informació i inscripcions
+                        </Button>
+                    </a>
+                </p>
+            </CardContent>
+        </Card>
+    )
+}
 
 export default function LoginForm() {
     //
@@ -64,7 +88,8 @@ export default function LoginForm() {
                     alt="Teacher"
                     priority={true}
                 />
-                <Card className="w-72">
+                <Announcement />
+                <Card className="w-72 mb-12">
                     <CardHeader>
                         <CardTitle className="text-2xl">Sign in</CardTitle>
                     </CardHeader>

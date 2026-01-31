@@ -86,6 +86,10 @@ export default function HomePage() {
                         </div>
                         <ul className="ml-4 mt-4 list-disc list-outside space-y-2">
                             <li>
+                                2026-01-31: Problem generation with Jutge<sup>AI</sup> moved to New
+                                Toolkit.
+                            </li>
+                            <li>
                                 2025-11-27: Allow filtering for problem codes on add problem dialog.
                             </li>
                             <li>
