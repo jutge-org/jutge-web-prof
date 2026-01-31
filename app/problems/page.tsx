@@ -226,11 +226,6 @@ function ProblemsListView() {
                         Toolkit
                     </Button>
                 </a>
-                <Link href="/problems/aigen">
-                    <Button className="w-36 justify-start" title="Generate problem with JutgeAI">
-                        <BotIcon /> Generate
-                    </Button>
-                </Link>
                 <Link href="/problems/new">
                     <Button className="w-36 justify-start" title="Add a new problem">
                         <SquarePlusIcon /> New problem
