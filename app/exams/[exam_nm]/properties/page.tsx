@@ -210,14 +210,26 @@ function EditExamForm(props: ExamFormProps) {
             label: 'Description',
             value: description || '',
             setValue: setDescription,
-            placeHolder: 'Exam description (available to students)',
+            placeHolder: 'Exam description',
+            help: (
+                <div>
+                    The exam description will be available to all participants in the exam/contest,
+                    including in its anouncement.
+                </div>
+            ),
         },
         instructions: {
             type: 'markdown',
             label: 'Instructions',
             value: instructions || '',
             setValue: setInstructions,
-            placeHolder: 'Exam instructions (available to students once they log in the exam)',
+            placeHolder: 'Exam instructions',
+            help: (
+                <div>
+                    The exam instructions will be available to all participants in the exam/contest
+                    once they log in the exam and the exam has started.
+                </div>
+            ),
         },
         expectedStart: {
             type: 'datetime',
@@ -289,6 +301,13 @@ function EditExamForm(props: ExamFormProps) {
             label: 'Visible submissions',
             value: visibleSubmissions,
             setValue: setVisibleSubmissions,
+            help: (
+                <div>
+                    If enabled, submissions <i>and</i> problems sent to an exam/contest will be
+                    visible from the regular Jutge.org site. You probably don't want to have visible
+                    submissions until the end of the exam.
+                </div>
+            ),
         },
         archived: {
             type: 'switch',

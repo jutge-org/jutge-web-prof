@@ -118,6 +118,7 @@ function EditExamForm(props: ExamFormProps) {
             label: 'Obscure private testcases',
             value: obscurePrivateTestNames,
             setValue: setObscurePrivateTestNames,
+            help: `Obscure the names of the private test cases in the output to hide their intent.`,
         },
         includePDF: {
             type: 'switch',

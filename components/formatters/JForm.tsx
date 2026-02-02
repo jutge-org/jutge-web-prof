@@ -9,10 +9,12 @@ import {
     CloudUploadIcon,
     EyeIcon,
     EyeOffIcon,
+    InfoIcon,
     PenOffIcon,
     TrashIcon,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { sleep } from 'radash'
 import { Dispatch, JSX, SetStateAction, useState } from 'react'
 import Dropzone, { DropzoneState } from 'shadcn-dropzone'
 import { toast } from 'sonner'
@@ -36,8 +38,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Switch } from '../ui/switch'
 import { Textarea } from '../ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import HtmlEditor from '../wrappers/HtmlEditor'
-import { sleep } from 'radash'
 
 export type JFormInputField = {
     type: 'input'
@@ -47,6 +49,7 @@ export type JFormInputField = {
     validator?: ZodSchema
     disabled?: boolean
     placeHolder?: string
+    help?: string | JSX.Element
 }
 
 export type JFormNumberField = {
@@ -57,6 +60,7 @@ export type JFormNumberField = {
     validator?: ZodSchema
     disabled?: boolean
     placeHolder?: string
+    help?: string | JSX.Element
 }
 
 export type JFormPasswordField = {
@@ -67,6 +71,7 @@ export type JFormPasswordField = {
     validator?: ZodSchema
     disabled?: boolean
     placeHolder?: string
+    help?: string | JSX.Element
 }
 
 export type JFormTextareaField = {
@@ -78,6 +83,7 @@ export type JFormTextareaField = {
     disabled?: boolean
     placeHolder?: string
     rows?: number
+    help?: string | JSX.Element
 }
 
 export type JFormHtmlField = {
@@ -88,6 +94,7 @@ export type JFormHtmlField = {
     validator?: ZodSchema
     disabled?: boolean
     placeHolder?: string
+    help?: string | JSX.Element
 }
 
 export type JFormMarkdownField = {
@@ -98,6 +105,7 @@ export type JFormMarkdownField = {
     validator?: ZodSchema
     disabled?: boolean
     placeHolder?: string
+    help?: string | JSX.Element
 }
 
 export type JFormFileField = {
@@ -108,6 +116,7 @@ export type JFormFileField = {
     validator?: ZodSchema
     accept?: string[]
     disabled?: boolean
+    help?: string | JSX.Element
 }
 
 export type JFormSwitchField = {
@@ -117,6 +126,7 @@ export type JFormSwitchField = {
     setValue: (value: boolean) => void
     disabled?: boolean
     validator?: ZodSchema
+    help?: string | JSX.Element
 }
 
 export type JFormDateTimeField = {
@@ -126,6 +136,7 @@ export type JFormDateTimeField = {
     setValue?: (value: string) => void
     disabled?: boolean
     placeHolder?: string
+    help?: string | JSX.Element
 }
 
 export type JFormSelectField = {
@@ -135,6 +146,7 @@ export type JFormSelectField = {
     setValue: (value: string | null) => void
     options: { value: string; label: string }[]
     disabled?: boolean
+    help?: string | JSX.Element
 }
 
 export type JFormMultiSelectField = {
@@ -144,6 +156,7 @@ export type JFormMultiSelectField = {
     setValue: (value: string[]) => void
     options: { value: string; label: string }[]
     disabled?: boolean
+    help?: string | JSX.Element
 }
 
 export type JFormRadioField = {
@@ -153,6 +166,7 @@ export type JFormRadioField = {
     setValue: (value: string) => void
     options: { value: string; label: string | JSX.Element }[]
     disabled?: boolean
+    help?: string | JSX.Element
 }
 
 export type JFormButtonField = {
@@ -433,6 +447,7 @@ function JInputComponent(props: JInputComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -482,6 +497,7 @@ function JNumberComponent(props: JNumberComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -511,6 +527,7 @@ function JPasswordComponent(props: JPasswordComponentProps) {
                     </Badge>
                 }
                 error={props.errors[props.fieldKey]}
+                help={props.field.help}
             />
         )
     }
@@ -567,6 +584,7 @@ function JPasswordComponent(props: JPasswordComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -594,6 +612,7 @@ function JTextareaComponent(props: JTextareaComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -613,6 +632,7 @@ function JHtmlComponent(props: JHtmlComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -649,6 +669,7 @@ function JMarkdownComponent(props: JMarkdownComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -680,6 +701,7 @@ function JFileComponent(props: JFileComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -732,6 +754,7 @@ function JSwitchComponent(props: JSwitchComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -777,6 +800,7 @@ function JDateTimeComponent(props: JDateTimeComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -862,6 +886,7 @@ function JSelectComponent(props: JSelectComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -891,6 +916,7 @@ function JMultiSelectComponent(props: JMultiSelectComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -921,6 +947,7 @@ function JRadioComponent(props: JRadioComponentProps) {
             label={props.field.label}
             content={content}
             error={props.errors[props.fieldKey]}
+            help={props.field.help}
         />
     )
 }
@@ -993,15 +1020,38 @@ interface JFieldComponentProps {
     label: JSX.Element | string
     content: JSX.Element | string
     error?: JSX.Element | string
+    help?: string | JSX.Element
 }
 
 function JFieldComponent(props: JFieldComponentProps) {
     return (
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-4">
             <Label className="mt-3 font-bold sm:w-[30ex] sm:text-right">
-                <span className={props.error ? 'text-red-700 dark:red-text-400' : ''}>
-                    {props.label}
-                </span>
+                {props.help ? (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex sm:flex-row-reverse gap-1">
+                                    <span
+                                        className={
+                                            props.error ? 'text-red-700 dark:red-text-400' : ''
+                                        }
+                                    >
+                                        {props.label}
+                                    </span>
+                                    <InfoIcon size={12} className="-translate-y-0" />
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <div className="max-w-64">{props.help}</div>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                ) : (
+                    <span className={props.error ? 'text-red-700 dark:red-text-400' : ''}>
+                        {props.label}
+                    </span>
+                )}
             </Label>
             <div className="w-full">
                 <div>{props.content}</div>
