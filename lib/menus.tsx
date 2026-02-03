@@ -16,6 +16,7 @@ import {
     SearchIcon,
     SquareCodeIcon,
     TableIcon,
+    WrenchIcon,
 } from 'lucide-react'
 import { Menu } from '@/components/layout/lib/Menu'
 
@@ -254,6 +255,12 @@ export const menus: Record<string, Menu> = {
             name: 'API',
             icon: <CableIcon />,
             icon2xl: <CableIcon size={52} strokeWidth={0.8} />,
+        },
+        toolkit: {
+            href: 'https://github.com/jutge-org/jutge-toolkit',
+            name: 'Toolkit',
+            icon: <WrenchIcon />,
+            icon2xl: <WrenchIcon size={52} strokeWidth={0.8} />,
         },
     },
 }
