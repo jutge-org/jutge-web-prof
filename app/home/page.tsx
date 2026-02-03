@@ -21,24 +21,6 @@ export default function HomePage() {
 
         return (
             <Page pageContext={{ menu: 'user', current: 'home', title: 'Home' }}>
-                <div className="w-full md:w-1/2 mx-auto border-primary border-2 rounded-lg">
-                    <div className="bg-gray-100 ">
-                        <div className="p-6 flex flex-col gap-1 text-sm ">
-                            <div>
-                                <FileWarning size={64} strokeWidth={0.8} className="ml-2" />
-                            </div>
-                            <div>
-                                Because of maintenance work, it is currently not possible to add or
-                                update problems.
-                            </div>
-                            <div>
-                                We expect the service to be restored by Monday, February 9th. We
-                                apologize for the inconvenience. Thank you for your patience.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div className="mt-8 w-full pt-8 flex flex-row justify-center">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
                         {Object.entries(menu)

@@ -69,7 +69,7 @@ function ProblemUpdateView() {
             return
         }
 
-        const { id } = await jutge.instructor.problems.legacyUpdateWithTerminal(problem_nm, file)
+        const { id } = await jutge.instructor.problems.update(problem_nm, file)
         redirect(`/problems/${problem_nm}/update/${id}`)
     }
 

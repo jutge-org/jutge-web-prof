@@ -85,7 +85,7 @@ function ProblemsNewView() {
             return
         }
 
-        const { id } = await jutge.instructor.problems.legacyCreateWithTerminal(passcode, file)
+        const { id } = await jutge.instructor.problems.create(passcode, file)
         redirect(`/problems/new/${id}`)
     }
 
