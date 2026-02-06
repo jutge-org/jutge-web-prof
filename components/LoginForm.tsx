@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 
-function Announcement() {
+function AnnouncementOld() {
     return (
         <Card className="w-72 mb-6">
             <CardHeader>
@@ -33,6 +33,10 @@ function Announcement() {
             </CardContent>
         </Card>
     )
+}
+
+function Announcement() {
+    return null
 }
 
 export default function LoginForm() {
