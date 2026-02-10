@@ -1,6 +1,7 @@
 'use client'
 
 import {
+    BotIcon,
     BoxesIcon,
     CableIcon,
     FileIcon,
@@ -87,6 +88,17 @@ export const menus: Record<string, Menu> = {
             icon: <SearchIcon />,
             icon2xl: <SearchIcon size={52} strokeWidth={0.8} />,
             shortcut: 'S',
+        },
+        jutgeai: {
+            href: '/jutgeai',
+            name: (
+                <span>
+                    Jutge<sup>AI</sup>
+                </span>
+            ),
+            icon: <BotIcon />,
+            icon2xl: <BotIcon size={52} strokeWidth={0.8} />,
+            shortcut: 'J',
         },
         docs: {
             href: '/docs',

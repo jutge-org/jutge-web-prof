@@ -1,7 +1,7 @@
 'use client'
 
 export interface MenuItem {
-    name: string
+    name: string | React.ReactElement
     href: string
     icon?: React.ReactElement
     icon2xl?: React.ReactElement
