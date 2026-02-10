@@ -12,7 +12,12 @@ export default function DocsPage() {
             <div className="w-full pt-8 sm:pt-32 flex flex-row justify-center">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
                     {Object.entries(menu).map(([key, item]: [string, (typeof menu)[string]]) => (
-                        <Option key={key} icon={item.icon2xl} title={item.name} href={item.href} />
+                        <Option
+                            key={key}
+                            icon={item.icon2xl}
+                            title={item.name as string}
+                            href={item.href}
+                        />
                     ))}
                 </div>
             </div>
