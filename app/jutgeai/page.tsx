@@ -70,6 +70,7 @@ function LlmUsageView() {
 
     useEffect(() => {
         async function fetchEntries() {
+            // i don't know why this is giving me a type error
             const entries = await jutge.instructor.jutgeai.getLlmUsage()
             setEntries(entries)
             setRows(entries)
