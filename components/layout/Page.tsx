@@ -14,7 +14,7 @@ export type PageContext = {
     subCurrent?: string
     subPrefix?: string
     title?: string
-    subTitle?: JSX.Element | string
+    subTitle?: string
 }
 
 export interface PageProps {

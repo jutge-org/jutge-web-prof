@@ -91,11 +91,7 @@ export const menus: Record<string, Menu> = {
         },
         jutgeai: {
             href: '/jutgeai',
-            name: (
-                <span>
-                    Jutge<sup>AI</sup>
-                </span>
-            ),
+            name: 'JutgeAI',
             icon: <BotIcon />,
             icon2xl: <BotIcon size={52} strokeWidth={0.8} />,
             shortcut: 'J',

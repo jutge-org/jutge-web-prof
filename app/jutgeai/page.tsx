@@ -14,11 +14,7 @@ export default function LlmUsagePage() {
                 title: 'JutegAI',
                 menu: 'user',
                 current: 'jutgeai',
-                subTitle: (
-                    <span>
-                        Jutge<sup>AI</sup> usage
-                    </span>
-                ),
+                subTitle: 'JutgeAI',
                 subMenu: 'main',
             }}
         >
