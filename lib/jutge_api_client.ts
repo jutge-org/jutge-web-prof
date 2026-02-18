@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-02-10T14:45:06.465Z
+ * This file has been automatically generated at 2026-02-18T09:48:55.906Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -760,6 +760,18 @@ export type ProblemGenerationInfo = {
     model: string
 }
 
+export type Deprecation = {
+    problem_nm: string
+    reason: string | null
+}
+
+export type SharingSettings = {
+    problem_nm: string
+    passcode: string | null
+    shared_testcases: boolean
+    shared_solutions: boolean
+}
+
 export type SubmissionQuery = {
     email: string
     problem_nm: string
@@ -801,6 +813,44 @@ export type LlmUsageEntry = {
     output_tokens: number
     finish_reason: string
 }
+
+export type CreateImageInput = {
+    model: string
+    label: string
+    prompt: string
+    size: string
+}
+
+export type SubmitPlayerInput = {
+    problem_id: string
+    annotation: string
+    source_code: string
+    callback_url: string
+}
+
+export type SubmitPlayerOutput = NewSubmissionOut
+
+export type SubmitMatchInput = {
+    problem_id: string
+    annotation: string
+    source_codes: string[]
+    callback_url: string
+}
+
+export type SubmitMatchOutput = NewSubmissionOut
+
+export type GetPlayerSubmissionInput = {
+    problem_id: string
+    submission_id: string
+}
+
+export type GetPlayerSubmissionOutput = {
+    todo: string
+}
+
+export type GetMatchSubmissionInput = GetPlayerSubmissionInput
+
+export type GetMatchSubmissionOutput = GetPlayerSubmissionOutput
 
 export type InstructorEntry = {
     username: string
@@ -1231,6 +1281,7 @@ export class JutgeApiClient {
     readonly problems: Module_problems
     readonly student: Module_student
     readonly instructor: Module_instructor
+    readonly games: Module_games
     readonly admin: Module_admin
     readonly testing: Module_testing
 
@@ -1242,6 +1293,7 @@ export class JutgeApiClient {
         this.problems = new Module_problems(this)
         this.student = new Module_student(this)
         this.instructor = new Module_instructor(this)
+        this.games = new Module_games(this)
         this.admin = new Module_admin(this)
         this.testing = new Module_testing(this)
 
@@ -2328,7 +2380,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async get(data: { problem_id: string; submission_id: string }): Promise<Submission> {
+    async get(data: GetPlayerSubmissionInput): Promise<Submission> {
         const [output, ofiles] = await this.root.execute("student.submissions.get", data)
         return output
     }
@@ -2340,7 +2392,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async getCodeAsB64(data: { problem_id: string; submission_id: string }): Promise<string> {
+    async getCodeAsB64(data: GetPlayerSubmissionInput): Promise<string> {
         const [output, ofiles] = await this.root.execute("student.submissions.getCodeAsB64", data)
         return output
     }
@@ -2352,7 +2404,7 @@ class Module_student_submissions {
      * ❌ Warning: TODO: add more documentation
      * See https://github.com/jutge-org/jutge-code-metrics for details.
      */
-    async getCodeMetrics(data: { problem_id: string; submission_id: string }): Promise<any> {
+    async getCodeMetrics(data: GetPlayerSubmissionInput): Promise<any> {
         const [output, ofiles] = await this.root.execute("student.submissions.getCodeMetrics", data)
         return output
     }
@@ -2364,7 +2416,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async getAwards(data: { problem_id: string; submission_id: string }): Promise<string[]> {
+    async getAwards(data: GetPlayerSubmissionInput): Promise<string[]> {
         const [output, ofiles] = await this.root.execute("student.submissions.getAwards", data)
         return output
     }
@@ -2376,7 +2428,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async getAnalysis(data: { problem_id: string; submission_id: string }): Promise<SubmissionAnalysis[]> {
+    async getAnalysis(data: GetPlayerSubmissionInput): Promise<SubmissionAnalysis[]> {
         const [output, ofiles] = await this.root.execute("student.submissions.getAnalysis", data)
         return output
     }
@@ -3389,74 +3441,43 @@ class Module_instructor_problems {
     }
 
     /**
-     * Get the passcode of a problem.
+     * Set the sharing settings of a problem.
      *
      * 🔐 Authentication: instructor
      * No warnings
-     * Returns an empty string if the problem has no passcode.
+     *
+            Without a passcode, the problem is visible to all users.
+            With a passcode, the problem is only visible to users with the correct passcode.
+            With shared testcases, the testcases are shared with instructors.
+            With shared solutions, the solutions are shared with instructors.
+
      */
-    async getPasscode(problem_nm: string): Promise<string> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.getPasscode", problem_nm)
+    async setSharingSettings(data: SharingSettings): Promise<void> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.setSharingSettings", data)
         return output
     }
 
     /**
-     * Set or update the passcode of a problem.
+     * Get the sharing settings of a problem.
      *
      * 🔐 Authentication: instructor
      * No warnings
-     * The passcode must be at least 8 characters long and contain only alphanumeric characters. The passcode will be stored in the database in plain text.
+     *
      */
-    async setPasscode(data: { problem_nm: string; passcode: string }): Promise<void> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.setPasscode", data)
+    async getSharingSettings(problem_nm: string): Promise<SharingSettings> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getSharingSettings", problem_nm)
         return output
     }
 
     /**
-     * Remove passcode of a problem.
+     * Set the deprecation of a problem.
      *
      * 🔐 Authentication: instructor
      * No warnings
-     *
+     * If the reason is null or empty, the problem is undeprecated.
      */
-    async removePasscode(problem_nm: string): Promise<void> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.removePasscode", problem_nm)
-        return output
-    }
-
-    /**
-     * Share passcode to a list of users identified by their email.
-     *
-     * 🔐 Authentication: instructor
-     * No warnings
-     * No emails are sent. Emails that are not registered in the system are ignored.
-     */
-    async sharePasscode(data: { problem_nm: string; emails: string[] }): Promise<void> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.sharePasscode", data)
-        return output
-    }
-
-    /**
-     * Deprecate a problem.
-     *
-     * 🔐 Authentication: instructor
-     * No warnings
-     *
-     */
-    async deprecate(data: { problem_nm: string; reason: string }): Promise<void> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.deprecate", data)
-        return output
-    }
-
-    /**
-     * Undeprecate a problem.
-     *
-     * 🔐 Authentication: instructor
-     * No warnings
-     *
-     */
-    async undeprecate(problem_nm: string): Promise<void> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.undeprecate", problem_nm)
+    async setDeprecation(data: Deprecation): Promise<void> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.setDeprecation", data)
         return output
     }
 
@@ -3608,6 +3629,18 @@ class Module_instructor_jutgeai {
     }
 
     /**
+     * Get the list of supported image models.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async supportedImageModels(): Promise<string[]> {
+        const [output, ofiles] = await this.root.execute("instructor.jutgeai.supportedImageModels", null)
+        return output
+    }
+
+    /**
      * Chat with an AI model using a list of messages.
      *
      * 🔐 Authentication: instructor
@@ -3620,6 +3653,18 @@ class Module_instructor_jutgeai {
     }
 
     /**
+     * Create an image using an AI image model.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     * Some models only accept certain sizes and aspect ratios.
+     */
+    async createImage(data: CreateImageInput): Promise<Download> {
+        const [output, ofiles] = await this.root.execute("instructor.jutgeai.createImage", data)
+        return ofiles[0]
+    }
+
+    /**
      * Get audit usage of LLM models.
      *
      * 🔐 Authentication: instructor
@@ -3628,6 +3673,103 @@ class Module_instructor_jutgeai {
      */
     async getLlmUsage(): Promise<LlmUsageEntry[]> {
         const [output, ofiles] = await this.root.execute("instructor.jutgeai.getLlmUsage", null)
+        return output
+    }
+}
+
+/**
+ *
+ * Module to allow playing Jutge.org games. All operations require the `competitions` user. This module is still under development and is not yet ready for production.
+ *
+ */
+class Module_games {
+    private readonly root: JutgeApiClient
+
+    constructor(root: JutgeApiClient) {
+        this.root = root
+    }
+
+    /**
+     * Get list of problems that are games.
+     *
+     * 🔐 Authentication: competitions
+     * No warnings
+     *
+     */
+    async getGames(): Promise<string[]> {
+        const [output, ofiles] = await this.root.execute("games.getGames", null)
+        return output
+    }
+
+    /**
+     * Get dummy player for a game.
+     *
+     * 🔐 Authentication: competitions
+     * No warnings
+     *
+     */
+    async getDummy(problem_id: string): Promise<string> {
+        const [output, ofiles] = await this.root.execute("games.getDummy", problem_id)
+        return output
+    }
+
+    /**
+     * Get a ZIP file with the viewer for a game.
+     *
+     * 🔐 Authentication: competitions
+     * No warnings
+     *
+     */
+    async getViewer(problem_id: string): Promise<Download> {
+        const [output, ofiles] = await this.root.execute("games.getViewer", problem_id)
+        return ofiles[0]
+    }
+
+    /**
+     * Submit a player for a game.
+     *
+     * 🔐 Authentication: competitions
+     * No warnings
+     *
+     */
+    async submitPlayer(data: SubmitPlayerInput): Promise<NewSubmissionOut> {
+        const [output, ofiles] = await this.root.execute("games.submitPlayer", data)
+        return output
+    }
+
+    /**
+     * Get a player submission for a game.
+     *
+     * 🔐 Authentication: competitions
+     * No warnings
+     *
+     */
+    async getPlayerSubmission(data: GetPlayerSubmissionInput): Promise<GetPlayerSubmissionOutput> {
+        const [output, ofiles] = await this.root.execute("games.getPlayerSubmission", data)
+        return output
+    }
+
+    /**
+     * Submit a match for a game.
+     *
+     * 🔐 Authentication: competitions
+     * No warnings
+     *
+     */
+    async submitMatch(data: SubmitMatchInput): Promise<NewSubmissionOut> {
+        const [output, ofiles] = await this.root.execute("games.submitMatch", data)
+        return output
+    }
+
+    /**
+     * Get a match submission for a game.
+     *
+     * 🔐 Authentication: competitions
+     * No warnings
+     *
+     */
+    async getMatchSubmission(data: GetPlayerSubmissionInput): Promise<GetPlayerSubmissionOutput> {
+        const [output, ofiles] = await this.root.execute("games.getMatchSubmission", data)
         return output
     }
 }

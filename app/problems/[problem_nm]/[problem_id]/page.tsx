@@ -26,6 +26,7 @@ export default function ProblemPropertiesPage() {
                 current: 'problems',
                 subTitle: `Problems ❯ ${problem_id}`,
                 subMenu: 'problems',
+                subCurrent: 'properties',
             }}
         >
             <ProblemPropertiesView />

@@ -17,7 +17,9 @@ export default function ProblemUpdatePage() {
                 title: `Problem ${problem_nm}`,
                 menu: 'user',
                 current: 'problems',
-                subTitle: `Problems ❯ ${problem_nm} ❯ Update`,
+                subTitle: `Problems ❯ ${problem_nm}`,
+                subMenu: 'problems',
+                subCurrent: 'update',
             }}
         >
             <ProblemUpdateView />
@@ -37,14 +39,9 @@ function ProblemUpdateView() {
             label: '',
             content: (
                 <div className="text-sm space-y-2 border rounded-lg p-4 mb-8">
-                    <p>Update a problem by uploading a ZIP archive with its content.</p>
+                    <p>Update problem {problem_nm} by uploading a ZIP archive with its content.</p>
                 </div>
             ),
-        },
-        id: {
-            type: 'input',
-            label: 'Problem',
-            value: problem_nm,
         },
         file: {
             type: 'file',

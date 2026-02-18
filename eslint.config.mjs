@@ -10,7 +10,7 @@ export default tseslint.config(
     [
         globalIgnores([
             'components/ui/**',
-            'lib/jutge_api_client.ts',
+            // 'lib/jutge_api_client.ts',
             '.next/**',
             'postcss.config.mjs',
             'eslint.config.mjs',

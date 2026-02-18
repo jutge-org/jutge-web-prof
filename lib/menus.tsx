@@ -192,8 +192,24 @@ export const menus: Record<string, Menu> = {
     },
 
     problems: {
+        properties: {
+            href: 'properties',
+            name: 'Properties',
+        },
+        sharing: {
+            href: 'sharing',
+            name: 'Sharing',
+        },
+        update: {
+            href: 'update',
+            name: 'Update',
+        },
+        deprecation: {
+            href: 'deprecation',
+            name: 'Deprecation',
+        },
         up: {
-            href: '.',
+            href: '..',
             name: 'Up',
             icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
         },
