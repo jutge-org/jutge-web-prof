@@ -42,7 +42,7 @@ export default function JutgeAIChatPage() {
 
 function JutgeAIChatView() {
     const [models, setModels] = useState<string[]>([])
-    const [selectedModel, setSelectedModel] = useState<string>('')
+    const [selectedModel, setSelectedModel] = useState<string>('openai/gpt-4.1-mini')
     const [messages, setMessages] = useState<UiMessage[]>([])
     const [input, setInput] = useState('')
     const [loading, setLoading] = useState(false)
@@ -52,7 +52,10 @@ function JutgeAIChatView() {
         async function loadModels() {
             const list = await jutge.instructor.jutgeai.supportedModels()
             setModels(list)
-            if (list.length > 0 && !selectedModel) setSelectedModel(list[0])
+            const preferred = 'openai/gpt-4.1-mini'
+            if (list.length > 0 && !list.includes(selectedModel)) {
+                setSelectedModel(list.includes(preferred) ? preferred : list[0])
+            }
         }
         loadModels()
     }, [])
@@ -156,22 +159,6 @@ function JutgeAIChatView() {
 
     return (
         <div className="flex flex-col gap-4 h-[calc(100vh-12rem)]">
-            <div className="flex flex-row gap-2 items-center flex-shrink-0">
-                <span className="text-sm font-medium">Model</span>
-                <Select value={selectedModel} onValueChange={setSelectedModel} disabled={loading}>
-                    <SelectTrigger className="w-[220px]">
-                        <SelectValue placeholder="Select model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {models.map((m) => (
-                            <SelectItem key={m} value={m}>
-                                {m}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-
             <ScrollArea className="flex-1 border rounded-lg p-4 min-h-0">
                 <div className="flex flex-col gap-4 pr-4">
                     {messages.length === 0 && (
@@ -191,7 +178,7 @@ function JutgeAIChatView() {
                 </div>
             </ScrollArea>
 
-            <div className="flex flex-row gap-2 flex-shrink-0">
+            <div className="flex flex-col gap-2 flex-shrink-0">
                 <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -204,14 +191,32 @@ function JutgeAIChatView() {
                         }
                     }}
                 />
-                <Button
-                    onClick={handleSend}
-                    disabled={loading || !input.trim() || !selectedModel}
-                    className="self-end"
-                >
-                    <SendIcon className="size-4" />
-                    Send
-                </Button>
+                <div className="flex flex-row gap-2 justify-end items-center">
+                    <Select
+                        value={selectedModel}
+                        onValueChange={setSelectedModel}
+                        disabled={loading}
+                    >
+                        <SelectTrigger className="w-[220px]">
+                            <SelectValue placeholder="Select model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {models.map((m) => (
+                                <SelectItem key={m} value={m}>
+                                    {m}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Button
+                        onClick={handleSend}
+                        disabled={loading || !input.trim() || !selectedModel}
+                        className="w-36"
+                    >
+                        <SendIcon className="size-8" />
+                        Send
+                    </Button>
+                </div>
             </div>
         </div>
     )

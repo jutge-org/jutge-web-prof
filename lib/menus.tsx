@@ -260,6 +260,10 @@ export const menus: Record<string, Menu> = {
             href: 'chat',
             name: 'Chat',
         },
+        audit: {
+            href: 'audit',
+            name: 'Audit',
+        },
         usage: {
             href: 'usage',
             name: 'Usage',
