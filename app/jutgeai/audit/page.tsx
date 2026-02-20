@@ -166,7 +166,7 @@ function LlmAuditView() {
             filter: false,
             type: 'rightAligned',
             valueFormatter: (p: any) =>
-                p.data.priceEur != null ? `€ ${Number(p.data.priceEur).toFixed(2)}` : '—',
+                p.data.priceEur != null ? `${Number(p.data.priceEur).toFixed(2)}` : '—',
         },
         {
             field: 'wattHours',
@@ -196,7 +196,9 @@ function LlmAuditView() {
             <AgTableFull
                 rowData={displayRows}
                 columnDefs={colDefs}
-                getRowClass={(params: any) => (params.data?.isTotal ? 'jutgeai-audit-total-row' : '')}
+                getRowClass={(params: any) =>
+                    params.data?.isTotal ? 'jutgeai-audit-total-row' : ''
+                }
             />
             <div className="mt-4 flex flex-row gap-2">
                 <div className="text-sm">
