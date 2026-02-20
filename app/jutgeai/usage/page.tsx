@@ -1,0 +1,93 @@
+'use client'
+
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import Page from '@/components/layout/Page'
+import { AgTableFull } from '@/components/wrappers/AgTable'
+import jutge from '@/lib/jutge'
+import { LlmUsageEntry } from '@/lib/jutge_api_client'
+
+export default function JutgeAIUsagePage() {
+    return (
+        <Page
+            pageContext={{
+                title: 'JutgeAI Usage',
+                menu: 'user',
+                current: 'jutgeai',
+                subTitle: 'JutgeAI',
+                subMenu: 'jutgeai',
+                subCurrent: 'usage',
+            }}
+        >
+            <LlmUsageView />
+        </Page>
+    )
+}
+
+function LlmUsageView() {
+    const [entries, setEntries] = useState<LlmUsageEntry[]>([])
+    const [rows, setRows] = useState<LlmUsageEntry[]>([])
+
+    const [colDefs, setColDefs] = useState([
+        { field: 'label', flex: 2, filter: true },
+        {
+            field: 'created_at',
+            headerName: 'Created',
+            width: 180,
+            filter: true,
+            valueGetter: (p: any) => dayjs(p.data.created_at).format('YYYY-MM-DD HH:mm:ss'),
+        },
+        { field: 'model', flex: 2, filter: true },
+        {
+            field: 'duration',
+            headerName: 'Duration',
+            width: 110,
+            filter: false,
+            type: 'rightAligned',
+            valueFormatter: (p: any) => `${Number(p.data.duration).toFixed(3)}`,
+        },
+        {
+            field: 'input_tokens',
+            headerName: 'TokensIn',
+            width: 110,
+            filter: false,
+            type: 'rightAligned',
+        },
+        {
+            field: 'output_tokens',
+            headerName: 'TokensOut',
+            width: 110,
+            filter: false,
+            type: 'rightAligned',
+        },
+        {
+            field: 'finish_reason',
+            headerName: 'Finish',
+            width: 110,
+            filter: false,
+            type: 'rightAligned',
+        },
+    ])
+
+    useEffect(() => {
+        async function fetchEntries() {
+            const entries = await jutge.instructor.jutgeai.getLlmUsage()
+            setEntries(entries)
+            setRows(entries)
+        }
+
+        fetchEntries()
+    }, [])
+
+    return (
+        <>
+            <AgTableFull rowData={rows} columnDefs={colDefs} />
+            <div className="mt-4 flex flex-row gap-2">
+                <div className="text-sm">
+                    This table shows your usage of Jutge<sup>AI</sup>. Rates apply.
+                </div>
+                <div className="flex-grow" />
+            </div>
+        </>
+    )
+}

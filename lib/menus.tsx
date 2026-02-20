@@ -255,6 +255,17 @@ export const menus: Record<string, Menu> = {
         },
     },
 
+    jutgeai: {
+        chat: {
+            href: 'chat',
+            name: 'Chat',
+        },
+        usage: {
+            href: 'usage',
+            name: 'Usage',
+        },
+    },
+
     docs: {
         compilers: {
             href: '/docs/compilers',
