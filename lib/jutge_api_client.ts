@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-03T18:50:57.308Z
+ * This file has been automatically generated at 2026-03-03T19:17:16.367Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -3584,6 +3584,18 @@ class Module_instructor_problems {
      */
     async update(problem_nm: string, ifile: File): Promise<WebStream> {
         const [output, ofiles] = await this.root.execute("instructor.problems.update", problem_nm, [ifile])
+        return output
+    }
+
+    /**
+     * Remove a problem.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     * A problem can only be removed if it has few submissions.
+     */
+    async remove(problem_nm: string): Promise<void> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.remove", problem_nm)
         return output
     }
 }

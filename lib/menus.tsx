@@ -208,9 +208,9 @@ export const menus: Record<string, Menu> = {
             href: 'update',
             name: 'Update',
         },
-        deprecation: {
-            href: 'deprecation',
-            name: 'Deprecation',
+        dangerzone: {
+            href: 'dangerzone',
+            name: 'Danger Zone',
         },
         up: {
             href: '..',
