@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-02-18T09:48:55.906Z
+ * This file has been automatically generated at 2026-03-03T18:50:57.308Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -333,6 +333,46 @@ export type TestcaseAnalysis = {
     input_b64: string
     output_b64: string
     expected_b64: string
+}
+
+export type GetGameResultIn = {
+    problem_id: string
+    submission_id: string
+}
+
+export type MatchSchema = {
+    seed: number
+    status: number[]
+    players: string[]
+    scores: number[]
+}
+
+export type ProblemSchema = {
+    author: string
+    description: string
+    email: string
+    gamename: string
+    title: string
+    version: number
+}
+
+export type SubmissionSchema = {
+    compiler_id: string
+    description: string
+    email: string
+    problem_id: string
+}
+
+export type GetGameResultOut = {
+    games: MatchSchema[]
+    problem: ProblemSchema
+    submission: SubmissionSchema
+}
+
+export type GetGameOutputIn = {
+    problem_id: string
+    submission_id: string
+    game_id: number
 }
 
 export type PublicProfile = {
@@ -772,6 +812,11 @@ export type SharingSettings = {
     shared_solutions: boolean
 }
 
+export type ProblemStatistics = {
+    users: { ok: number; ko: number }
+    submissions: Distribution
+}
+
 export type SubmissionQuery = {
     email: string
     problem_nm: string
@@ -785,16 +830,10 @@ export type SubmissionsQuery = SubmissionQuery[]
 
 export type TagsDict = Record<string, string[]>
 
-export type ChatMessage =
-    | { role: string; content: string }
-    | {
-          role: string
-          content: string
-      }
-    | {
-          role: string
-          content: string
-      }
+export type ChatMessage = {
+    role: string
+    content: string
+}
 
 export type ChatPrompt = {
     model: string
@@ -839,18 +878,13 @@ export type SubmitMatchInput = {
 
 export type SubmitMatchOutput = NewSubmissionOut
 
-export type GetPlayerSubmissionInput = {
-    problem_id: string
-    submission_id: string
-}
-
-export type GetPlayerSubmissionOutput = {
+export type GetGameResultOutput = {
     todo: string
 }
 
-export type GetMatchSubmissionInput = GetPlayerSubmissionInput
+export type GetMatchSubmissionInput = GetGameResultIn
 
-export type GetMatchSubmissionOutput = GetPlayerSubmissionOutput
+export type GetMatchSubmissionOutput = GetGameResultOutput
 
 export type InstructorEntry = {
     username: string
@@ -2380,7 +2414,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async get(data: GetPlayerSubmissionInput): Promise<Submission> {
+    async get(data: GetGameResultIn): Promise<Submission> {
         const [output, ofiles] = await this.root.execute("student.submissions.get", data)
         return output
     }
@@ -2392,7 +2426,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async getCodeAsB64(data: GetPlayerSubmissionInput): Promise<string> {
+    async getCodeAsB64(data: GetGameResultIn): Promise<string> {
         const [output, ofiles] = await this.root.execute("student.submissions.getCodeAsB64", data)
         return output
     }
@@ -2404,7 +2438,7 @@ class Module_student_submissions {
      * ❌ Warning: TODO: add more documentation
      * See https://github.com/jutge-org/jutge-code-metrics for details.
      */
-    async getCodeMetrics(data: GetPlayerSubmissionInput): Promise<any> {
+    async getCodeMetrics(data: GetGameResultIn): Promise<any> {
         const [output, ofiles] = await this.root.execute("student.submissions.getCodeMetrics", data)
         return output
     }
@@ -2416,7 +2450,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async getAwards(data: GetPlayerSubmissionInput): Promise<string[]> {
+    async getAwards(data: GetGameResultIn): Promise<string[]> {
         const [output, ofiles] = await this.root.execute("student.submissions.getAwards", data)
         return output
     }
@@ -2428,7 +2462,7 @@ class Module_student_submissions {
      * No warnings
      *
      */
-    async getAnalysis(data: GetPlayerSubmissionInput): Promise<SubmissionAnalysis[]> {
+    async getAnalysis(data: GetGameResultIn): Promise<SubmissionAnalysis[]> {
         const [output, ofiles] = await this.root.execute("student.submissions.getAnalysis", data)
         return output
     }
@@ -2446,6 +2480,30 @@ class Module_student_submissions {
         testcase: string
     }): Promise<TestcaseAnalysis> {
         const [output, ofiles] = await this.root.execute("student.submissions.getTestcaseAnalysis", data)
+        return output
+    }
+
+    /**
+     * Get the result of a game submission.
+     *
+     * 🔐 Authentication: user
+     * No warnings
+     *
+     */
+    async getGameResult(data: GetGameResultIn): Promise<GetGameResultOut> {
+        const [output, ofiles] = await this.root.execute("student.submissions.getGameResult", data)
+        return output
+    }
+
+    /**
+     * Get the output of a game in a game submission.
+     *
+     * 🔐 Authentication: user
+     * No warnings
+     *
+     */
+    async getGameOutput(data: GetGameOutputIn): Promise<string> {
+        const [output, ofiles] = await this.root.execute("student.submissions.getGameOutput", data)
         return output
     }
 }
@@ -3482,6 +3540,18 @@ class Module_instructor_problems {
     }
 
     /**
+     * Get statistics of an abstract problem.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getStatistics(problem_nm: string): Promise<ProblemStatistics> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getStatistics", problem_nm)
+        return output
+    }
+
+    /**
      * Download a problem as a ZIP file.
      *
      * 🔐 Authentication: instructor
@@ -3726,30 +3796,6 @@ class Module_games {
     }
 
     /**
-     * Submit a player for a game.
-     *
-     * 🔐 Authentication: competitions
-     * No warnings
-     *
-     */
-    async submitPlayer(data: SubmitPlayerInput): Promise<NewSubmissionOut> {
-        const [output, ofiles] = await this.root.execute("games.submitPlayer", data)
-        return output
-    }
-
-    /**
-     * Get a player submission for a game.
-     *
-     * 🔐 Authentication: competitions
-     * No warnings
-     *
-     */
-    async getPlayerSubmission(data: GetPlayerSubmissionInput): Promise<GetPlayerSubmissionOutput> {
-        const [output, ofiles] = await this.root.execute("games.getPlayerSubmission", data)
-        return output
-    }
-
-    /**
      * Submit a match for a game.
      *
      * 🔐 Authentication: competitions
@@ -3758,18 +3804,6 @@ class Module_games {
      */
     async submitMatch(data: SubmitMatchInput): Promise<NewSubmissionOut> {
         const [output, ofiles] = await this.root.execute("games.submitMatch", data)
-        return output
-    }
-
-    /**
-     * Get a match submission for a game.
-     *
-     * 🔐 Authentication: competitions
-     * No warnings
-     *
-     */
-    async getMatchSubmission(data: GetPlayerSubmissionInput): Promise<GetPlayerSubmissionOutput> {
-        const [output, ofiles] = await this.root.execute("games.getMatchSubmission", data)
         return output
     }
 }
