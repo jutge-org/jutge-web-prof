@@ -67,6 +67,7 @@ export default function HomePage() {
                             <b>News</b>
                         </div>
                         <ul className="ml-4 mt-4 list-disc list-outside space-y-2">
+                            <li>2026-03-03: Problem statistics available.</li>
                             <li>
                                 2026-01-31: Problem generation with Jutge<sup>AI</sup> moved to New
                                 Toolkit.
