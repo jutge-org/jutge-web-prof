@@ -11,6 +11,8 @@ import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
+    Area,
+    AreaChart,
     Bar,
     BarChart,
     CartesianGrid,
@@ -72,6 +74,9 @@ function getCategoryColor(key: string, category: string, colors: ColorMapping): 
 }
 
 type OkKoPoint = { label: string; ok: number; ko: number }
+
+/** Submission volume over time: one point per year, ok/ko counts. */
+type VolumeOverTimePoint = { year: number; label: string; ok: number; ko: number }
 
 /** Time-to-first-pass funnel: at each hour threshold T, cumulative % of solvers who passed by T. */
 type TimeToFirstPassPoint = { hours: number; label: string; cumulativePct: number }
@@ -278,6 +283,24 @@ function deriveChartData(statistics: ProblemStatistics) {
     const timeToFirstPass = computeTimeToFirstPassFunnel(statistics.submissions)
     const attemptsToSolve = computeAttemptsToSolve(statistics.submissions)
 
+    // Submission volume over time: one point per year (ok = green base, ko = red stacked)
+    const submissionVolumeOverTime: VolumeOverTimePoint[] = (() => {
+        if (statistics.submissions.length === 0) return []
+        const byYear = new Map<number, { ok: number; ko: number }>()
+        for (const s of statistics.submissions) {
+            const year = dayjs(s.time).year()
+            const existing = byYear.get(year) ?? { ok: 0, ko: 0 }
+            if (isOk(s.verdict)) existing.ok += 1
+            else existing.ko += 1
+            byYear.set(year, existing)
+        }
+        const years = Array.from(byYear.keys()).sort((a, b) => a - b)
+        return years.map((year) => {
+            const { ok = 0, ko = 0 } = byYear.get(year) ?? {}
+            return { year, label: String(year), ok, ko }
+        })
+    })()
+
     return {
         heatmapData,
         heatmapStart,
@@ -291,7 +314,74 @@ function deriveChartData(statistics: ProblemStatistics) {
         submissionsByMonth,
         timeToFirstPass,
         attemptsToSolve,
+        submissionVolumeOverTime,
     }
+}
+
+// -----------------------------------------------------------------------------
+// Statistics dashboard card (top summary)
+// -----------------------------------------------------------------------------
+
+type DashboardStats = {
+    totalSubmissions: number
+    totalUsers: number
+    passRatePct: number
+    passedCount: number
+    neverPassed: number
+}
+
+function StatisticsDashboardCard({ stats }: { stats: DashboardStats }) {
+    const totalUsers = stats.totalUsers
+    const avgPerStudent = totalUsers > 0 ? (stats.totalSubmissions / totalUsers).toFixed(1) : '—'
+
+    return (
+        <Card className="w-full overflow-hidden">
+            <CardContent className="p-0">
+                <div className="grid grid-cols-2 md:grid-cols-4">
+                    <div className="flex flex-col gap-1 p-4 md:p-5">
+                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            Total submissions
+                        </span>
+                        <span className="text-4xl font-bold tabular-nums">
+                            {stats.totalSubmissions.toLocaleString()}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                            {avgPerStudent} avg subs / user
+                        </span>
+                    </div>
+                    <div className="flex flex-col gap-1 p-4 md:p-5">
+                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            Total users
+                        </span>
+                        <span className="text-4xl font-bold tabular-nums">
+                            {stats.totalUsers.toLocaleString()}
+                        </span>
+                        <span className="text-sm text-muted-foreground">users</span>
+                    </div>
+                    <div className="flex flex-col gap-1 p-4 md:p-5">
+                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            Pass rate
+                        </span>
+                        <span className="text-4xl font-bold tabular-nums text-green-600 dark:text-green-500">
+                            {totalUsers > 0 ? Math.round(stats.passRatePct) : 0}%
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                            {stats.passedCount} / {stats.totalUsers}
+                        </span>
+                    </div>
+                    <div className="flex flex-col gap-1 p-4 md:p-5">
+                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            Never passed
+                        </span>
+                        <span className="text-4xl font-bold tabular-nums text-red-600 dark:text-red-500">
+                            {stats.neverPassed}
+                        </span>
+                        <span className="text-sm text-muted-foreground">users</span>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    )
 }
 
 // -----------------------------------------------------------------------------
@@ -654,6 +744,76 @@ function AttemptsToSolveChart({
     )
 }
 
+type SubmissionVolumeAreaChartProps = {
+    data: VolumeOverTimePoint[]
+    colors: ColorMapping
+}
+
+function SubmissionVolumeAreaChart({ data, colors }: SubmissionVolumeAreaChartProps) {
+    const chartConfig = {
+        year: { label: 'Year', color: 'hsl(var(--muted-foreground))' },
+        ok: {
+            label: 'OK (AC)',
+            color: getCategoryColor('OK', 'statuses', colors),
+        },
+        ko: {
+            label: 'KO',
+            color: getCategoryColor('KO', 'statuses', colors),
+        },
+    }
+    const formatCount = (value: unknown) => [String(value), 'Submissions'] as [string, string]
+    if (data.length === 0) {
+        return (
+            <div className="flex h-[160px] w-full items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+                No submission data
+            </div>
+        )
+    }
+    return (
+        <ChartContainer config={chartConfig} className="h-[160px] w-full aspect-auto">
+            <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                    dataKey="year"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(y: number) => String(y)}
+                />
+                <YAxis tickLine={false} axisLine={false} allowDecimals={false} />
+                <ChartTooltip
+                    content={
+                        <ChartTooltipContent
+                            formatter={formatCount}
+                            labelFormatter={(_, payload) => {
+                                const p = payload?.[0]?.payload as VolumeOverTimePoint | undefined
+                                return p ? String(p.year) : ''
+                            }}
+                        />
+                    }
+                />
+                <Area
+                    type="monotone"
+                    dataKey="ok"
+                    stackId="a"
+                    stroke="var(--color-ok)"
+                    fill="var(--color-ok)"
+                    fillOpacity={0.6}
+                    name="OK (AC)"
+                />
+                <Area
+                    type="monotone"
+                    dataKey="ko"
+                    stackId="a"
+                    stroke="var(--color-ko)"
+                    fill="var(--color-ko)"
+                    fillOpacity={0.6}
+                    name="KO"
+                />
+            </AreaChart>
+        </ChartContainer>
+    )
+}
+
 // -----------------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------------
@@ -699,8 +859,18 @@ function ProblemStatisticsView() {
 
     const derived = deriveChartData(statistics)
 
+    const totalUsers = statistics.users.ok + statistics.users.ko
+    const dashboardStats: DashboardStats = {
+        totalSubmissions: statistics.submissions.length,
+        totalUsers,
+        passRatePct: totalUsers > 0 ? (statistics.users.ok / totalUsers) * 100 : 0,
+        passedCount: statistics.users.ok,
+        neverPassed: statistics.users.ko,
+    }
+
     return (
         <div className="flex w-full flex-col gap-4">
+            <StatisticsDashboardCard stats={dashboardStats} />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 <StatCard title="User statuses">
                     <MyPieChart data={derived.usersOkKo} category="statuses" colors={colors} />
@@ -734,6 +904,17 @@ function ProblemStatisticsView() {
                         start={derived.heatmapStart}
                         end={derived.heatmapEnd}
                         maxValue={derived.maxValue}
+                    />
+                </CardContent>
+            </Card>
+            <Card className="w-full">
+                <CardHeader className="p-4">
+                    <CardTitle>Submission volume over time</CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-4">
+                    <SubmissionVolumeAreaChart
+                        data={derived.submissionVolumeOverTime}
+                        colors={colors}
                     />
                 </CardContent>
             </Card>
