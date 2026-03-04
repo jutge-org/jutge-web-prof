@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-04T13:54:44.264Z
+ * This file has been automatically generated at 2026-03-04T18:36:21.156Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -817,7 +817,14 @@ export type ProblemStatistics = {
     verdicts: Distribution
     compilers: Distribution
     proglangs: Distribution
-    submissions: { time: string; verdict: string; anonymous_user_id: string; compiler_id: string; proglang: string }[]
+    submissions: {
+        time: string
+        anonymous_user_id: string
+        problem_id: string
+        verdict: string
+        compiler_id: string
+        proglang: string
+    }[]
 }
 
 export type SubmissionQuery = {

@@ -40,6 +40,7 @@ import SimpleSpinner from '@/components/SimpleSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import jutge from '@/lib/jutge'
@@ -129,7 +130,7 @@ function computeTimeToFirstPassFunnel(submissions: SubmissionEntry[]): {
     }
     deltasHours.sort((a, b) => a - b)
     const totalSolvers = deltasHours.length
-    const medianHours = totalSolvers > 0 ? deltasHours[Math.floor(totalSolvers / 2)]! : null
+    const medianHours = totalSolvers > 0 ? deltasHours[Math.floor(totalSolvers / 2)] : null
 
     const timeBucketsHours = [0, 0.25, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 168]
     const curve: TimeToFirstPassPoint[] = timeBucketsHours.map((hours) => {
@@ -185,7 +186,7 @@ function computeAttemptsToSolve(submissions: SubmissionEntry[]): {
 
     attemptCounts.sort((a, b) => a - b)
     const totalPassed = attemptCounts.length
-    const medianAttempts = totalPassed > 0 ? attemptCounts[Math.floor(totalPassed / 2)]! : null
+    const medianAttempts = totalPassed > 0 ? attemptCounts[Math.floor(totalPassed / 2)] : null
 
     // Build histogram buckets: 1, 2, 3, ... maxAttempts, then optionally "Never passed"
     const maxAttempts = attemptCounts.length > 0 ? Math.max(...attemptCounts) : 0
@@ -575,6 +576,8 @@ function DatePickerField({
 function ProblemHeaderCard({
     problem_nm,
     abstractProblem,
+    selectedProblemIds,
+    onToggleProblemId,
     startDate,
     endDate,
     onStartDateChange,
@@ -585,6 +588,8 @@ function ProblemHeaderCard({
 }: {
     problem_nm: string
     abstractProblem: AbstractProblem
+    selectedProblemIds: Set<string>
+    onToggleProblemId: (problem_id: string, checked: boolean) => void
     startDate: Date
     endDate: Date
     onStartDateChange: (d: Date | undefined) => void
@@ -608,6 +613,13 @@ function ProblemHeaderCard({
                         <div className="mt-2 flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
                             {problems.map((p) => (
                                 <span key={p.problem_id} className="flex items-center gap-1.5">
+                                    <Switch
+                                        checked={selectedProblemIds.has(p.problem_id)}
+                                        onCheckedChange={(checked) =>
+                                            onToggleProblemId(p.problem_id, !!checked)
+                                        }
+                                        aria-label={`Include ${p.problem_id} in statistics`}
+                                    />
                                     <a
                                         href={`https://jutge.org/problems/${p.problem_id}`}
                                         target="_blank"
@@ -990,6 +1002,7 @@ function ProblemStatisticsView() {
     const [statistics, setStatistics] = useState<ProblemStatistics | null>(null)
     const [colors, setColors] = useState<ColorMapping | null>(null)
     const [abstractProblem, setAbstractProblem] = useState<AbstractProblem | null>(null)
+    const [selectedProblemIds, setSelectedProblemIds] = useState<Set<string>>(new Set())
     const [startDate, setStartDate] = useState<Date | null>(null)
     const [endDate, setEndDate] = useState<Date | null>(null)
 
@@ -1003,6 +1016,9 @@ function ProblemStatisticsView() {
             setStatistics(stats)
             setColors(colorMap)
             setAbstractProblem(abstract)
+            setSelectedProblemIds(
+                new Set(Object.values(abstract.problems).map((p) => p.problem_id)),
+            )
         }
         fetchData()
     }, [problem_nm])
@@ -1027,9 +1043,11 @@ function ProblemStatisticsView() {
         const end = dayjs(endDate).endOf('day')
         return statistics.submissions.filter((s) => {
             const t = dayjs(s.time)
-            return !t.isBefore(start) && !t.isAfter(end)
+            const inRange = !t.isBefore(start) && !t.isAfter(end)
+            const selected = selectedProblemIds.has(s.problem_id)
+            return inRange && selected
         })
-    }, [statistics, startDate, endDate])
+    }, [statistics, startDate, endDate, selectedProblemIds])
 
     const derived = useMemo(() => deriveChartData(filteredSubmissions), [filteredSubmissions])
 
@@ -1057,6 +1075,15 @@ function ProblemStatisticsView() {
             <ProblemHeaderCard
                 problem_nm={problem_nm}
                 abstractProblem={abstractProblem}
+                selectedProblemIds={selectedProblemIds}
+                onToggleProblemId={(problem_id, checked) =>
+                    setSelectedProblemIds((prev) => {
+                        const next = new Set(prev)
+                        if (checked) next.add(problem_id)
+                        else next.delete(problem_id)
+                        return next
+                    })
+                }
                 startDate={startDate}
                 endDate={endDate}
                 onStartDateChange={(d) => d != null && setStartDate(d)}
