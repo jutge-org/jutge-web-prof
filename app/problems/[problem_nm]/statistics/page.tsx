@@ -572,7 +572,7 @@ function AttemptsToSolveChart({
             <ChartContainer config={chartConfig} className="h-[300px] w-full">
                 <BarChart
                     data={histogram}
-                    margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                    margin={{ top: 32, right: 8, bottom: 8, left: 52 }}
                     barCategoryGap="10%"
                 >
                     <CartesianGrid vertical={false} />
@@ -589,7 +589,13 @@ function AttemptsToSolveChart({
                     <YAxis
                         tickLine={false}
                         axisLine={false}
-                        label={{ value: 'Number of students', angle: -90, position: 'insideLeft' }}
+                        width={40}
+                        label={{
+                            value: 'Number of students',
+                            angle: -90,
+                            position: 'center',
+                            style: { textAnchor: 'middle' },
+                        }}
                     />
                     <ChartTooltip
                         content={
@@ -609,6 +615,7 @@ function AttemptsToSolveChart({
                                 value: 'Median',
                                 position: 'top',
                                 fill: 'hsl(var(--chart-3))',
+                                offset: 4,
                             }}
                         />
                     )}
