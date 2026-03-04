@@ -1,13 +1,22 @@
 'use client'
 
+import { AbstractProblem } from '@/lib/jutge_api_client'
+import { ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
-import { BotIcon, BotMessageSquareIcon, SquarePlusIcon, WrenchIcon } from 'lucide-react'
+import {
+    BotIcon,
+    BotMessageSquareIcon,
+    FileBoxIcon,
+    FileCodeIcon,
+    KeyRoundIcon,
+    SquarePlusIcon,
+    WrenchIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Page from '../../components/layout/Page'
 import { Badge } from '../../components/ui/badge'
 import { Button } from '../../components/ui/button'
-import { Checkbox } from '../../components/ui/checkbox'
 import { Switch } from '../../components/ui/switch'
 import {
     Tooltip,
@@ -19,8 +28,6 @@ import { AgTableFull } from '../../components/wrappers/AgTable'
 import { useIsMobile } from '../../hooks/use-mobile'
 import jutge from '../../lib/jutge'
 import { mapmap } from '../../lib/utils'
-import { ICellRendererParams } from 'ag-grid-community'
-import { AbstractProblem } from '@/lib/jutge_api_client'
 
 type ProblemRow = {
     problem_nm: string
@@ -156,17 +163,34 @@ function ProblemsListView() {
             sort: false,
             cellRenderer: (p: ICellRendererParams<ProblemRow>) => (
                 <div className="flex flex-row gap-2 mt-3">
-                    <Checkbox checked={!p.data!.passcode} disabled title="Passcode" />
-                    <Checkbox
-                        checked={p.data!.shared_testcases}
-                        disabled
-                        title="Shared testcases"
-                    />
-                    <Checkbox
-                        checked={p.data!.shared_solutions}
-                        disabled
-                        title="Shared solutions"
-                    />
+                    {!p.data!.passcode ? (
+                        <span title="Protected by passcode">
+                            <KeyRoundIcon size={14} />
+                        </span>
+                    ) : (
+                        <span title="Visible to all">
+                            <KeyRoundIcon size={14} className="text-gray-200" />
+                        </span>
+                    )}
+                    {p.data!.shared_testcases ? (
+                        <span title="Test cases shared with instructors">
+                            <FileBoxIcon size={14} />
+                        </span>
+                    ) : (
+                        <span title="Test cases not shared with instructors">
+                            <FileBoxIcon size={14} className="text-gray-200" />
+                        </span>
+                    )}
+
+                    {p.data!.shared_solutions ? (
+                        <span title="Solutions shared with instructors">
+                            <FileCodeIcon size={14} />
+                        </span>
+                    ) : (
+                        <span title="Solutions not shared with instructors">
+                            <FileCodeIcon size={14} className="text-gray-200" />
+                        </span>
+                    )}
                 </div>
             ),
         },

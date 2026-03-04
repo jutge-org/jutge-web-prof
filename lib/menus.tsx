@@ -196,13 +196,13 @@ export const menus: Record<string, Menu> = {
             href: 'properties',
             name: 'Properties',
         },
-        statistics: {
-            href: 'statistics',
-            name: 'Statistics',
-        },
         sharing: {
             href: 'sharing',
             name: 'Sharing',
+        },
+        statistics: {
+            href: 'statistics',
+            name: 'Statistics',
         },
         update: {
             href: 'update',
