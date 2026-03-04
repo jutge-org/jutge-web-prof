@@ -351,7 +351,7 @@ function ProblemStatisticsView() {
 
     return (
         <div className="flex w-full flex-col gap-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 <MyCard title="User statuses">
                     <MyPieChart data={usersOkKo} category="statuses" colors={colors} />
                 </MyCard>
@@ -360,6 +360,14 @@ function ProblemStatisticsView() {
                 </MyCard>
                 <MyCard title="Submissions by verdict">
                     <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
+                </MyCard>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                <MyCard title="Compilers">
+                    <MyPieChart data={statistics.compilers} category="compilers" colors={colors} />
+                </MyCard>
+                <MyCard title="Programming languages">
+                    <MyPieChart data={statistics.proglangs} category="proglangs" colors={colors} />
                 </MyCard>
             </div>
             <Card className="w-full">
