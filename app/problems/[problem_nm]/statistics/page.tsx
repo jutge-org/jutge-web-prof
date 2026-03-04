@@ -13,11 +13,23 @@ import {
     CalendarIcon,
     ExternalLinkIcon,
     RotateCcwIcon,
+    Settings,
     TableIcon,
+    CheckIcon,
 } from 'lucide-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import FloatingToolbar from '@/components/ui/FloatingToolbar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import {
@@ -573,20 +585,7 @@ function DatePickerField({
     )
 }
 
-function ProblemHeaderCard({
-    problem_nm,
-    abstractProblem,
-    selectedProblemIds,
-    onToggleProblemId,
-    startDate,
-    endDate,
-    onStartDateChange,
-    onEndDateChange,
-    onResetDates,
-    defaultStartDate,
-    defaultEndDate,
-}: {
-    problem_nm: string
+type StatisticsSettingsDialogProps = {
     abstractProblem: AbstractProblem
     selectedProblemIds: Set<string>
     onToggleProblemId: (problem_id: string, checked: boolean) => void
@@ -594,78 +593,100 @@ function ProblemHeaderCard({
     endDate: Date
     onStartDateChange: (d: Date | undefined) => void
     onEndDateChange: (d: Date | undefined) => void
-    onResetDates: () => void
     defaultStartDate: Date
     defaultEndDate: Date
-}) {
+    onReset: () => void
+}
+
+function StatisticsSettingsDialog({
+    abstractProblem,
+    selectedProblemIds,
+    onToggleProblemId,
+    startDate,
+    endDate,
+    onStartDateChange,
+    onEndDateChange,
+    onReset,
+}: StatisticsSettingsDialogProps) {
     const problems = Object.values(abstractProblem.problems)
-    const isDefaultRange =
-        dayjs(startDate).isSame(dayjs(defaultStartDate), 'day') &&
-        dayjs(endDate).isSame(dayjs(defaultEndDate), 'day')
     return (
-        <Card className="w-full bg-gray-50 dark:bg-gray-950">
-            <CardHeader className="p-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0 flex-1">
-                        <CardTitle className="text-lg font-semibold">
-                            Statistics for {problem_nm}
-                        </CardTitle>
-                        <div className="mt-2 flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                            {problems.map((p) => (
-                                <span key={p.problem_id} className="flex items-center gap-1.5">
-                                    <Switch
-                                        checked={selectedProblemIds.has(p.problem_id)}
-                                        onCheckedChange={(checked) =>
-                                            onToggleProblemId(p.problem_id, !!checked)
-                                        }
-                                        aria-label={`Include ${p.problem_id} in statistics`}
-                                    />
-                                    <a
-                                        href={`https://jutge.org/problems/${p.problem_id}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex text-muted-foreground hover:text-foreground"
-                                        title={`Open ${p.problem_id} on jutge.org`}
-                                    >
-                                        <ExternalLinkIcon className="h-4 w-4" />
-                                    </a>
-                                    <span className="font-medium text-foreground">
-                                        {p.problem_id}
-                                    </span>
-                                    <span
-                                        className="max-w-[200px] truncate sm:max-w-none"
-                                        title={p.title}
-                                    >
-                                        {p.title}
-                                    </span>
-                                </span>
-                            ))}
+        <FloatingToolbar>
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button
+                        size="icon"
+                        variant="default"
+                        className="h-14 w-14 rounded-full"
+                        aria-label="Open statistics settings"
+                    >
+                        <Settings className="h-6 w-6" />
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Statistics settings</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4 py-2">
+                        <div className="flex flex-col gap-2">
+                            <span className="text-sm font-medium text-muted-foreground">
+                                Problems
+                            </span>
+                            <div className="flex flex-col gap-2 text-sm">
+                                {problems
+                                    .sort((a, b) => a.problem_id.localeCompare(b.problem_id))
+                                    .map((p) => (
+                                        <span
+                                            key={p.problem_id}
+                                            className="flex items-center gap-4"
+                                        >
+                                            <Switch
+                                                checked={selectedProblemIds.has(p.problem_id)}
+                                                onCheckedChange={(checked) =>
+                                                    onToggleProblemId(p.problem_id, !!checked)
+                                                }
+                                                aria-label={`Include ${p.problem_id} in statistics`}
+                                            />
+                                            <span className="font-medium text-foreground w-20">
+                                                {p.problem_id}
+                                            </span>
+                                            <span
+                                                className="max-w-[200px] truncate sm:max-w-none"
+                                                title={p.title}
+                                            >
+                                                {p.title}
+                                            </span>
+                                        </span>
+                                    ))}
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap items-end gap-2">
+                            <DatePickerField
+                                label="Start date"
+                                value={startDate}
+                                onChange={onStartDateChange}
+                            />
+                            <DatePickerField
+                                label="End date"
+                                value={endDate}
+                                onChange={onEndDateChange}
+                            />
                         </div>
                     </div>
-                    <div className="flex flex-shrink-0 flex-wrap items-end gap-2">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={onResetDates}
-                            disabled={isDefaultRange}
-                            title="Reset to full range"
-                        >
+                    <DialogFooter>
+                        <Button onClick={onReset} className="gap-2 w-full">
                             <RotateCcwIcon className="h-4 w-4" />
+                            Reset
                         </Button>
-                        <DatePickerField
-                            label="Start date"
-                            value={startDate}
-                            onChange={onStartDateChange}
-                        />
-                        <DatePickerField
-                            label="End date"
-                            value={endDate}
-                            onChange={onEndDateChange}
-                        />
-                    </div>
-                </div>
-            </CardHeader>
-        </Card>
+                        <DialogClose asChild>
+                            <Button className="w-full">
+                                <CheckIcon className="h-4 w-4" />
+                                Accept
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </FloatingToolbar>
     )
 }
 
@@ -1070,31 +1091,16 @@ function ProblemStatisticsView() {
         return <SimpleSpinner />
     }
 
+    const handleResetSettings = () => {
+        setSelectedProblemIds(
+            new Set(Object.values(abstractProblem.problems).map((p) => p.problem_id)),
+        )
+        setStartDate(defaultStartDate)
+        setEndDate(defaultEndDate)
+    }
+
     return (
         <div className="flex w-full flex-col gap-4">
-            <ProblemHeaderCard
-                problem_nm={problem_nm}
-                abstractProblem={abstractProblem}
-                selectedProblemIds={selectedProblemIds}
-                onToggleProblemId={(problem_id, checked) =>
-                    setSelectedProblemIds((prev) => {
-                        const next = new Set(prev)
-                        if (checked) next.add(problem_id)
-                        else next.delete(problem_id)
-                        return next
-                    })
-                }
-                startDate={startDate}
-                endDate={endDate}
-                onStartDateChange={(d) => d != null && setStartDate(d)}
-                onEndDateChange={(d) => d != null && setEndDate(d)}
-                onResetDates={() => {
-                    setStartDate(defaultStartDate)
-                    setEndDate(defaultEndDate)
-                }}
-                defaultStartDate={defaultStartDate}
-                defaultEndDate={defaultEndDate}
-            />
             <StatisticsDashboardCard stats={dashboardStats} />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 <StatCard title="User statuses">
@@ -1193,6 +1199,25 @@ function ProblemStatisticsView() {
                     </CardContent>
                 </Card>
             </div>
+            <StatisticsSettingsDialog
+                abstractProblem={abstractProblem}
+                selectedProblemIds={selectedProblemIds}
+                onToggleProblemId={(problem_id, checked) =>
+                    setSelectedProblemIds((prev) => {
+                        const next = new Set(prev)
+                        if (checked) next.add(problem_id)
+                        else next.delete(problem_id)
+                        return next
+                    })
+                }
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={(d) => d != null && setStartDate(d)}
+                onEndDateChange={(d) => d != null && setEndDate(d)}
+                defaultStartDate={defaultStartDate}
+                defaultEndDate={defaultEndDate}
+                onReset={handleResetSettings}
+            />
         </div>
     )
 }
