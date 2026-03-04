@@ -16,6 +16,7 @@ import {
     Settings,
     TableIcon,
     CheckIcon,
+    XIcon,
 } from 'lucide-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
@@ -586,32 +587,58 @@ function DatePickerField({
 }
 
 type StatisticsSettingsDialogProps = {
+    open: boolean
+    onOpenChange: (open: boolean) => void
     abstractProblem: AbstractProblem
     selectedProblemIds: Set<string>
-    onToggleProblemId: (problem_id: string, checked: boolean) => void
     startDate: Date
     endDate: Date
-    onStartDateChange: (d: Date | undefined) => void
-    onEndDateChange: (d: Date | undefined) => void
     defaultStartDate: Date
     defaultEndDate: Date
-    onReset: () => void
+    onAccept: (selectedProblemIds: Set<string>, startDate: Date, endDate: Date) => void
 }
 
 function StatisticsSettingsDialog({
+    open,
+    onOpenChange,
     abstractProblem,
     selectedProblemIds,
-    onToggleProblemId,
     startDate,
     endDate,
-    onStartDateChange,
-    onEndDateChange,
-    onReset,
+    defaultStartDate,
+    defaultEndDate,
+    onAccept,
 }: StatisticsSettingsDialogProps) {
     const problems = Object.values(abstractProblem.problems)
+
+    const [draftSelectedProblemIds, setDraftSelectedProblemIds] = useState<Set<string>>(
+        () => new Set(selectedProblemIds),
+    )
+    const [draftStartDate, setDraftStartDate] = useState<Date>(() => startDate)
+    const [draftEndDate, setDraftEndDate] = useState<Date>(() => endDate)
+
+    useEffect(() => {
+        if (open) {
+            setDraftSelectedProblemIds(new Set(selectedProblemIds))
+            setDraftStartDate(startDate)
+            setDraftEndDate(endDate)
+        }
+    }, [open, selectedProblemIds, startDate, endDate])
+
+    const handleResetDraft = () => {
+        setDraftSelectedProblemIds(new Set(problems.map((p) => p.problem_id)))
+        setDraftStartDate(defaultStartDate)
+        setDraftEndDate(defaultEndDate)
+    }
+
+    const handleAccept = () => {
+        onAccept(draftSelectedProblemIds, draftStartDate, draftEndDate)
+        onOpenChange(false)
+    }
+
     return (
         <FloatingToolbar>
-            <Dialog>
+            <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogTrigger asChild>
                     <Button
                         size="icon"
@@ -640,9 +667,14 @@ function StatisticsSettingsDialog({
                                             className="flex items-center gap-4"
                                         >
                                             <Switch
-                                                checked={selectedProblemIds.has(p.problem_id)}
+                                                checked={draftSelectedProblemIds.has(p.problem_id)}
                                                 onCheckedChange={(checked) =>
-                                                    onToggleProblemId(p.problem_id, !!checked)
+                                                    setDraftSelectedProblemIds((prev) => {
+                                                        const next = new Set(prev)
+                                                        if (checked) next.add(p.problem_id)
+                                                        else next.delete(p.problem_id)
+                                                        return next
+                                                    })
                                                 }
                                                 aria-label={`Include ${p.problem_id} in statistics`}
                                             />
@@ -662,27 +694,31 @@ function StatisticsSettingsDialog({
                         <div className="flex flex-wrap items-end gap-2">
                             <DatePickerField
                                 label="Start date"
-                                value={startDate}
-                                onChange={onStartDateChange}
+                                value={draftStartDate}
+                                onChange={(d) => d != null && setDraftStartDate(d)}
                             />
                             <DatePickerField
                                 label="End date"
-                                value={endDate}
-                                onChange={onEndDateChange}
+                                value={draftEndDate}
+                                onChange={(d) => d != null && setDraftEndDate(d)}
                             />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button onClick={onReset} className="gap-2 w-full">
+                    <DialogFooter className="flex flex-col gap-0">
+                        <Button variant="outline" onClick={handleResetDraft} className="w-full">
                             <RotateCcwIcon className="h-4 w-4" />
                             Reset
                         </Button>
                         <DialogClose asChild>
-                            <Button className="w-full">
-                                <CheckIcon className="h-4 w-4" />
-                                Accept
+                            <Button variant="outline" className="w-full">
+                                <XIcon className="h-4 w-4" />
+                                Cancel
                             </Button>
                         </DialogClose>
+                        <Button onClick={handleAccept} className="w-full">
+                            <CheckIcon className="h-4 w-4" />
+                            Accept
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -1026,6 +1062,7 @@ function ProblemStatisticsView() {
     const [selectedProblemIds, setSelectedProblemIds] = useState<Set<string>>(new Set())
     const [startDate, setStartDate] = useState<Date | null>(null)
     const [endDate, setEndDate] = useState<Date | null>(null)
+    const [settingsOpen, setSettingsOpen] = useState(false)
 
     useEffect(() => {
         async function fetchData() {
@@ -1091,12 +1128,10 @@ function ProblemStatisticsView() {
         return <SimpleSpinner />
     }
 
-    const handleResetSettings = () => {
-        setSelectedProblemIds(
-            new Set(Object.values(abstractProblem.problems).map((p) => p.problem_id)),
-        )
-        setStartDate(defaultStartDate)
-        setEndDate(defaultEndDate)
+    const handleAcceptSettings = (ids: Set<string>, start: Date, end: Date) => {
+        setSelectedProblemIds(ids)
+        setStartDate(start)
+        setEndDate(end)
     }
 
     return (
@@ -1124,6 +1159,42 @@ function ProblemStatisticsView() {
                 <StatCard title="Programming languages">
                     <MyPieChart data={derived.proglangs} category="proglangs" colors={colors} />
                 </StatCard>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <Card className="w-full">
+                    <CardHeader className="p-4">
+                        <CardTitle>Attempts to solve</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Curve shows how many tries it took each student to pass.
+                        </p>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                        <AttemptsToSolveChart
+                            histogram={derived.attemptsToSolve.histogram}
+                            medianAttempts={derived.attemptsToSolve.medianAttempts}
+                            totalPassed={derived.attemptsToSolve.totalPassed}
+                            neverPassedCount={derived.attemptsToSolve.neverPassedCount}
+                            colors={colors}
+                        />
+                    </CardContent>
+                </Card>
+                <Card className="w-full">
+                    <CardHeader className="p-4">
+                        <CardTitle>Time to solve</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Cumulative % of students who had AC by a given time since their first
+                            submission. Students who never passed are excluded from the curve.
+                        </p>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                        <TimeToFirstPassFunnelChart
+                            curve={derived.timeToFirstPass.curve}
+                            totalSolvers={derived.timeToFirstPass.totalSolvers}
+                            neverSolved={derived.timeToFirstPass.neverSolved}
+                            medianHours={derived.timeToFirstPass.medianHours}
+                        />
+                    </CardContent>
+                </Card>
             </div>
             <Card className="w-full">
                 <CardHeader className="p-4">
@@ -1163,60 +1234,16 @@ function ProblemStatisticsView() {
                     <StackedOkKoBarChart data={derived.submissionsByHour} colors={colors} />
                 </StatCard>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <Card className="w-full">
-                    <CardHeader className="p-4">
-                        <CardTitle>Attempts to solve</CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            Curve shows how many tries it took each student to pass.
-                        </p>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4">
-                        <AttemptsToSolveChart
-                            histogram={derived.attemptsToSolve.histogram}
-                            medianAttempts={derived.attemptsToSolve.medianAttempts}
-                            totalPassed={derived.attemptsToSolve.totalPassed}
-                            neverPassedCount={derived.attemptsToSolve.neverPassedCount}
-                            colors={colors}
-                        />
-                    </CardContent>
-                </Card>
-                <Card className="w-full">
-                    <CardHeader className="p-4">
-                        <CardTitle>Time to solve</CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            Cumulative % of students who had AC by a given time since their first
-                            submission. Students who never passed are excluded from the curve.
-                        </p>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4">
-                        <TimeToFirstPassFunnelChart
-                            curve={derived.timeToFirstPass.curve}
-                            totalSolvers={derived.timeToFirstPass.totalSolvers}
-                            neverSolved={derived.timeToFirstPass.neverSolved}
-                            medianHours={derived.timeToFirstPass.medianHours}
-                        />
-                    </CardContent>
-                </Card>
-            </div>
             <StatisticsSettingsDialog
+                open={settingsOpen}
+                onOpenChange={setSettingsOpen}
                 abstractProblem={abstractProblem}
                 selectedProblemIds={selectedProblemIds}
-                onToggleProblemId={(problem_id, checked) =>
-                    setSelectedProblemIds((prev) => {
-                        const next = new Set(prev)
-                        if (checked) next.add(problem_id)
-                        else next.delete(problem_id)
-                        return next
-                    })
-                }
                 startDate={startDate}
                 endDate={endDate}
-                onStartDateChange={(d) => d != null && setStartDate(d)}
-                onEndDateChange={(d) => d != null && setEndDate(d)}
                 defaultStartDate={defaultStartDate}
                 defaultEndDate={defaultEndDate}
-                onReset={handleResetSettings}
+                onAccept={handleAcceptSettings}
             />
         </div>
     )
