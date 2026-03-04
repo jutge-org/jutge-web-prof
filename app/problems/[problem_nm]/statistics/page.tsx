@@ -125,6 +125,75 @@ function computeTimeToFirstPassFunnel(submissions: ProblemStatistics['submission
     return { curve, totalSolvers, neverSolved, medianHours }
 }
 
+/** Attempts-to-solve: per-student count of submissions up to (and including) first AC. */
+type AttemptsToSolvePoint = {
+    attempts: number
+    label: string
+    passed: number
+    neverPassed?: number
+}
+
+function computeAttemptsToSolve(submissions: ProblemStatistics['submissions']): {
+    histogram: AttemptsToSolvePoint[]
+    medianAttempts: number | null
+    totalPassed: number
+    neverPassedCount: number
+} {
+    // Group by user and sort each user's submissions by time
+    const byUser = new Map<string, { time: string; verdict: string }[]>()
+    for (const s of submissions) {
+        let list = byUser.get(s.anonymous_user_id)
+        if (!list) {
+            list = []
+            byUser.set(s.anonymous_user_id, list)
+        }
+        list.push({ time: s.time, verdict: s.verdict })
+    }
+    for (const list of byUser.values()) {
+        list.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime())
+    }
+
+    const attemptCounts: number[] = []
+    let neverPassedCount = 0
+    for (const list of byUser.values()) {
+        const firstAcIndex = list.findIndex((s) => s.verdict === 'AC')
+        if (firstAcIndex >= 0) {
+            attemptCounts.push(firstAcIndex + 1) // 1-based attempts
+        } else {
+            neverPassedCount += 1
+        }
+    }
+
+    attemptCounts.sort((a, b) => a - b)
+    const totalPassed = attemptCounts.length
+    const medianAttempts = totalPassed > 0 ? attemptCounts[Math.floor(totalPassed / 2)]! : null
+
+    // Build histogram buckets: 1, 2, 3, ... maxAttempts, then optionally "Never passed"
+    const maxAttempts = attemptCounts.length > 0 ? Math.max(...attemptCounts) : 0
+    const bucketCount: Record<number, number> = {}
+    for (let k = 1; k <= maxAttempts; k++) bucketCount[k] = 0
+    for (const k of attemptCounts) {
+        bucketCount[k] = (bucketCount[k] ?? 0) + 1
+    }
+    const histogram: AttemptsToSolvePoint[] = []
+    for (let k = 1; k <= maxAttempts; k++) {
+        histogram.push({
+            attempts: k,
+            label: String(k),
+            passed: bucketCount[k] ?? 0,
+        })
+    }
+    if (neverPassedCount > 0) {
+        histogram.push({
+            attempts: maxAttempts + 1,
+            label: 'No AC',
+            passed: 0,
+            neverPassed: neverPassedCount,
+        })
+    }
+    return { histogram, medianAttempts, totalPassed, neverPassedCount }
+}
+
 function deriveChartData(statistics: ProblemStatistics) {
     const isOk = (verdict: string) => verdict === 'AC'
 
@@ -207,6 +276,7 @@ function deriveChartData(statistics: ProblemStatistics) {
     }))
 
     const timeToFirstPass = computeTimeToFirstPassFunnel(statistics.submissions)
+    const attemptsToSolve = computeAttemptsToSolve(statistics.submissions)
 
     return {
         heatmapData,
@@ -220,6 +290,7 @@ function deriveChartData(statistics: ProblemStatistics) {
         submissionsByHour,
         submissionsByMonth,
         timeToFirstPass,
+        attemptsToSolve,
     }
 }
 
@@ -469,6 +540,113 @@ function TimeToFirstPassFunnelChart({
     )
 }
 
+type AttemptsToSolveChartProps = {
+    histogram: AttemptsToSolvePoint[]
+    medianAttempts: number | null
+    totalPassed: number
+    neverPassedCount: number
+    colors: ColorMapping
+}
+
+function AttemptsToSolveChart({
+    histogram,
+    medianAttempts,
+    totalPassed,
+    neverPassedCount,
+    colors,
+}: AttemptsToSolveChartProps) {
+    const chartConfig = {
+        label: { label: 'Attempts', color: 'hsl(var(--muted-foreground))' },
+        passed: {
+            label: 'Passed (AC)',
+            color: getCategoryColor('OK', 'statuses', colors),
+        },
+        neverPassed: {
+            label: 'Did not pass',
+            color: getCategoryColor('KO', 'statuses', colors),
+        },
+    }
+    const formatCount = (value: unknown) => [String(value), 'Students'] as [string, string]
+    return (
+        <>
+            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                <BarChart
+                    data={histogram}
+                    margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                    barCategoryGap="10%"
+                >
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                        dataKey="label"
+                        tickLine={false}
+                        axisLine={false}
+                        label={{
+                            value: 'Attempts to first AC',
+                            position: 'insideBottom',
+                            offset: -4,
+                        }}
+                    />
+                    <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        label={{ value: 'Number of students', angle: -90, position: 'insideLeft' }}
+                    />
+                    <ChartTooltip
+                        content={
+                            <ChartTooltipContent
+                                formatter={formatCount}
+                                labelFormatter={(label) => `Attempts: ${label}`}
+                            />
+                        }
+                    />
+                    {medianAttempts != null && (
+                        <ReferenceLine
+                            x={String(medianAttempts)}
+                            stroke="hsl(var(--chart-3))"
+                            strokeWidth={2}
+                            strokeDasharray="4 4"
+                            label={{
+                                value: 'Median',
+                                position: 'top',
+                                fill: 'hsl(var(--chart-3))',
+                            }}
+                        />
+                    )}
+                    <Bar
+                        dataKey="passed"
+                        fill="var(--color-passed)"
+                        stackId="a"
+                        radius={[0, 0, 4, 4]}
+                        name="Passed (AC)"
+                    />
+                    <Bar
+                        dataKey="neverPassed"
+                        fill="var(--color-neverPassed)"
+                        stackId="a"
+                        radius={[4, 4, 0, 0]}
+                        name="Did not pass"
+                    />
+                </BarChart>
+            </ChartContainer>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                {totalPassed > 0 && (
+                    <>
+                        <span>Solvers: {totalPassed}</span>
+                        {neverPassedCount > 0 && <span>Did not pass: {neverPassedCount}</span>}
+                        {medianAttempts != null && (
+                            <span>Median attempts to solve: {medianAttempts}</span>
+                        )}
+                    </>
+                )}
+                {totalPassed === 0 && neverPassedCount === 0 && <span>No submissions yet</span>}
+                {totalPassed === 0 && neverPassedCount > 0 && (
+                    <span>No solvers yet ({neverPassedCount} attempted)</span>
+                )}
+            </div>
+        </>
+    )
+}
+
 // -----------------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------------
@@ -567,7 +745,24 @@ function ProblemStatisticsView() {
                 </StatCard>
                 <Card className="w-full">
                     <CardHeader className="p-4">
-                        <CardTitle>Time-to-first-pass funnel</CardTitle>
+                        <CardTitle>Attempts to solve</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Curve shows how many tries it took each student to pass.
+                        </p>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                        <AttemptsToSolveChart
+                            histogram={derived.attemptsToSolve.histogram}
+                            medianAttempts={derived.attemptsToSolve.medianAttempts}
+                            totalPassed={derived.attemptsToSolve.totalPassed}
+                            neverPassedCount={derived.attemptsToSolve.neverPassedCount}
+                            colors={colors}
+                        />
+                    </CardContent>
+                </Card>
+                <Card className="w-full">
+                    <CardHeader className="p-4">
+                        <CardTitle>Time to first pass</CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">
                             Cumulative % of students who had passed by a given time since their
                             first submission. Students who never passed are excluded from the curve;
