@@ -55,7 +55,7 @@ function ProblemDangerZoneView() {
 
     if (abstractProblem === null || statistics === null) return <SimpleSpinner />
 
-    const totalSubmissions = Object.values(statistics.submissions).reduce((a, b) => a + b, 0)
+    const totalSubmissions = statistics.submissions.length
     const canRemove = totalSubmissions < REMOVE_MAX_SUBMISSIONS
 
     async function saveDeprecation() {
