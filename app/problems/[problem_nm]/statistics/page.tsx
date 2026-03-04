@@ -2,7 +2,7 @@
 
 /**
  * Problem statistics page: pie charts (users, submissions, verdicts, compilers, languages),
- * submission heatmap by day, and stacked OK/KO bar charts by year, month, weekday, and hour.
+ * submission heatmap by day, time-to-first-pass funnel, and stacked OK/KO bar charts.
  */
 
 import { Heatmap } from '@/components/Heatmap'
@@ -10,7 +10,19 @@ import { ChartPieIcon, TableIcon } from 'lucide-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Bar, BarChart, CartesianGrid, LabelList, Pie, PieChart, XAxis, YAxis } from 'recharts'
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    LabelList,
+    Line,
+    LineChart,
+    Pie,
+    PieChart,
+    ReferenceLine,
+    XAxis,
+    YAxis,
+} from 'recharts'
 import Page from '@/components/layout/Page'
 import SimpleSpinner from '@/components/SimpleSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,8 +44,18 @@ import {
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 const MONTHS = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
 ] as const
 /** Pie chart: slices below this percentage are grouped into "Others". */
 const MIN_PERCENT_FOR_PIE_LABEL = 5
@@ -50,6 +72,58 @@ function getCategoryColor(key: string, category: string, colors: ColorMapping): 
 }
 
 type OkKoPoint = { label: string; ok: number; ko: number }
+
+/** Time-to-first-pass funnel: at each hour threshold T, cumulative % of solvers who passed by T. */
+type TimeToFirstPassPoint = { hours: number; label: string; cumulativePct: number }
+
+/** Compute per-student Δt (first AC − first submission in hours), then build cumulative curve. */
+function computeTimeToFirstPassFunnel(submissions: ProblemStatistics['submissions']): {
+    curve: TimeToFirstPassPoint[]
+    totalSolvers: number
+    neverSolved: number
+    medianHours: number | null
+} {
+    const byUser = new Map<string, { firstTime: number; firstAcTime: number | null }>()
+    for (const s of submissions) {
+        const t = dayjs(s.time).valueOf()
+        const existing = byUser.get(s.anonymous_user_id)
+        if (!existing) {
+            byUser.set(s.anonymous_user_id, {
+                firstTime: t,
+                firstAcTime: s.verdict === 'AC' ? t : null,
+            })
+        } else {
+            if (t < existing.firstTime) existing.firstTime = t
+            if (s.verdict === 'AC' && (existing.firstAcTime === null || t < existing.firstAcTime)) {
+                existing.firstAcTime = t
+            }
+        }
+    }
+    const deltasHours: number[] = []
+    let neverSolved = 0
+    for (const { firstTime, firstAcTime } of byUser.values()) {
+        if (firstAcTime != null) {
+            deltasHours.push((firstAcTime - firstTime) / (60 * 60 * 1000))
+        } else {
+            neverSolved += 1
+        }
+    }
+    deltasHours.sort((a, b) => a - b)
+    const totalSolvers = deltasHours.length
+    const medianHours = totalSolvers > 0 ? deltasHours[Math.floor(totalSolvers / 2)]! : null
+
+    const timeBucketsHours = [0, 0.25, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 168]
+    const curve: TimeToFirstPassPoint[] = timeBucketsHours.map((hours) => {
+        const count = totalSolvers === 0 ? 0 : deltasHours.filter((d) => d <= hours).length
+        const cumulativePct = totalSolvers === 0 ? 0 : (count / totalSolvers) * 100
+        let label: string
+        if (hours < 1) label = `${Math.round(hours * 60)}m`
+        else if (hours < 24) label = `${hours}h`
+        else label = `${hours / 24}d`
+        return { hours, label, cumulativePct }
+    })
+    return { curve, totalSolvers, neverSolved, medianHours }
+}
 
 function deriveChartData(statistics: ProblemStatistics) {
     const isOk = (verdict: string) => verdict === 'AC'
@@ -132,6 +206,8 @@ function deriveChartData(statistics: ProblemStatistics) {
         ko: byMonth[i].ko,
     }))
 
+    const timeToFirstPass = computeTimeToFirstPassFunnel(statistics.submissions)
+
     return {
         heatmapData,
         heatmapStart,
@@ -143,6 +219,7 @@ function deriveChartData(statistics: ProblemStatistics) {
         submissionsByWeekday,
         submissionsByHour,
         submissionsByMonth,
+        timeToFirstPass,
     }
 }
 
@@ -236,10 +313,7 @@ function MyPieChart({ data, category, colors }: MyPieChartProps) {
                                 <TableCell>{key}</TableCell>
                                 <TableCell className="text-end">{value}</TableCell>
                                 <TableCell className="text-end">
-                                    {tableTotal > 0
-                                        ? ((value / tableTotal) * 100).toFixed(1)
-                                        : 0}
-                                    %
+                                    {tableTotal > 0 ? ((value / tableTotal) * 100).toFixed(1) : 0}%
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -303,6 +377,98 @@ function StackedOkKoBarChart({ data, colors }: StackedOkKoBarChartProps) {
     )
 }
 
+type TimeToFirstPassFunnelProps = {
+    curve: TimeToFirstPassPoint[]
+    totalSolvers: number
+    neverSolved: number
+    medianHours: number | null
+}
+
+function TimeToFirstPassFunnelChart({
+    curve,
+    totalSolvers,
+    neverSolved,
+    medianHours,
+}: TimeToFirstPassFunnelProps) {
+    const chartConfig = {
+        hours: { label: 'Time since first submission', color: 'hsl(var(--muted-foreground))' },
+        cumulativePct: { label: 'Cumulative % solved', color: 'hsl(var(--chart-1))' },
+    }
+    const formatPct = (value: unknown) =>
+        [`${Number(value).toFixed(1)}%`, 'Solved by this time'] as [string, string]
+    const formatTimeLabel = (label: unknown) => {
+        const h = Number(label)
+        return h < 1
+            ? `${Math.round(h * 60)} min`
+            : h < 24
+              ? `${h} h`
+              : `${(h / 24).toFixed(1)} days`
+    }
+    return (
+        <>
+            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                <LineChart data={curve} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                    <XAxis
+                        dataKey="hours"
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(h: number) =>
+                            h < 1 ? `${Math.round(h * 60)}m` : h < 24 ? `${h}h` : `${h / 24}d`
+                        }
+                    />
+                    <YAxis
+                        domain={[0, 100]}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(v: number) => `${v}%`}
+                    />
+                    <ChartTooltip
+                        content={
+                            <ChartTooltipContent
+                                formatter={formatPct}
+                                labelFormatter={formatTimeLabel}
+                            />
+                        }
+                    />
+                    <ReferenceLine
+                        y={50}
+                        stroke="hsl(var(--muted-foreground))"
+                        strokeDasharray="3 3"
+                    />
+                    <Line
+                        type="monotone"
+                        dataKey="cumulativePct"
+                        stroke="hsl(var(--chart-2))"
+                        strokeWidth={2}
+                        dot={false}
+                        connectNulls
+                    />
+                </LineChart>
+            </ChartContainer>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                {totalSolvers > 0 && (
+                    <>
+                        <span>Solvers: {totalSolvers}</span>
+                        {neverSolved > 0 && <span>Never solved: {neverSolved}</span>}
+                        {medianHours != null && (
+                            <span>
+                                Median time-to-solve:{' '}
+                                {medianHours < 1
+                                    ? `${Math.round(medianHours * 60)} min`
+                                    : medianHours < 24
+                                      ? `${medianHours.toFixed(1)} h`
+                                      : `${(medianHours / 24).toFixed(1)} days`}
+                            </span>
+                        )}
+                    </>
+                )}
+                {totalSolvers === 0 && <span>No solvers yet</span>}
+            </div>
+        </>
+    )
+}
+
 // -----------------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------------
@@ -355,7 +521,11 @@ function ProblemStatisticsView() {
                     <MyPieChart data={derived.usersOkKo} category="statuses" colors={colors} />
                 </StatCard>
                 <StatCard title="Submission statuses">
-                    <MyPieChart data={derived.submissionsOkKo} category="statuses" colors={colors} />
+                    <MyPieChart
+                        data={derived.submissionsOkKo}
+                        category="statuses"
+                        colors={colors}
+                    />
                 </StatCard>
                 <StatCard title="Submissions by verdict">
                     <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
@@ -395,6 +565,24 @@ function ProblemStatisticsView() {
                 <StatCard title="Submissions by hour of day">
                     <StackedOkKoBarChart data={derived.submissionsByHour} colors={colors} />
                 </StatCard>
+                <Card className="w-full">
+                    <CardHeader className="p-4">
+                        <CardTitle>Time-to-first-pass funnel</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Cumulative % of students who had passed by a given time since their
+                            first submission. Students who never passed are excluded from the curve;
+                            the dashed line marks 50%.
+                        </p>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                        <TimeToFirstPassFunnelChart
+                            curve={derived.timeToFirstPass.curve}
+                            totalSolvers={derived.timeToFirstPass.totalSolvers}
+                            neverSolved={derived.timeToFirstPass.neverSolved}
+                            medianHours={derived.timeToFirstPass.medianHours}
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )
