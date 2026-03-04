@@ -51,7 +51,13 @@ import {
 import Page from '@/components/layout/Page'
 import SimpleSpinner from '@/components/SimpleSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import {
+    ChartContainer,
+    ChartLegend,
+    ChartLegendContent,
+    ChartTooltip,
+    ChartTooltipContent,
+} from '@/components/ui/chart'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
@@ -62,6 +68,7 @@ import {
     ColorMapping,
     Distribution,
     HeatmapCalendar,
+    Language,
     ProblemStatistics,
 } from '@/lib/jutge_api_client'
 
@@ -105,6 +112,13 @@ type OkKoPoint = { label: string; ok: number; ko: number }
 
 /** Submission volume over time: one point per year, ok/ko counts. */
 type VolumeOverTimePoint = { year: number; label: string; ok: number; ko: number }
+
+/** Submissions by (human) language over time: one point per year, one series per language. */
+type SubmissionsByLanguageOverTimePoint = {
+    year: number
+    label: string
+    [language_id: string]: number | string
+}
 
 /** Time-to-first-pass funnel: at each hour threshold T, cumulative % of solvers who passed by T. */
 type TimeToFirstPassPoint = { hours: number; label: string; cumulativePct: number }
@@ -391,16 +405,14 @@ function StatisticsDashboardCard({ stats }: { stats: DashboardStats }) {
                 <div className="grid grid-cols-2 md:grid-cols-5">
                     <div className="flex flex-col gap-1 p-4 md:p-5">
                         <span className="text-xs font-medium uppercase tracking-wider ">
-                            Total submissions
+                            Submissions
                         </span>
                         <span className="text-4xl font-bold text-gray-500">
                             {stats.totalSubmissions}
                         </span>
                     </div>
                     <div className="flex flex-col gap-1 p-4 md:p-5">
-                        <span className="text-xs font-medium uppercase tracking-wider">
-                            Total users
-                        </span>
+                        <span className="text-xs font-medium uppercase tracking-wider">Users</span>
                         <span className="text-4xl font-bold text-gray-500">{stats.totalUsers}</span>
                     </div>
                     <div className="flex flex-col gap-1 p-4 md:p-5">
@@ -411,16 +423,14 @@ function StatisticsDashboardCard({ stats }: { stats: DashboardStats }) {
                     </div>
                     <div className="flex flex-col gap-1 p-4 md:p-5">
                         <span className="text-xs font-medium uppercase tracking-wider">
-                            Pass rate
+                            AC rate
                         </span>
                         <span className="text-4xl font-bold text-gray-500">
                             {totalUsers > 0 ? Math.round(stats.passRatePct) : 0}%
                         </span>
                     </div>
                     <div className="flex flex-col gap-1 p-4 md:p-5">
-                        <span className="text-xs font-medium uppercase tracking-wider">
-                            Never passed
-                        </span>
+                        <span className="text-xs font-medium uppercase tracking-wider">Fails</span>
                         <span className="text-4xl font-bold text-gray-500">
                             {stats.neverPassed}
                         </span>
@@ -1032,6 +1042,84 @@ function SubmissionVolumeAreaChart({ data, colors }: SubmissionVolumeAreaChartPr
     )
 }
 
+const CHART_COLORS = [
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+] as const
+
+type SubmissionsByLanguageChartProps = {
+    data: SubmissionsByLanguageOverTimePoint[]
+    languageIds: string[]
+    languageNames: Record<string, string>
+}
+
+function SubmissionsByLanguageChart({
+    data,
+    languageIds,
+    languageNames,
+}: SubmissionsByLanguageChartProps) {
+    const chartConfig = useMemo(() => {
+        const config: Record<string, { label: string; color: string }> = {
+            year: { label: 'Year', color: 'hsl(var(--muted-foreground))' },
+        }
+        languageIds.forEach((lid, i) => {
+            config[lid] = {
+                label: languageNames[lid] ?? lid,
+                color: CHART_COLORS[i % CHART_COLORS.length],
+            }
+        })
+        return config
+    }, [languageIds, languageNames])
+    if (data.length === 0) {
+        return (
+            <div className="flex h-[160px] w-full items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+                No submission data by language
+            </div>
+        )
+    }
+    return (
+        <ChartContainer config={chartConfig} className="h-[160px] w-full aspect-auto">
+            <LineChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                    dataKey="year"
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(y: number) => String(y)}
+                />
+                <YAxis tickLine={false} axisLine={false} allowDecimals={false} />
+                <ChartTooltip
+                    content={
+                        <ChartTooltipContent
+                            labelFormatter={(_, payload) => {
+                                const p = payload?.[0]?.payload as
+                                    | SubmissionsByLanguageOverTimePoint
+                                    | undefined
+                                return p ? `Year ${p.year}` : ''
+                            }}
+                        />
+                    }
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+                {languageIds.map((lid, i) => (
+                    <Line
+                        key={lid}
+                        type="monotone"
+                        dataKey={lid}
+                        stroke={CHART_COLORS[i % CHART_COLORS.length]}
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                        name={languageNames[lid] ?? lid}
+                    />
+                ))}
+            </LineChart>
+        </ChartContainer>
+    )
+}
+
 // -----------------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------------
@@ -1058,6 +1146,7 @@ function ProblemStatisticsView() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
     const [statistics, setStatistics] = useState<ProblemStatistics | null>(null)
     const [colors, setColors] = useState<ColorMapping | null>(null)
+    const [languagesTable, setLanguagesTable] = useState<Record<string, Language> | null>(null)
     const [abstractProblem, setAbstractProblem] = useState<AbstractProblem | null>(null)
     const [selectedProblemIds, setSelectedProblemIds] = useState<Set<string>>(new Set())
     const [startDate, setStartDate] = useState<Date | null>(null)
@@ -1066,13 +1155,15 @@ function ProblemStatisticsView() {
 
     useEffect(() => {
         async function fetchData() {
-            const [stats, colorMap, abstract] = await Promise.all([
+            const [stats, colorMap, languages, abstract] = await Promise.all([
                 jutge.instructor.problems.getStatistics(problem_nm),
                 jutge.misc.getHexColors(),
+                jutge.tables.getLanguages(),
                 jutge.problems.getAbstractProblem(problem_nm),
             ])
             setStatistics(stats)
             setColors(colorMap)
+            setLanguagesTable(languages)
             setAbstractProblem(abstract)
             setSelectedProblemIds(
                 new Set(Object.values(abstract.problems).map((p) => p.problem_id)),
@@ -1107,7 +1198,59 @@ function ProblemStatisticsView() {
         })
     }, [statistics, startDate, endDate, selectedProblemIds])
 
+    /** Submissions filtered by date only (all problem_ids). Used for "Submissions by language" card. */
+    const submissionsByDateOnly = useMemo(() => {
+        if (!statistics || startDate === null || endDate === null)
+            return statistics?.submissions ?? []
+        const start = dayjs(startDate).startOf('day')
+        const end = dayjs(endDate).endOf('day')
+        return statistics.submissions.filter((s) => {
+            const t = dayjs(s.time)
+            return !t.isBefore(start) && !t.isAfter(end)
+        })
+    }, [statistics, startDate, endDate])
+
     const derived = useMemo(() => deriveChartData(filteredSubmissions), [filteredSubmissions])
+
+    /** Submissions by (human) language over time: one point per year per language, date-filtered only. problem_id = problem_nm + '_' + language_id. */
+    const submissionsByLanguageOverTime = useMemo((): {
+        data: SubmissionsByLanguageOverTimePoint[]
+        languageIds: string[]
+        languageNames: Record<string, string>
+    } => {
+        if (!problem_nm || !languagesTable) return { data: [], languageIds: [], languageNames: {} }
+        const prefix = problem_nm + '_'
+        const byYearAndLang = new Map<number, Record<string, number>>()
+        const langIdSet = new Set<string>()
+        for (const s of submissionsByDateOnly) {
+            if (!s.problem_id.startsWith(prefix)) continue
+            const language_id = s.problem_id.slice(prefix.length)
+            const year = dayjs(s.time).year()
+            langIdSet.add(language_id)
+            const row = byYearAndLang.get(year) ?? {}
+            row[language_id] = (row[language_id] ?? 0) + 1
+            byYearAndLang.set(year, row)
+        }
+        const years = Array.from(byYearAndLang.keys()).sort((a, b) => a - b)
+        const languageIds = Array.from(langIdSet).sort((a, b) => {
+            const na = languagesTable[a]?.eng_name ?? a
+            const nb = languagesTable[b]?.eng_name ?? b
+            return na.localeCompare(nb)
+        })
+        const languageNames: Record<string, string> = {}
+        for (const lid of languageIds) {
+            languageNames[lid] = languagesTable[lid]?.eng_name ?? lid
+        }
+        const data: SubmissionsByLanguageOverTimePoint[] = years.map((year) => {
+            const row = byYearAndLang.get(year) ?? {}
+            const point: SubmissionsByLanguageOverTimePoint = { year, label: String(year) }
+            for (const lid of languageIds) {
+                point[lid] = row[lid] ?? 0
+            }
+            return point
+        })
+        return { data, languageIds, languageNames }
+    }, [problem_nm, languagesTable, submissionsByDateOnly])
 
     const totalUsers = derived.usersOkKo.OK + derived.usersOkKo.KO
     const dashboardStats: DashboardStats = {
@@ -1165,7 +1308,7 @@ function ProblemStatisticsView() {
                     <CardHeader className="p-4">
                         <CardTitle>Attempts to solve</CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">
-                            Curve shows how many tries it took each student to pass.
+                            Curve shows how many tries it took each student to get AC.
                         </p>
                     </CardHeader>
                     <CardContent className="px-4 pb-4">
@@ -1211,7 +1354,7 @@ function ProblemStatisticsView() {
             </Card>
             <Card className="w-full">
                 <CardHeader className="p-4">
-                    <CardTitle>Submission volume over time</CardTitle>
+                    <CardTitle>Submission over time</CardTitle>
                 </CardHeader>
                 <CardContent className="px-4 pb-4">
                     <SubmissionVolumeAreaChart
@@ -1220,6 +1363,20 @@ function ProblemStatisticsView() {
                     />
                 </CardContent>
             </Card>
+            {Object.values(abstractProblem.problems).length > 1 && (
+                <Card className="w-full">
+                    <CardHeader className="p-4">
+                        <CardTitle>Submissions by language</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                        <SubmissionsByLanguageChart
+                            data={submissionsByLanguageOverTime.data}
+                            languageIds={submissionsByLanguageOverTime.languageIds}
+                            languageNames={submissionsByLanguageOverTime.languageNames}
+                        />
+                    </CardContent>
+                </Card>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <StatCard title="Submissions by year">
                     <StackedOkKoBarChart data={derived.submissionsByYear} colors={colors} />
