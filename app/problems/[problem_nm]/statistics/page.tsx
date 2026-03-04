@@ -6,7 +6,7 @@
  */
 
 import { Heatmap } from '@/components/Heatmap'
-import { ChartPieIcon, TableIcon } from 'lucide-react'
+import { ChartPieIcon, ExternalLinkIcon, TableIcon } from 'lucide-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -34,6 +34,7 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import jutge from '@/lib/jutge'
 import {
+    AbstractProblem,
     ColorMapping,
     Distribution,
     HeatmapCalendar,
@@ -503,6 +504,42 @@ function MyPieChart({ data, category, colors }: MyPieChartProps) {
     )
 }
 
+function ProblemHeaderCard({
+    problem_nm,
+    abstractProblem,
+}: {
+    problem_nm: string
+    abstractProblem: AbstractProblem
+}) {
+    const problems = Object.values(abstractProblem.problems)
+    return (
+        <Card className="w-full">
+            <CardHeader className="p-4">
+                <CardTitle className="text-lg font-semibold">Statistics for {problem_nm}</CardTitle>
+                <div className="mt-2 flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                    {problems.map((p) => (
+                        <span key={p.problem_id} className="flex items-center gap-1.5">
+                            <a
+                                href={`https://jutge.org/problems/${p.problem_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex text-muted-foreground hover:text-foreground"
+                                title={`Open ${p.problem_id} on jutge.org`}
+                            >
+                                <ExternalLinkIcon className="h-4 w-4" />
+                            </a>
+                            <span className="font-medium text-foreground">{p.problem_id}</span>
+                            <span className="max-w-[200px] truncate sm:max-w-none" title={p.title}>
+                                {p.title}
+                            </span>
+                        </span>
+                    ))}
+                </div>
+            </CardHeader>
+        </Card>
+    )
+}
+
 function StatCard({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <Card>
@@ -840,20 +877,23 @@ function ProblemStatisticsView() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
     const [statistics, setStatistics] = useState<ProblemStatistics | null>(null)
     const [colors, setColors] = useState<ColorMapping | null>(null)
+    const [abstractProblem, setAbstractProblem] = useState<AbstractProblem | null>(null)
 
     useEffect(() => {
         async function fetchData() {
-            const [stats, colorMap] = await Promise.all([
+            const [stats, colorMap, abstract] = await Promise.all([
                 jutge.instructor.problems.getStatistics(problem_nm),
                 jutge.misc.getHexColors(),
+                jutge.problems.getAbstractProblem(problem_nm),
             ])
             setStatistics(stats)
             setColors(colorMap)
+            setAbstractProblem(abstract)
         }
         fetchData()
     }, [problem_nm])
 
-    if (statistics === null || colors === null) {
+    if (statistics === null || colors === null || abstractProblem === null) {
         return <SimpleSpinner />
     }
 
@@ -870,6 +910,7 @@ function ProblemStatisticsView() {
 
     return (
         <div className="flex w-full flex-col gap-4">
+            <ProblemHeaderCard problem_nm={problem_nm} abstractProblem={abstractProblem} />
             <StatisticsDashboardCard stats={dashboardStats} />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 <StatCard title="User statuses">
