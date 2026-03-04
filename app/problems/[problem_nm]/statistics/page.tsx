@@ -374,46 +374,42 @@ function StatisticsDashboardCard({ stats }: { stats: DashboardStats }) {
     return (
         <Card className="w-full overflow-hidden">
             <CardContent className="p-0">
-                <div className="grid grid-cols-2 md:grid-cols-4">
+                <div className="grid grid-cols-2 md:grid-cols-5">
                     <div className="flex flex-col gap-1 p-4 md:p-5">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        <span className="text-xs font-medium uppercase tracking-wider ">
                             Total submissions
                         </span>
-                        <span className="text-4xl font-bold tabular-nums">
-                            {stats.totalSubmissions.toLocaleString()}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                            {avgPerStudent} avg subs / user
+                        <span className="text-4xl font-bold text-gray-500">
+                            {stats.totalSubmissions}
                         </span>
                     </div>
                     <div className="flex flex-col gap-1 p-4 md:p-5">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        <span className="text-xs font-medium uppercase tracking-wider">
                             Total users
                         </span>
-                        <span className="text-4xl font-bold tabular-nums">
-                            {stats.totalUsers.toLocaleString()}
-                        </span>
-                        <span className="text-sm text-muted-foreground">users</span>
+                        <span className="text-4xl font-bold text-gray-500">{stats.totalUsers}</span>
                     </div>
                     <div className="flex flex-col gap-1 p-4 md:p-5">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        <span className="text-xs font-medium uppercase tracking-wider">
+                            Avg subs/user
+                        </span>
+                        <span className="text-4xl font-bold text-gray-500">{avgPerStudent}</span>
+                    </div>
+                    <div className="flex flex-col gap-1 p-4 md:p-5">
+                        <span className="text-xs font-medium uppercase tracking-wider">
                             Pass rate
                         </span>
-                        <span className="text-4xl font-bold tabular-nums text-green-600 dark:text-green-500">
+                        <span className="text-4xl font-bold text-gray-500">
                             {totalUsers > 0 ? Math.round(stats.passRatePct) : 0}%
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                            {stats.passedCount} / {stats.totalUsers}
                         </span>
                     </div>
                     <div className="flex flex-col gap-1 p-4 md:p-5">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        <span className="text-xs font-medium uppercase tracking-wider">
                             Never passed
                         </span>
-                        <span className="text-4xl font-bold tabular-nums text-red-600 dark:text-red-500">
+                        <span className="text-4xl font-bold text-gray-500">
                             {stats.neverPassed}
                         </span>
-                        <span className="text-sm text-muted-foreground">users</span>
                     </div>
                 </div>
             </CardContent>
@@ -602,7 +598,7 @@ function ProblemHeaderCard({
         dayjs(startDate).isSame(dayjs(defaultStartDate), 'day') &&
         dayjs(endDate).isSame(dayjs(defaultEndDate), 'day')
     return (
-        <Card className="w-full">
+        <Card className="w-full bg-gray-50 dark:bg-gray-950">
             <CardHeader className="p-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
@@ -750,16 +746,11 @@ function TimeToFirstPassFunnelChart({
                             />
                         }
                     />
-                    <ReferenceLine
-                        y={50}
-                        stroke="hsl(var(--muted-foreground))"
-                        strokeDasharray="3 3"
-                    />
                     <Line
                         type="monotone"
                         dataKey="cumulativePct"
                         stroke="hsl(var(--chart-2))"
-                        strokeWidth={2}
+                        strokeWidth={4}
                         dot={false}
                         connectNulls
                     />
@@ -1125,7 +1116,7 @@ function ProblemStatisticsView() {
                     />
                 </CardContent>
             </Card>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <StatCard title="Submissions by year">
                     <StackedOkKoBarChart data={derived.submissionsByYear} colors={colors} />
                 </StatCard>
@@ -1138,6 +1129,8 @@ function ProblemStatisticsView() {
                 <StatCard title="Submissions by hour of day">
                     <StackedOkKoBarChart data={derived.submissionsByHour} colors={colors} />
                 </StatCard>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card className="w-full">
                     <CardHeader className="p-4">
                         <CardTitle>Attempts to solve</CardTitle>
@@ -1157,11 +1150,10 @@ function ProblemStatisticsView() {
                 </Card>
                 <Card className="w-full">
                     <CardHeader className="p-4">
-                        <CardTitle>Time to first pass</CardTitle>
+                        <CardTitle>Time to solve</CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">
-                            Cumulative % of students who had passed by a given time since their
-                            first submission. Students who never passed are excluded from the curve;
-                            the dashed line marks 50%.
+                            Cumulative % of students who had AC by a given time since their first
+                            submission. Students who never passed are excluded from the curve.
                         </p>
                     </CardHeader>
                     <CardContent className="px-4 pb-4">
