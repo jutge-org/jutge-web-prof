@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import Page from '../../components/layout/Page'
 import { Badge } from '../../components/ui/badge'
 import { Button } from '../../components/ui/button'
+import { Checkbox } from '../../components/ui/checkbox'
 import { Switch } from '../../components/ui/switch'
 import {
     Tooltip,
@@ -29,6 +30,8 @@ type ProblemRow = {
     deprecated: boolean
     languages: string[]
     passcode: boolean
+    shared_testcases: boolean
+    shared_solutions: boolean
     abstractProblems: Record<string, AbstractProblem>
 }
 
@@ -69,6 +72,14 @@ function ProblemsListView() {
             const ownProblemsWithPasscode =
                 await jutge.instructor.problems.getOwnProblemsWithPasscode()
             const abstractProblems = await jutge.problems.getAbstractProblems(ownProblems.join(','))
+            const sharingSettingsList = await Promise.all(
+                ownProblems.map((problem_nm) =>
+                    jutge.instructor.problems.getSharingSettings(problem_nm),
+                ),
+            )
+            const sharingByProblem = Object.fromEntries(
+                sharingSettingsList.map((s) => [s.problem_nm, s]),
+            )
 
             function buildTitle(problem_nm: string) {
                 const problems = Object.values(abstractProblems[problem_nm].problems)
@@ -77,6 +88,7 @@ function ProblemsListView() {
 
             const rows = ownProblems.map((problem_nm) => {
                 const abstractProblem = abstractProblems[problem_nm]
+                const sharing = sharingByProblem[problem_nm]
                 return {
                     problem_nm,
                     title: buildTitle(abstractProblem.problem_nm),
@@ -88,6 +100,8 @@ function ProblemsListView() {
                         (problem_id, problem) => problem.language_id,
                     ),
                     passcode: ownProblemsWithPasscode.includes(problem_nm),
+                    shared_testcases: sharing?.shared_testcases ?? false,
+                    shared_solutions: sharing?.shared_solutions ?? false,
                     abstractProblems,
                 }
             })
@@ -135,10 +149,26 @@ function ProblemsListView() {
             sort: 'desc',
         },
         {
-            field: 'passcode',
-            headerName: 'Passcode',
+            field: 'sharing',
+            headerName: 'Sharing',
             width: 120,
-            filter: true,
+            filter: false,
+            sort: false,
+            cellRenderer: (p: ICellRendererParams<ProblemRow>) => (
+                <div className="flex flex-row gap-2 mt-3">
+                    <Checkbox checked={!p.data!.passcode} disabled title="Passcode" />
+                    <Checkbox
+                        checked={p.data!.shared_testcases}
+                        disabled
+                        title="Shared testcases"
+                    />
+                    <Checkbox
+                        checked={p.data!.shared_solutions}
+                        disabled
+                        title="Shared solutions"
+                    />
+                </div>
+            ),
         },
         {
             field: 'languages',
