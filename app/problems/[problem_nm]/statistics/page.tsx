@@ -1,6 +1,8 @@
 'use client'
 
+import { Heatmap } from '@/components/Heatmap'
 import { ChartPieIcon, TableIcon } from 'lucide-react'
+import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 import { JSX, useEffect, useState } from 'react'
 import { LabelList, Pie, PieChart } from 'recharts'
@@ -12,7 +14,12 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import jutge from '@/lib/jutge'
-import { ColorMapping, Distribution, ProblemStatistics } from '@/lib/jutge_api_client'
+import {
+    ColorMapping,
+    Distribution,
+    HeatmapCalendar,
+    ProblemStatistics,
+} from '@/lib/jutge_api_client'
 
 function color(key: string, category: string, colors: ColorMapping) {
     if (!(category in colors) || !(key in colors[category])) {
@@ -217,17 +224,57 @@ function ProblemStatisticsView() {
         KO: submissionsTotal - acCount,
     }
 
+    const heatmapData: HeatmapCalendar = (() => {
+        const byDay: Record<string, number> = {}
+        for (const s of statistics.submissions) {
+            const key = dayjs(s.time).format('YYYY-MM-DD')
+            byDay[key] = (byDay[key] ?? 0) + 1
+        }
+        return Object.entries(byDay).map(([key, value]) => ({
+            date: dayjs(key).startOf('day').unix(),
+            value,
+        }))
+    })()
+
+    let maxValue = 0
+    for (const item of heatmapData) {
+        if (item.value > maxValue) {
+            maxValue = item.value
+        }
+    }
+
+    const heatmapEnd = dayjs().add(1, 'day').startOf('day')
+    const heatmapStart =
+        statistics.submissions.length > 0
+            ? dayjs(statistics.submissions[0].time).startOf('day')
+            : dayjs().startOf('day')
+
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <MyCard title="Users (OK / KO)">
-                <MyPieChart data={usersOkKo} category="statuses" colors={colors} />
-            </MyCard>
-            <MyCard title="Submissions (OK / KO)">
-                <MyPieChart data={submissionsOkKo} category="statuses" colors={colors} />
-            </MyCard>
-            <MyCard title="Submissions by verdict">
-                <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
-            </MyCard>
+        <div className="flex w-full flex-col gap-4">
+            <Card className="w-full">
+                <CardHeader className="p-4">
+                    <CardTitle>Submissions by day</CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-4">
+                    <Heatmap
+                        data={heatmapData}
+                        start={heatmapStart}
+                        end={heatmapEnd}
+                        maxValue={maxValue}
+                    />
+                </CardContent>
+            </Card>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <MyCard title="User statuses">
+                    <MyPieChart data={usersOkKo} category="statuses" colors={colors} />
+                </MyCard>
+                <MyCard title="Submission statuses">
+                    <MyPieChart data={submissionsOkKo} category="statuses" colors={colors} />
+                </MyCard>
+                <MyCard title="Submissions by verdict">
+                    <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
+                </MyCard>
+            </div>
         </div>
     )
 }
