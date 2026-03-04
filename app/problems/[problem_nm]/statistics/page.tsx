@@ -7,20 +7,12 @@ import { LabelList, Pie, PieChart } from 'recharts'
 import Page from '@/components/layout/Page'
 import SimpleSpinner from '@/components/SimpleSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from '@/components/ui/chart'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import jutge from '@/lib/jutge'
-import {
-    ColorMapping,
-    Distribution,
-    ProblemStatistics,
-} from '@/lib/jutge_api_client'
+import { ColorMapping, Distribution, ProblemStatistics } from '@/lib/jutge_api_client'
 
 function color(key: string, category: string, colors: ColorMapping) {
     if (!(category in colors) || !(key in colors[category])) {
@@ -120,9 +112,14 @@ function MyPieChart(props: MyPieChartProps) {
                                 <TableCell className="text-end">{value}</TableCell>
                                 <TableCell className="text-end">
                                     {total > 0
-                                        ? ((value / Object.values(props.data).reduce((s, n) => s + n, 0)) * 100).toFixed(
-                                              1
-                                          )
+                                        ? (
+                                              (value /
+                                                  Object.values(props.data).reduce(
+                                                      (s, n) => s + n,
+                                                      0,
+                                                  )) *
+                                              100
+                                          ).toFixed(1)
                                         : 0}
                                     %
                                 </TableCell>
@@ -213,8 +210,8 @@ function ProblemStatisticsView() {
         KO: statistics.users.ko,
     }
 
-    const acCount = statistics.submissions['AC'] ?? 0
-    const submissionsTotal = Object.values(statistics.submissions).reduce((a, b) => a + b, 0)
+    const acCount = statistics.verdicts['AC'] ?? 0
+    const submissionsTotal = Object.values(statistics.verdicts).reduce((a, b) => a + b, 0)
     const submissionsOkKo: Distribution = {
         OK: acCount,
         KO: submissionsTotal - acCount,
@@ -229,7 +226,7 @@ function ProblemStatisticsView() {
                 <MyPieChart data={submissionsOkKo} category="statuses" colors={colors} />
             </MyCard>
             <MyCard title="Submissions by verdict">
-                <MyPieChart data={statistics.submissions} category="verdicts" colors={colors} />
+                <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
             </MyCard>
         </div>
     )

@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-03T19:17:16.367Z
+ * This file has been automatically generated at 2026-03-04T09:17:35.024Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -814,7 +814,8 @@ export type SharingSettings = {
 
 export type ProblemStatistics = {
     users: { ok: number; ko: number }
-    submissions: Distribution
+    verdicts: Distribution
+    submissions: { time: string; verdict: string }[]
 }
 
 export type SubmissionQuery = {
@@ -3540,7 +3541,7 @@ class Module_instructor_problems {
     }
 
     /**
-     * Get statistics of an abstract problem.
+     * Get statistics of the submissions for an abstract problem.
      *
      * 🔐 Authentication: instructor
      * No warnings
