@@ -6,10 +6,20 @@
  */
 
 import { Heatmap } from '@/components/Heatmap'
-import { ChartPieIcon, ExternalLinkIcon, TableIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import {
+    ChartPieIcon,
+    CalendarIcon,
+    ExternalLinkIcon,
+    RotateCcwIcon,
+    TableIcon,
+} from 'lucide-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 import {
     Area,
     AreaChart,
@@ -40,6 +50,9 @@ import {
     HeatmapCalendar,
     ProblemStatistics,
 } from '@/lib/jutge_api_client'
+
+/** Single submission entry from ProblemStatistics, used for date filtering and derived stats. */
+type SubmissionEntry = ProblemStatistics['submissions'][number]
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -83,7 +96,7 @@ type VolumeOverTimePoint = { year: number; label: string; ok: number; ko: number
 type TimeToFirstPassPoint = { hours: number; label: string; cumulativePct: number }
 
 /** Compute per-student Δt (first AC − first submission in hours), then build cumulative curve. */
-function computeTimeToFirstPassFunnel(submissions: ProblemStatistics['submissions']): {
+function computeTimeToFirstPassFunnel(submissions: SubmissionEntry[]): {
     curve: TimeToFirstPassPoint[]
     totalSolvers: number
     neverSolved: number
@@ -139,7 +152,7 @@ type AttemptsToSolvePoint = {
     neverPassed?: number
 }
 
-function computeAttemptsToSolve(submissions: ProblemStatistics['submissions']): {
+function computeAttemptsToSolve(submissions: SubmissionEntry[]): {
     histogram: AttemptsToSolvePoint[]
     medianAttempts: number | null
     totalPassed: number
@@ -200,11 +213,12 @@ function computeAttemptsToSolve(submissions: ProblemStatistics['submissions']): 
     return { histogram, medianAttempts, totalPassed, neverPassedCount }
 }
 
-function deriveChartData(statistics: ProblemStatistics) {
+/** All chart/table data derived from a submissions list (e.g. filtered by date range). */
+function deriveChartData(submissions: SubmissionEntry[]) {
     const isOk = (verdict: string) => verdict === 'AC'
 
     const byDay: Record<string, number> = {}
-    for (const s of statistics.submissions) {
+    for (const s of submissions) {
         const key = dayjs(s.time).format('YYYY-MM-DD')
         byDay[key] = (byDay[key] ?? 0) + 1
     }
@@ -215,23 +229,42 @@ function deriveChartData(statistics: ProblemStatistics) {
     const maxValue = heatmapData.length ? Math.max(...heatmapData.map((d) => d.value)) : 0
     const heatmapEnd = dayjs().add(1, 'day').startOf('day')
     const heatmapStart =
-        statistics.submissions.length > 0
-            ? dayjs(statistics.submissions[0].time).startOf('day')
-            : dayjs().startOf('day')
+        submissions.length > 0 ? dayjs(submissions[0].time).startOf('day') : dayjs().startOf('day')
 
-    const usersOkKo: Distribution = {
-        OK: statistics.users.ok,
-        KO: statistics.users.ko,
+    // Users: unique users with at least one AC = OK, others = KO (derived from submissions only)
+    const userStatus = new Map<string, boolean>()
+    for (const s of submissions) {
+        const hasAc = userStatus.get(s.anonymous_user_id)
+        if (!hasAc) userStatus.set(s.anonymous_user_id, s.verdict === 'AC')
+        else if (s.verdict === 'AC') userStatus.set(s.anonymous_user_id, true)
     }
-    const acCount = statistics.verdicts['AC'] ?? 0
-    const submissionsTotal = Object.values(statistics.verdicts).reduce((a, b) => a + b, 0)
+    let usersOk = 0
+    let usersKo = 0
+    for (const ok of userStatus.values()) {
+        if (ok) usersOk += 1
+        else usersKo += 1
+    }
+    const usersOkKo: Distribution = { OK: usersOk, KO: usersKo }
+
+    const acCount = submissions.filter((s) => s.verdict === 'AC').length
+    const submissionsTotal = submissions.length
     const submissionsOkKo: Distribution = {
         OK: acCount,
         KO: submissionsTotal - acCount,
     }
 
+    // Verdicts, compilers, proglangs derived from submissions only
+    const verdicts: Distribution = {}
+    const compilers: Distribution = {}
+    const proglangs: Distribution = {}
+    for (const s of submissions) {
+        verdicts[s.verdict] = (verdicts[s.verdict] ?? 0) + 1
+        compilers[s.compiler_id] = (compilers[s.compiler_id] ?? 0) + 1
+        proglangs[s.proglang] = (proglangs[s.proglang] ?? 0) + 1
+    }
+
     const byYear: Record<string, { ok: number; ko: number }> = {}
-    for (const s of statistics.submissions) {
+    for (const s of submissions) {
         const y = dayjs(s.time).year().toString()
         if (!byYear[y]) byYear[y] = { ok: 0, ko: 0 }
         if (isOk(s.verdict)) byYear[y].ok += 1
@@ -243,7 +276,7 @@ function deriveChartData(statistics: ProblemStatistics) {
 
     const byDow: Record<number, { ok: number; ko: number }> = {}
     for (let i = 0; i < 7; i++) byDow[i] = { ok: 0, ko: 0 }
-    for (const s of statistics.submissions) {
+    for (const s of submissions) {
         const d = dayjs(s.time).day()
         const idx = (d + 6) % 7 // Sunday=0 → index 6 (last); Monday=0 (first)
         if (isOk(s.verdict)) byDow[idx].ok += 1
@@ -257,7 +290,7 @@ function deriveChartData(statistics: ProblemStatistics) {
 
     const byHour: Record<number, { ok: number; ko: number }> = {}
     for (let h = 0; h < 24; h++) byHour[h] = { ok: 0, ko: 0 }
-    for (const s of statistics.submissions) {
+    for (const s of submissions) {
         const h = dayjs(s.time).hour()
         if (isOk(s.verdict)) byHour[h].ok += 1
         else byHour[h].ko += 1
@@ -270,7 +303,7 @@ function deriveChartData(statistics: ProblemStatistics) {
 
     const byMonth: Record<number, { ok: number; ko: number }> = {}
     for (let m = 0; m < 12; m++) byMonth[m] = { ok: 0, ko: 0 }
-    for (const s of statistics.submissions) {
+    for (const s of submissions) {
         const m = dayjs(s.time).month()
         if (isOk(s.verdict)) byMonth[m].ok += 1
         else byMonth[m].ko += 1
@@ -281,14 +314,14 @@ function deriveChartData(statistics: ProblemStatistics) {
         ko: byMonth[i].ko,
     }))
 
-    const timeToFirstPass = computeTimeToFirstPassFunnel(statistics.submissions)
-    const attemptsToSolve = computeAttemptsToSolve(statistics.submissions)
+    const timeToFirstPass = computeTimeToFirstPassFunnel(submissions)
+    const attemptsToSolve = computeAttemptsToSolve(submissions)
 
     // Submission volume over time: one point per year (ok = green base, ko = red stacked)
     const submissionVolumeOverTime: VolumeOverTimePoint[] = (() => {
-        if (statistics.submissions.length === 0) return []
+        if (submissions.length === 0) return []
         const byYear = new Map<number, { ok: number; ko: number }>()
-        for (const s of statistics.submissions) {
+        for (const s of submissions) {
             const year = dayjs(s.time).year()
             const existing = byYear.get(year) ?? { ok: 0, ko: 0 }
             if (isOk(s.verdict)) existing.ok += 1
@@ -309,6 +342,9 @@ function deriveChartData(statistics: ProblemStatistics) {
         maxValue,
         usersOkKo,
         submissionsOkKo,
+        verdicts,
+        compilers,
+        proglangs,
         submissionsByYear,
         submissionsByWeekday,
         submissionsByHour,
@@ -504,36 +540,121 @@ function MyPieChart({ data, category, colors }: MyPieChartProps) {
     )
 }
 
+function DatePickerField({
+    label,
+    value,
+    onChange,
+    disabled,
+}: {
+    label: string
+    value: Date
+    onChange: (d: Date | undefined) => void
+    disabled?: boolean
+}) {
+    return (
+        <div className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium text-muted-foreground">{label}</span>
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button
+                        variant="outline"
+                        disabled={disabled}
+                        className={cn(
+                            'w-[160px] justify-start text-left font-normal',
+                            !value && 'text-muted-foreground',
+                        )}
+                    >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {value ? dayjs(value).format('YYYY-MM-DD') : <span>{label}</span>}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar mode="single" selected={value} onSelect={onChange} initialFocus />
+                </PopoverContent>
+            </Popover>
+        </div>
+    )
+}
+
 function ProblemHeaderCard({
     problem_nm,
     abstractProblem,
+    startDate,
+    endDate,
+    onStartDateChange,
+    onEndDateChange,
+    onResetDates,
+    defaultStartDate,
+    defaultEndDate,
 }: {
     problem_nm: string
     abstractProblem: AbstractProblem
+    startDate: Date
+    endDate: Date
+    onStartDateChange: (d: Date | undefined) => void
+    onEndDateChange: (d: Date | undefined) => void
+    onResetDates: () => void
+    defaultStartDate: Date
+    defaultEndDate: Date
 }) {
     const problems = Object.values(abstractProblem.problems)
+    const isDefaultRange =
+        dayjs(startDate).isSame(dayjs(defaultStartDate), 'day') &&
+        dayjs(endDate).isSame(dayjs(defaultEndDate), 'day')
     return (
         <Card className="w-full">
             <CardHeader className="p-4">
-                <CardTitle className="text-lg font-semibold">Statistics for {problem_nm}</CardTitle>
-                <div className="mt-2 flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                    {problems.map((p) => (
-                        <span key={p.problem_id} className="flex items-center gap-1.5">
-                            <a
-                                href={`https://jutge.org/problems/${p.problem_id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex text-muted-foreground hover:text-foreground"
-                                title={`Open ${p.problem_id} on jutge.org`}
-                            >
-                                <ExternalLinkIcon className="h-4 w-4" />
-                            </a>
-                            <span className="font-medium text-foreground">{p.problem_id}</span>
-                            <span className="max-w-[200px] truncate sm:max-w-none" title={p.title}>
-                                {p.title}
-                            </span>
-                        </span>
-                    ))}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
+                        <CardTitle className="text-lg font-semibold">
+                            Statistics for {problem_nm}
+                        </CardTitle>
+                        <div className="mt-2 flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                            {problems.map((p) => (
+                                <span key={p.problem_id} className="flex items-center gap-1.5">
+                                    <a
+                                        href={`https://jutge.org/problems/${p.problem_id}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex text-muted-foreground hover:text-foreground"
+                                        title={`Open ${p.problem_id} on jutge.org`}
+                                    >
+                                        <ExternalLinkIcon className="h-4 w-4" />
+                                    </a>
+                                    <span className="font-medium text-foreground">
+                                        {p.problem_id}
+                                    </span>
+                                    <span
+                                        className="max-w-[200px] truncate sm:max-w-none"
+                                        title={p.title}
+                                    >
+                                        {p.title}
+                                    </span>
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex flex-shrink-0 flex-wrap items-end gap-2">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={onResetDates}
+                            disabled={isDefaultRange}
+                            title="Reset to full range"
+                        >
+                            <RotateCcwIcon className="h-4 w-4" />
+                        </Button>
+                        <DatePickerField
+                            label="Start date"
+                            value={startDate}
+                            onChange={onStartDateChange}
+                        />
+                        <DatePickerField
+                            label="End date"
+                            value={endDate}
+                            onChange={onEndDateChange}
+                        />
+                    </div>
                 </div>
             </CardHeader>
         </Card>
@@ -878,6 +999,8 @@ function ProblemStatisticsView() {
     const [statistics, setStatistics] = useState<ProblemStatistics | null>(null)
     const [colors, setColors] = useState<ColorMapping | null>(null)
     const [abstractProblem, setAbstractProblem] = useState<AbstractProblem | null>(null)
+    const [startDate, setStartDate] = useState<Date | null>(null)
+    const [endDate, setEndDate] = useState<Date | null>(null)
 
     useEffect(() => {
         async function fetchData() {
@@ -893,24 +1016,67 @@ function ProblemStatisticsView() {
         fetchData()
     }, [problem_nm])
 
-    if (statistics === null || colors === null || abstractProblem === null) {
-        return <SimpleSpinner />
+    const defaultStartDate = useMemo(() => {
+        if (!statistics || statistics.submissions.length === 0)
+            return dayjs().startOf('day').toDate()
+        return dayjs(statistics.submissions[0].time).startOf('day').toDate()
+    }, [statistics])
+    const defaultEndDate = useMemo(() => dayjs().startOf('day').toDate(), [])
+
+    useEffect(() => {
+        if (!statistics || startDate !== null) return
+        setStartDate(defaultStartDate)
+        setEndDate(defaultEndDate)
+    }, [statistics, defaultStartDate, defaultEndDate, startDate])
+
+    const filteredSubmissions = useMemo(() => {
+        if (!statistics || startDate === null || endDate === null)
+            return statistics?.submissions ?? []
+        const start = dayjs(startDate).startOf('day')
+        const end = dayjs(endDate).endOf('day')
+        return statistics.submissions.filter((s) => {
+            const t = dayjs(s.time)
+            return !t.isBefore(start) && !t.isAfter(end)
+        })
+    }, [statistics, startDate, endDate])
+
+    const derived = useMemo(() => deriveChartData(filteredSubmissions), [filteredSubmissions])
+
+    const totalUsers = derived.usersOkKo.OK + derived.usersOkKo.KO
+    const dashboardStats: DashboardStats = {
+        totalSubmissions: filteredSubmissions.length,
+        totalUsers,
+        passRatePct: totalUsers > 0 ? (derived.usersOkKo.OK / totalUsers) * 100 : 0,
+        passedCount: derived.usersOkKo.OK,
+        neverPassed: derived.usersOkKo.KO,
     }
 
-    const derived = deriveChartData(statistics)
-
-    const totalUsers = statistics.users.ok + statistics.users.ko
-    const dashboardStats: DashboardStats = {
-        totalSubmissions: statistics.submissions.length,
-        totalUsers,
-        passRatePct: totalUsers > 0 ? (statistics.users.ok / totalUsers) * 100 : 0,
-        passedCount: statistics.users.ok,
-        neverPassed: statistics.users.ko,
+    if (
+        statistics === null ||
+        colors === null ||
+        abstractProblem === null ||
+        startDate === null ||
+        endDate === null
+    ) {
+        return <SimpleSpinner />
     }
 
     return (
         <div className="flex w-full flex-col gap-4">
-            <ProblemHeaderCard problem_nm={problem_nm} abstractProblem={abstractProblem} />
+            <ProblemHeaderCard
+                problem_nm={problem_nm}
+                abstractProblem={abstractProblem}
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={(d) => d != null && setStartDate(d)}
+                onEndDateChange={(d) => d != null && setEndDate(d)}
+                onResetDates={() => {
+                    setStartDate(defaultStartDate)
+                    setEndDate(defaultEndDate)
+                }}
+                defaultStartDate={defaultStartDate}
+                defaultEndDate={defaultEndDate}
+            />
             <StatisticsDashboardCard stats={dashboardStats} />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 <StatCard title="User statuses">
@@ -924,15 +1090,15 @@ function ProblemStatisticsView() {
                     />
                 </StatCard>
                 <StatCard title="Submissions by verdict">
-                    <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
+                    <MyPieChart data={derived.verdicts} category="verdicts" colors={colors} />
                 </StatCard>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 <StatCard title="Compilers">
-                    <MyPieChart data={statistics.compilers} category="compilers" colors={colors} />
+                    <MyPieChart data={derived.compilers} category="compilers" colors={colors} />
                 </StatCard>
                 <StatCard title="Programming languages">
-                    <MyPieChart data={statistics.proglangs} category="proglangs" colors={colors} />
+                    <MyPieChart data={derived.proglangs} category="proglangs" colors={colors} />
                 </StatCard>
             </div>
             <Card className="w-full">
