@@ -5,7 +5,7 @@ import { ChartPieIcon, TableIcon } from 'lucide-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 import { JSX, useEffect, useState } from 'react'
-import { LabelList, Pie, PieChart } from 'recharts'
+import { Bar, BarChart, CartesianGrid, LabelList, Pie, PieChart, XAxis, YAxis } from 'recharts'
 import Page from '@/components/layout/Page'
 import SimpleSpinner from '@/components/SimpleSpinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -173,6 +173,30 @@ function MyCard(props: MyCardProps) {
     )
 }
 
+type StackedOkKoBarChartProps = {
+    data: { label: string; ok: number; ko: number }[]
+    colors: ColorMapping
+}
+
+function StackedOkKoBarChart(props: StackedOkKoBarChartProps) {
+    const chartConfig = {
+        ok: { label: 'OK', color: color('OK', 'statuses', props.colors) },
+        ko: { label: 'KO', color: color('KO', 'statuses', props.colors) },
+    }
+    return (
+        <ChartContainer config={chartConfig} className="h-[260px] w-full">
+            <BarChart data={props.data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="ko" fill="var(--color-ko)" radius={[0, 0, 4, 4]} stackId="a" />
+                <Bar dataKey="ok" fill="var(--color-ok)" radius={[4, 4, 0, 0]} stackId="a" />
+            </BarChart>
+        </ChartContainer>
+    )
+}
+
 export default function ProblemStatisticsPage() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
     return (
@@ -249,8 +273,95 @@ function ProblemStatisticsView() {
             ? dayjs(statistics.submissions[0].time).startOf('day')
             : dayjs().startOf('day')
 
+    const isOk = (verdict: string) => verdict === 'AC'
+
+    const submissionsByYear = (() => {
+        const byYear: Record<string, { ok: number; ko: number }> = {}
+        for (const s of statistics.submissions) {
+            const y = dayjs(s.time).year().toString()
+            if (!byYear[y]) byYear[y] = { ok: 0, ko: 0 }
+            if (isOk(s.verdict)) byYear[y].ok += 1
+            else byYear[y].ko += 1
+        }
+        return Object.entries(byYear)
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([label, counts]) => ({ label, ok: counts.ok, ko: counts.ko }))
+    })()
+
+    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    const submissionsByWeekday = (() => {
+        const byDow: Record<number, { ok: number; ko: number }> = {}
+        for (let i = 0; i < 7; i++) byDow[i] = { ok: 0, ko: 0 }
+        for (const s of statistics.submissions) {
+            const d = dayjs(s.time).day()
+            const idx = (d + 6) % 7
+            if (isOk(s.verdict)) byDow[idx].ok += 1
+            else byDow[idx].ko += 1
+        }
+        return weekdays.map((label, i) => ({
+            label,
+            ok: byDow[i].ok,
+            ko: byDow[i].ko,
+        }))
+    })()
+
+    const submissionsByHour = (() => {
+        const byHour: Record<number, { ok: number; ko: number }> = {}
+        for (let h = 0; h < 24; h++) byHour[h] = { ok: 0, ko: 0 }
+        for (const s of statistics.submissions) {
+            const h = dayjs(s.time).hour()
+            if (isOk(s.verdict)) byHour[h].ok += 1
+            else byHour[h].ko += 1
+        }
+        return Array.from({ length: 24 }, (_, h) => ({
+            label: h.toString(),
+            ok: byHour[h].ok,
+            ko: byHour[h].ko,
+        }))
+    })()
+
+    const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+    ]
+    const submissionsByMonth = (() => {
+        const byMonth: Record<number, { ok: number; ko: number }> = {}
+        for (let m = 0; m < 12; m++) byMonth[m] = { ok: 0, ko: 0 }
+        for (const s of statistics.submissions) {
+            const m = dayjs(s.time).month()
+            if (isOk(s.verdict)) byMonth[m].ok += 1
+            else byMonth[m].ko += 1
+        }
+        return months.map((label, i) => ({
+            label,
+            ok: byMonth[i].ok,
+            ko: byMonth[i].ko,
+        }))
+    })()
+
     return (
         <div className="flex w-full flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <MyCard title="User statuses">
+                    <MyPieChart data={usersOkKo} category="statuses" colors={colors} />
+                </MyCard>
+                <MyCard title="Submission statuses">
+                    <MyPieChart data={submissionsOkKo} category="statuses" colors={colors} />
+                </MyCard>
+                <MyCard title="Submissions by verdict">
+                    <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
+                </MyCard>
+            </div>
             <Card className="w-full">
                 <CardHeader className="p-4">
                     <CardTitle>Submissions by day</CardTitle>
@@ -264,15 +375,18 @@ function ProblemStatisticsView() {
                     />
                 </CardContent>
             </Card>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <MyCard title="User statuses">
-                    <MyPieChart data={usersOkKo} category="statuses" colors={colors} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <MyCard title="Submissions by year">
+                    <StackedOkKoBarChart data={submissionsByYear} colors={colors} />
                 </MyCard>
-                <MyCard title="Submission statuses">
-                    <MyPieChart data={submissionsOkKo} category="statuses" colors={colors} />
+                <MyCard title="Submissions by month of year">
+                    <StackedOkKoBarChart data={submissionsByMonth} colors={colors} />
                 </MyCard>
-                <MyCard title="Submissions by verdict">
-                    <MyPieChart data={statistics.verdicts} category="verdicts" colors={colors} />
+                <MyCard title="Submissions by day of week">
+                    <StackedOkKoBarChart data={submissionsByWeekday} colors={colors} />
+                </MyCard>
+                <MyCard title="Submissions by hour of day">
+                    <StackedOkKoBarChart data={submissionsByHour} colors={colors} />
                 </MyCard>
             </div>
         </div>
