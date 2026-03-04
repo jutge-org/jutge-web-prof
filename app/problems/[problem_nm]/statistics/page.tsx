@@ -502,7 +502,7 @@ function MyPieChart({ data, category, colors }: MyPieChartProps) {
     const chart = (
         <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square max-h-[400px] [&_.recharts-text]:fill-background"
+            className="mx-auto aspect-square max-h-[300px] [&_.recharts-text]:fill-background"
         >
             <PieChart>
                 <ChartTooltip content={<ChartTooltipContent nameKey="label" hideLabel />} />
@@ -521,7 +521,7 @@ function MyPieChart({ data, category, colors }: MyPieChartProps) {
 
     const tableTotal = Object.values(data).reduce((s, n) => s + n, 0)
     const table = (
-        <ScrollArea className="h-[305px] w-full">
+        <ScrollArea className="h-[300px] w-full">
             <Table>
                 <TableBody>
                     {Object.entries(data)
