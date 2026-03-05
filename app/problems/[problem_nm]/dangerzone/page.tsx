@@ -9,7 +9,7 @@ import { JForm, JFormFields } from '@/components/formatters/JForm'
 import Page from '@/components/layout/Page'
 import SimpleSpinner from '@/components/SimpleSpinner'
 import jutge from '@/lib/jutge'
-import { AbstractProblem, ProblemStatistics } from '@/lib/jutge_api_client'
+import { AbstractProblem, ProblemAnonymousSubmission } from '@/lib/jutge_api_client'
 
 const REMOVE_MAX_SUBMISSIONS = 6
 
@@ -35,27 +35,27 @@ function ProblemDangerZoneView() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
     const router = useRouter()
     const [abstractProblem, setAbstractProblem] = useState<AbstractProblem | null>(null)
-    const [statistics, setStatistics] = useState<ProblemStatistics | null>(null)
+    const [submissions, setSubmissions] = useState<number | null>(null)
     const [reason, setReason] = useState('')
     const [removeConfirmName, setRemoveConfirmName] = useState('')
     const [removeConfirmCheckbox, setRemoveConfirmCheckbox] = useState(false)
 
     useEffect(() => {
         async function fetchData() {
-            const [abstractProblemData, statisticsData] = await Promise.all([
+            const [abstractProblemData, submissionsData] = await Promise.all([
                 jutge.problems.getAbstractProblem(problem_nm),
-                jutge.instructor.problems.getStatistics(problem_nm),
+                jutge.instructor.problems.getAnonymousSubmissions(problem_nm),
             ])
             setAbstractProblem(abstractProblemData)
-            setStatistics(statisticsData)
+            setSubmissions(submissionsData.length)
             setReason(abstractProblemData.deprecation || '')
         }
         fetchData()
     }, [problem_nm])
 
-    if (abstractProblem === null || statistics === null) return <SimpleSpinner />
+    if (abstractProblem === null || submissions === null) return <SimpleSpinner />
 
-    const totalSubmissions = statistics.submissions.length
+    const totalSubmissions = submissions
     const canRemove = totalSubmissions < REMOVE_MAX_SUBMISSIONS
 
     async function saveDeprecation() {
