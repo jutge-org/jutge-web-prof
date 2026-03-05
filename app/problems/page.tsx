@@ -1,6 +1,6 @@
 'use client'
 
-import { AbstractProblem } from '@/lib/jutge_api_client'
+import { AbstractProblem, SharingSettings } from '@/lib/jutge_api_client'
 import { ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import {
@@ -9,7 +9,9 @@ import {
     FileBoxIcon,
     FileCodeIcon,
     KeyRoundIcon,
+    LockIcon,
     SquarePlusIcon,
+    UnlockIcon,
     WrenchIcon,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -76,16 +78,11 @@ function ProblemsListView() {
     useEffect(() => {
         async function fetchProblems() {
             const ownProblems = await jutge.instructor.problems.getOwnProblems()
-            const ownProblemsWithPasscode =
-                await jutge.instructor.problems.getOwnProblemsWithPasscode()
+            const ownProblemsSharingSettings =
+                await jutge.instructor.problems.getAllSharingSettings()
             const abstractProblems = await jutge.problems.getAbstractProblems(ownProblems.join(','))
-            const sharingSettingsList = await Promise.all(
-                ownProblems.map((problem_nm) =>
-                    jutge.instructor.problems.getSharingSettings(problem_nm),
-                ),
-            )
-            const sharingByProblem = Object.fromEntries(
-                sharingSettingsList.map((s) => [s.problem_nm, s]),
+            const sharingByProblem: Record<string, SharingSettings> = Object.fromEntries(
+                ownProblemsSharingSettings.map((s) => [s.problem_nm, s]),
             )
 
             function buildTitle(problem_nm: string) {
@@ -106,7 +103,7 @@ function ProblemsListView() {
                         abstractProblem.problems,
                         (problem_id, problem) => problem.language_id,
                     ),
-                    passcode: ownProblemsWithPasscode.includes(problem_nm),
+                    passcode: sharing?.passcode === null,
                     shared_testcases: sharing?.shared_testcases ?? false,
                     shared_solutions: sharing?.shared_solutions ?? false,
                     abstractProblems,
@@ -165,16 +162,16 @@ function ProblemsListView() {
                 <div className="flex flex-row gap-2 mt-3">
                     {!p.data!.passcode ? (
                         <span title="Protected by passcode">
-                            <KeyRoundIcon size={14} />
+                            <LockIcon size={14} className="text-red-800" />
                         </span>
                     ) : (
                         <span title="Visible to all">
-                            <KeyRoundIcon size={14} className="text-gray-200" />
+                            <UnlockIcon size={14} className="text-green-800" />
                         </span>
                     )}
                     {p.data!.shared_testcases ? (
                         <span title="Test cases shared with instructors">
-                            <FileBoxIcon size={14} />
+                            <FileBoxIcon size={14} className="text-green-800" />
                         </span>
                     ) : (
                         <span title="Test cases not shared with instructors">
@@ -184,7 +181,7 @@ function ProblemsListView() {
 
                     {p.data!.shared_solutions ? (
                         <span title="Solutions shared with instructors">
-                            <FileCodeIcon size={14} />
+                            <FileCodeIcon size={14} className="text-green-800" />
                         </span>
                     ) : (
                         <span title="Solutions not shared with instructors">

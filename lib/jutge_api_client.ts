@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-04T18:36:21.156Z
+ * This file has been automatically generated at 2026-03-05T13:58:55.152Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -3501,7 +3501,7 @@ class Module_instructor_problems {
      *
      * 🔐 Authentication: instructor
      * No warnings
-     *
+     * This endpoint will be deprecated in the immediate future.
      */
     async getOwnProblemsWithPasscode(): Promise<string[]> {
         const [output, ofiles] = await this.root.execute("instructor.problems.getOwnProblemsWithPasscode", null)
@@ -3534,6 +3534,18 @@ class Module_instructor_problems {
      */
     async getSharingSettings(problem_nm: string): Promise<SharingSettings> {
         const [output, ofiles] = await this.root.execute("instructor.problems.getSharingSettings", problem_nm)
+        return output
+    }
+
+    /**
+     * Get the sharing settings of all problems.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getAllSharingSettings(): Promise<SharingSettings[]> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getAllSharingSettings", null)
         return output
     }
 
