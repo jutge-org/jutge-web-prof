@@ -6,21 +6,18 @@
  */
 
 import { Heatmap } from '@/components/Heatmap'
+import Page from '@/components/layout/Page'
+import SimpleSpinner from '@/components/SimpleSpinner'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-    ChartPieIcon,
-    CalendarIcon,
-    ExternalLinkIcon,
-    RotateCcwIcon,
-    Settings,
-    TableIcon,
-    CheckIcon,
-    XIcon,
-} from 'lucide-react'
-import dayjs from 'dayjs'
-import { useParams } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+    ChartContainer,
+    ChartLegend,
+    ChartLegendContent,
+    ChartTooltip,
+    ChartTooltipContent,
+} from '@/components/ui/chart'
 import {
     Dialog,
     DialogClose,
@@ -32,7 +29,32 @@ import {
 } from '@/components/ui/dialog'
 import FloatingToolbar from '@/components/ui/FloatingToolbar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Switch } from '@/components/ui/switch'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import jutge from '@/lib/jutge'
+import {
+    AbstractProblem,
+    ColorMapping,
+    Distribution,
+    HeatmapCalendar,
+    Language,
+    ProblemAnonymousSubmission,
+} from '@/lib/jutge_api_client'
 import { cn } from '@/lib/utils'
+import dayjs from 'dayjs'
+import {
+    CalendarIcon,
+    ChartPieIcon,
+    CheckIcon,
+    RotateCcwIcon,
+    Settings,
+    TableIcon,
+    XIcon,
+} from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
 import {
     Area,
     AreaChart,
@@ -48,29 +70,6 @@ import {
     XAxis,
     YAxis,
 } from 'recharts'
-import Page from '@/components/layout/Page'
-import SimpleSpinner from '@/components/SimpleSpinner'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-    ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
-    ChartTooltip,
-    ChartTooltipContent,
-} from '@/components/ui/chart'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Switch } from '@/components/ui/switch'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import jutge from '@/lib/jutge'
-import {
-    AbstractProblem,
-    ColorMapping,
-    Distribution,
-    HeatmapCalendar,
-    Language,
-    ProblemAnonymousSubmission,
-} from '@/lib/jutge_api_client'
 
 /** Single submission entry, used for date filtering and derived stats. */
 type SubmissionEntry = ProblemAnonymousSubmission
@@ -1144,7 +1143,9 @@ export default function ProblemStatisticsPage() {
 
 function ProblemStatisticsView() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
-    const [statistics, setStatistics] = useState<{ submissions: ProblemAnonymousSubmission[] } | null>(null)
+    const [statistics, setStatistics] = useState<{
+        submissions: ProblemAnonymousSubmission[]
+    } | null>(null)
     const [colors, setColors] = useState<ColorMapping | null>(null)
     const [languagesTable, setLanguagesTable] = useState<Record<string, Language> | null>(null)
     const [abstractProblem, setAbstractProblem] = useState<AbstractProblem | null>(null)
