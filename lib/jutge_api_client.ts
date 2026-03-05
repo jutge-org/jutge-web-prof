@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-05T13:58:55.152Z
+ * This file has been automatically generated at 2026-03-05T14:27:53.415Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -812,19 +812,13 @@ export type SharingSettings = {
     shared_solutions: boolean
 }
 
-export type ProblemStatistics = {
-    users: { ok: number; ko: number }
-    verdicts: Distribution
-    compilers: Distribution
-    proglangs: Distribution
-    submissions: {
-        time: string
-        anonymous_user_id: string
-        problem_id: string
-        verdict: string
-        compiler_id: string
-        proglang: string
-    }[]
+export type ProblemAnonymousSubmission = {
+    time: string
+    anonymous_user_id: string
+    problem_id: string
+    verdict: string
+    compiler_id: string
+    proglang: string
 }
 
 export type SubmissionQuery = {
@@ -3497,18 +3491,6 @@ class Module_instructor_problems {
     }
 
     /**
-     * Get the list of own problems that have a passcode.
-     *
-     * 🔐 Authentication: instructor
-     * No warnings
-     * This endpoint will be deprecated in the immediate future.
-     */
-    async getOwnProblemsWithPasscode(): Promise<string[]> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.getOwnProblemsWithPasscode", null)
-        return output
-    }
-
-    /**
      * Set the sharing settings of a problem.
      *
      * 🔐 Authentication: instructor
@@ -3562,14 +3544,14 @@ class Module_instructor_problems {
     }
 
     /**
-     * Get statistics of the submissions for an abstract problem.
+     * Get anonymous submissions for an abstract problem.
      *
      * 🔐 Authentication: instructor
      * No warnings
-     *
+     * This function is useful to produce statistics about the submissions for an abstract problem. The user ids are anonymized using a nonce.
      */
-    async getStatistics(problem_nm: string): Promise<ProblemStatistics> {
-        const [output, ofiles] = await this.root.execute("instructor.problems.getStatistics", problem_nm)
+    async getAnonymousSubmissions(problem_nm: string): Promise<ProblemAnonymousSubmission[]> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getAnonymousSubmissions", problem_nm)
         return output
     }
 

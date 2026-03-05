@@ -69,11 +69,11 @@ import {
     Distribution,
     HeatmapCalendar,
     Language,
-    ProblemStatistics,
+    ProblemAnonymousSubmission,
 } from '@/lib/jutge_api_client'
 
-/** Single submission entry from ProblemStatistics, used for date filtering and derived stats. */
-type SubmissionEntry = ProblemStatistics['submissions'][number]
+/** Single submission entry, used for date filtering and derived stats. */
+type SubmissionEntry = ProblemAnonymousSubmission
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -1144,7 +1144,7 @@ export default function ProblemStatisticsPage() {
 
 function ProblemStatisticsView() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
-    const [statistics, setStatistics] = useState<ProblemStatistics | null>(null)
+    const [statistics, setStatistics] = useState<{ submissions: ProblemAnonymousSubmission[] } | null>(null)
     const [colors, setColors] = useState<ColorMapping | null>(null)
     const [languagesTable, setLanguagesTable] = useState<Record<string, Language> | null>(null)
     const [abstractProblem, setAbstractProblem] = useState<AbstractProblem | null>(null)
@@ -1155,13 +1155,13 @@ function ProblemStatisticsView() {
 
     useEffect(() => {
         async function fetchData() {
-            const [stats, colorMap, languages, abstract] = await Promise.all([
-                jutge.instructor.problems.getStatistics(problem_nm),
+            const [submissions, colorMap, languages, abstract] = await Promise.all([
+                jutge.instructor.problems.getAnonymousSubmissions(problem_nm),
                 jutge.misc.getHexColors(),
                 jutge.tables.getLanguages(),
                 jutge.problems.getAbstractProblem(problem_nm),
             ])
-            setStatistics(stats)
+            setStatistics({ submissions })
             setColors(colorMap)
             setLanguagesTable(languages)
             setAbstractProblem(abstract)
