@@ -67,6 +67,7 @@ function ProblemsListView() {
     const [problemRows, setProblemRows] = useState<ProblemRow[]>([])
     const [problemRowsAll, setProblemRowsAll] = useState<ProblemRow[]>([])
     const [showDeprecated, setShowDeprecated] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (isMobile)
@@ -77,41 +78,46 @@ function ProblemsListView() {
 
     useEffect(() => {
         async function fetchProblems() {
-            const ownProblems = await jutge.instructor.problems.getOwnProblems()
-            const ownProblemsSharingSettings =
-                await jutge.instructor.problems.getAllSharingSettings()
-            const abstractProblems = await jutge.problems.getAbstractProblems(ownProblems.join(','))
-            const sharingByProblem: Record<string, SharingSettings> = Object.fromEntries(
-                ownProblemsSharingSettings.map((s) => [s.problem_nm, s]),
-            )
+            setLoading(true)
+            try {
+                const ownProblems = await jutge.instructor.problems.getOwnProblems()
+                const ownProblemsSharingSettings =
+                    await jutge.instructor.problems.getAllSharingSettings()
+                const abstractProblems = await jutge.problems.getAbstractProblems(ownProblems.join(','))
+                const sharingByProblem: Record<string, SharingSettings> = Object.fromEntries(
+                    ownProblemsSharingSettings.map((s) => [s.problem_nm, s]),
+                )
 
-            function buildTitle(problem_nm: string) {
-                const problems = Object.values(abstractProblems[problem_nm].problems)
-                return problems.map((problem) => problem.title).join(' / ')
-            }
-
-            const rows = ownProblems.map((problem_nm) => {
-                const abstractProblem = abstractProblems[problem_nm]
-                const sharing = sharingByProblem[problem_nm]
-                return {
-                    problem_nm,
-                    title: buildTitle(abstractProblem.problem_nm),
-                    created_at: abstractProblem.created_at,
-                    updated_at: abstractProblem.updated_at,
-                    deprecated: abstractProblem.deprecation !== null,
-                    languages: mapmap(
-                        abstractProblem.problems,
-                        (problem_id, problem) => problem.language_id,
-                    ),
-                    passcode: sharing?.passcode === null,
-                    shared_testcases: sharing?.shared_testcases ?? false,
-                    shared_solutions: sharing?.shared_solutions ?? false,
-                    abstractProblems,
+                function buildTitle(problem_nm: string) {
+                    const problems = Object.values(abstractProblems[problem_nm].problems)
+                    return problems.map((problem) => problem.title).join(' / ')
                 }
-            })
 
-            setProblemRowsAll(rows)
-            setProblemRows(rows.filter((row) => !row.deprecated))
+                const rows = ownProblems.map((problem_nm) => {
+                    const abstractProblem = abstractProblems[problem_nm]
+                    const sharing = sharingByProblem[problem_nm]
+                    return {
+                        problem_nm,
+                        title: buildTitle(abstractProblem.problem_nm),
+                        created_at: abstractProblem.created_at,
+                        updated_at: abstractProblem.updated_at,
+                        deprecated: abstractProblem.deprecation !== null,
+                        languages: mapmap(
+                            abstractProblem.problems,
+                            (problem_id, problem) => problem.language_id,
+                        ),
+                        passcode: sharing?.passcode === null,
+                        shared_testcases: sharing?.shared_testcases ?? false,
+                        shared_solutions: sharing?.shared_solutions ?? false,
+                        abstractProblems,
+                    }
+                })
+
+                setProblemRowsAll(rows)
+                setProblemRows(rows.filter((row) => !row.deprecated))
+            } finally {
+                setLoading(false)
+            }
         }
 
         fetchProblems()
@@ -266,7 +272,7 @@ function ProblemsListView() {
 
     return (
         <>
-            <AgTableFull rowData={problemRows} columnDefs={colDefs as any} />
+            <AgTableFull rowData={problemRows} columnDefs={colDefs as any} loading={loading} />
             <div className="mt-4 flex flex-row gap-2">
                 <Switch checked={showDeprecated} onCheckedChange={showDeprecatedChange} />
                 <div className="text-sm">Deprecated problems</div>
