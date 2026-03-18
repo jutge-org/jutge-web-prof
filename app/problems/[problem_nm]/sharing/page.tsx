@@ -4,7 +4,7 @@ import { JForm, JFormFields } from '@/components/formatters/JForm'
 import Page from '@/components/layout/Page'
 import SimpleSpinner from '@/components/SimpleSpinner'
 import jutge from '@/lib/jutge'
-import { SaveIcon } from 'lucide-react'
+import { SaveIcon, Share2Icon } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -13,6 +13,23 @@ import { z } from 'zod'
 const passcodeRegex = /^[a-zA-Z0-9]{8,}$/
 const passcodeSchema = z.string().refine((v) => v.trim() === '' || passcodeRegex.test(v.trim()), {
     message: 'Passcode must be at least 8 characters long and contain only letters and digits.',
+})
+
+function parseEmailList(raw: string): string[] {
+    const seen = new Set<string>()
+    const out: string[] = []
+    for (const part of raw.split(/[\s,;]+/)) {
+        const e = part.trim().toLowerCase()
+        if (e && !seen.has(e)) {
+            seen.add(e)
+            out.push(e)
+        }
+    }
+    return out
+}
+
+const shareEmailsSchema = z.string().refine((v) => parseEmailList(v).length > 0, {
+    message: 'Enter at least one email address.',
 })
 
 export default function ProblemSharingPage() {
@@ -40,6 +57,8 @@ function ProblemSharingView() {
     const [sharedTestcases, setSharedTestcases] = useState(false)
     const [sharedSolutions, setSharedSolutions] = useState(false)
     const [passcodeInput, setPasscodeInput] = useState('')
+    const [shareEmailsInput, setShareEmailsInput] = useState('')
+    const [shareMessageInput, setShareMessageInput] = useState('')
 
     useEffect(() => {
         async function fetchSharing() {
@@ -74,6 +93,29 @@ function ProblemSharingView() {
             })
             setPasscode(newPasscode)
             toast.success('Sharing settings saved.')
+        } catch (e) {
+            toast.error(String(e))
+        }
+    }
+
+    async function shareWithEmails() {
+        const emails = parseEmailList(shareEmailsInput)
+        if (emails.length === 0) {
+            toast.error('Enter at least one email address.')
+            return
+        }
+        const invalid = emails.filter((e) => !z.string().email().safeParse(e).success)
+        if (invalid.length > 0) {
+            toast.error(`Invalid email(s): ${invalid.join(', ')}`)
+            return
+        }
+        try {
+            await jutge.instructor.problems.shareWith({
+                problem_nm,
+                emails,
+                text: shareMessageInput.trim(),
+            })
+            toast.success('Problem shared with the given addresses.')
         } catch (e) {
             toast.error(String(e))
         }
@@ -121,9 +163,54 @@ function ProblemSharingView() {
         },
     }
 
+    const shareFields: JFormFields | null =
+        passcode != null && passcode !== ''
+            ? {
+                  shareTitle: {
+                      type: 'free',
+                      label: '',
+                      content: (
+                          <div className="text-sm space-y-2 border rounded-lg p-4 mb-4">
+                              <p>
+                                  Send this problem to other users via emails. Separate multiple
+                                  addresses with spaces or new lines.
+                              </p>
+                          </div>
+                      ),
+                  },
+                  shareEmails: {
+                      type: 'textarea',
+                      label: 'Emails',
+                      value: shareEmailsInput,
+                      setValue: setShareEmailsInput,
+                      placeHolder: 'instructor1@example.com, instructor2@example.com',
+                      rows: 4,
+                      validator: shareEmailsSchema,
+                      help: 'List email addresses to share the problem with.',
+                  },
+                  shareMessage: {
+                      type: 'textarea',
+                      label: 'Additional text',
+                      value: shareMessageInput,
+                      setValue: setShareMessageInput,
+                      placeHolder: 'Optional message to include…',
+                      rows: 3,
+                      help: 'Optional message included when sharing.',
+                  },
+                  shareSep: { type: 'separator' },
+                  shareBtn: {
+                      type: 'button',
+                      text: 'Share',
+                      icon: <Share2Icon />,
+                      action: shareWithEmails,
+                  },
+              }
+            : null
+
     return (
         <div className="flex flex-col gap-4">
             <JForm fields={fields} />
+            {shareFields ? <JForm fields={shareFields} /> : null}
         </div>
     )
 }
