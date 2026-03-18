@@ -56,6 +56,7 @@ import {
     ColorMapping,
     Distribution,
     ProblemAnonymousSubmission,
+    ProblemPopularityBucketEntry,
     SearchResults,
 } from '@/lib/jutge_api_client'
 import { offerDownloadFile } from '@/lib/utils'
@@ -500,16 +501,16 @@ function CompactAttemptsChartOnly({
     const formatCount = (value: unknown) => [String(value), 'Students'] as [string, string]
     if (histogram.length === 0) {
         return (
-            <div className="flex h-[150px] items-center justify-center text-xs text-muted-foreground">
+            <div className="flex h-[132px] items-center justify-center text-xs text-muted-foreground">
                 No data
             </div>
         )
     }
     return (
-        <ChartContainer config={chartConfig} className="h-[150px] w-full">
+        <ChartContainer config={chartConfig} className="h-[132px] w-full aspect-auto">
             <BarChart
                 data={histogram}
-                margin={{ top: 20, right: 4, bottom: 4, left: 36 }}
+                margin={{ top: 16, right: 4, bottom: 2, left: 32 }}
                 barCategoryGap="10%"
             >
                 <CartesianGrid vertical={false} />
@@ -571,14 +572,14 @@ function CompactTimeToSolveChartOnly({ curve }: { curve: TimeToFirstPassPoint[] 
     }
     if (curve.length === 0 || curve.every((p) => p.cumulativePct === 0)) {
         return (
-            <div className="flex h-[150px] items-center justify-center text-xs text-muted-foreground">
+            <div className="flex h-[132px] items-center justify-center text-xs text-muted-foreground">
                 No solvers yet
             </div>
         )
     }
     return (
-        <ChartContainer config={chartConfig} className="h-[150px] w-full">
-            <LineChart data={curve} margin={{ top: 8, right: 4, bottom: 4, left: 4 }}>
+        <ChartContainer config={chartConfig} className="h-[132px] w-full aspect-auto">
+            <LineChart data={curve} margin={{ top: 6, right: 4, bottom: 2, left: 2 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
                 <XAxis
                     dataKey="hours"
@@ -633,14 +634,14 @@ function CompactSubmissionVolumeChart({
     const formatCount = (value: unknown) => [String(value), 'Submissions'] as [string, string]
     if (data.length === 0) {
         return (
-            <div className="flex h-[150px] items-center justify-center text-xs text-muted-foreground">
+            <div className="flex h-[132px] items-center justify-center text-xs text-muted-foreground">
                 No submission data
             </div>
         )
     }
     return (
-        <ChartContainer config={chartConfig} className="h-[150px] w-full aspect-auto">
-            <AreaChart data={data} margin={{ top: 8, right: 4, bottom: 4, left: 4 }}>
+        <ChartContainer config={chartConfig} className="h-[132px] w-full aspect-auto">
+            <AreaChart data={data} margin={{ top: 6, right: 4, bottom: 2, left: 2 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="year" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
                 <YAxis tickLine={false} axisLine={false} allowDecimals={false} width={28} />
@@ -676,8 +677,137 @@ function CompactSubmissionVolumeChart({
     )
 }
 
+function formatPopularityBucketPowerLabel(b: ProblemPopularityBucketEntry): string {
+    const { bucket_min, bucket_max, log2_bucket } = b
+    const openEnded = bucket_max > 1e15 || bucket_max <= bucket_min
+    if (bucket_min === 0 && bucket_max <= 1) {
+        return '0'
+    }
+    if (openEnded) {
+        return `2^${log2_bucket}+`
+    }
+    return `2^${log2_bucket}`
+}
+
+function buildPopularityChartData(buckets: ProblemPopularityBucketEntry[]) {
+    return [...buckets]
+        .sort((a, b) => a.bucket_min - b.bucket_min)
+        .map((b) => ({
+            label: formatPopularityBucketPowerLabel(b),
+            problem_count: b.problem_count,
+        }))
+}
+
+function findPopularityBucketLabel(
+    buckets: ProblemPopularityBucketEntry[],
+    totalSubmissions: number,
+): string | null {
+    if (buckets.length === 0) return null
+    const sorted = [...buckets].sort((a, b) => a.bucket_min - b.bucket_min)
+    for (let i = 0; i < sorted.length; i++) {
+        const b = sorted[i]
+        const isLast = i === sorted.length - 1
+        if (isLast) {
+            if (totalSubmissions >= b.bucket_min) return formatPopularityBucketPowerLabel(b)
+        } else if (totalSubmissions >= b.bucket_min && totalSubmissions < b.bucket_max) {
+            return formatPopularityBucketPowerLabel(b)
+        }
+    }
+    if (totalSubmissions < sorted[0].bucket_min) {
+        return formatPopularityBucketPowerLabel(sorted[0])
+    }
+    return formatPopularityBucketPowerLabel(sorted[sorted.length - 1])
+}
+
+function CompactProblemPopularityChart({
+    buckets,
+    problemTotalSubmissions,
+}: {
+    buckets: ProblemPopularityBucketEntry[]
+    problemTotalSubmissions: number
+}) {
+    const chartData = useMemo(() => buildPopularityChartData(buckets), [buckets])
+    const markerLabel = useMemo(
+        () => findPopularityBucketLabel(buckets, problemTotalSubmissions),
+        [buckets, problemTotalSubmissions],
+    )
+    const chartConfig = {
+        label: { label: 'Submissions (per problem)', color: 'hsl(var(--muted-foreground))' },
+        problem_count: {
+            label: 'Problems in bucket',
+            color: 'hsl(221 83% 53%)',
+        },
+    }
+    const formatCount = (value: unknown) => [String(value), 'Problems'] as [string, string]
+
+    if (chartData.length === 0) {
+        return (
+            <div className="flex h-[148px] items-center justify-center text-xs text-muted-foreground">
+                No popularity data
+            </div>
+        )
+    }
+
+    return (
+        <ChartContainer config={chartConfig} className="h-[148px] w-full aspect-auto">
+            <BarChart
+                data={chartData}
+                margin={{ top: 18, right: 2, bottom: 22, left: 28 }}
+                barCategoryGap="10%"
+            >
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis
+                    dataKey="label"
+                    tickLine={false}
+                    axisLine={false}
+                    interval={0}
+                    tick={{ fontSize: 7 }}
+                    angle={-40}
+                    textAnchor="end"
+                    height={26}
+                />
+                <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    width={26}
+                    allowDecimals={false}
+                    tick={{ fontSize: 8 }}
+                />
+                <ChartTooltip
+                    content={
+                        <ChartTooltipContent
+                            formatter={formatCount}
+                            labelFormatter={(label) => `Bucket starts at ${label}`}
+                        />
+                    }
+                />
+                {markerLabel != null && (
+                    <ReferenceLine
+                        x={markerLabel}
+                        stroke="hsl(var(--chart-3))"
+                        strokeWidth={2}
+                        label={{
+                            value: 'This',
+                            position: 'top',
+                            fill: 'hsl(var(--chart-3))',
+                            fontSize: 9,
+                        }}
+                    />
+                )}
+                <Bar
+                    dataKey="problem_count"
+                    fill="var(--color-problem_count)"
+                    radius={[2, 2, 0, 0]}
+                    name="Problems in bucket"
+                />
+            </BarChart>
+        </ChartContainer>
+    )
+}
+
 function CompactProblemStats({ problem_nm }: { problem_nm: string }) {
     const [submissions, setSubmissions] = useState<ProblemAnonymousSubmission[] | null>(null)
+    const [popularityBuckets, setPopularityBuckets] = useState<ProblemPopularityBucketEntry[]>([])
     const [colors, setColors] = useState<ColorMapping | null>(null)
     const [loading, setLoading] = useState(true)
     const [failed, setFailed] = useState(false)
@@ -688,15 +818,18 @@ function CompactProblemStats({ problem_nm }: { problem_nm: string }) {
         setFailed(false)
         setSubmissions(null)
         setColors(null)
+        setPopularityBuckets([])
         ;(async () => {
             try {
-                const [subs, colorMap] = await Promise.all([
+                const [subs, colorMap, buckets] = await Promise.all([
                     jutge.instructor.problems.getAnonymousSubmissions(problem_nm),
                     jutge.misc.getHexColors(),
+                    jutge.instructor.problems.getProblemPopularityBuckets().catch(() => []),
                 ])
                 if (!cancelled) {
                     setSubmissions(subs)
                     setColors(colorMap)
+                    setPopularityBuckets(Array.isArray(buckets) ? buckets : [])
                 }
             } catch {
                 if (!cancelled) setFailed(true)
@@ -784,7 +917,13 @@ function CompactProblemStats({ problem_nm }: { problem_nm: string }) {
                 </CompactStatCard>
             </div>
 
-            <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2 lg:grid-cols-4">
+                <CompactStatCard title="Problem popularity">
+                    <CompactProblemPopularityChart
+                        buckets={popularityBuckets}
+                        problemTotalSubmissions={stats.totalSubmissions}
+                    />
+                </CompactStatCard>
                 <CompactStatCard title="Attempts to solve">
                     <CompactAttemptsChartOnly
                         histogram={derived.attemptsToSolve.histogram}

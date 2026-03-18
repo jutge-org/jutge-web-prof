@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-18T14:27:56.661Z
+ * This file has been automatically generated at 2026-03-18T15:09:19.880Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -825,6 +825,13 @@ export type ShareWithInp = {
     problem_nm: string
     emails: string[]
     text: string
+}
+
+export type ProblemPopularityBucketEntry = {
+    log2_bucket: number
+    bucket_min: number
+    bucket_max: number
+    problem_count: number
 }
 
 export type SubmissionQuery = {
@@ -3558,6 +3565,18 @@ class Module_instructor_problems {
      */
     async setDeprecation(data: Deprecation): Promise<void> {
         const [output, ofiles] = await this.root.execute("instructor.problems.setDeprecation", data)
+        return output
+    }
+
+    /**
+     * Get the popularity buckets for all problems.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     * The buckets are sorted by the number of problems in each bucket by total number of submissions. The data is refreshed every hour.
+     */
+    async getProblemPopularityBuckets(): Promise<ProblemPopularityBucketEntry[]> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getProblemPopularityBuckets", null)
         return output
     }
 

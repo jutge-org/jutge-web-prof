@@ -41,6 +41,7 @@ import {
     HeatmapCalendar,
     Language,
     ProblemAnonymousSubmission,
+    ProblemPopularityBucketEntry,
 } from '@/lib/jutge_api_client'
 import { cn } from '@/lib/utils'
 import dayjs from 'dayjs'
@@ -886,72 +887,69 @@ function AttemptsToSolveChart({
     const formatCount = (value: unknown) => [String(value), 'Students'] as [string, string]
     return (
         <>
-            <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                <BarChart
-                    data={histogram}
-                    margin={{ top: 32, right: 8, bottom: 8, left: 52 }}
-                    barCategoryGap="10%"
-                >
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                        dataKey="label"
-                        tickLine={false}
-                        axisLine={false}
-                        label={{
-                            value: 'Attempts to first AC',
-                            position: 'insideBottom',
-                            offset: -4,
-                        }}
-                    />
-                    <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        width={40}
-                        label={{
-                            value: 'Number of students',
-                            angle: -90,
-                            position: 'center',
-                            style: { textAnchor: 'middle' },
-                        }}
-                    />
-                    <ChartTooltip
-                        content={
-                            <ChartTooltipContent
-                                formatter={formatCount}
-                                labelFormatter={(label) => `Attempts: ${label}`}
-                            />
-                        }
-                    />
-                    {medianAttempts != null && (
-                        <ReferenceLine
-                            x={String(medianAttempts)}
-                            stroke="hsl(var(--chart-3))"
-                            strokeWidth={2}
-                            strokeDasharray="4 4"
+            <div className="flex w-full items-stretch gap-1">
+                <div className="flex w-[1.125rem] shrink-0 items-center justify-center self-stretch sm:w-5">
+                    <span className="whitespace-nowrap text-xs text-muted-foreground [writing-mode:vertical-rl] rotate-180">
+                        Number of students
+                    </span>
+                </div>
+                <ChartContainer config={chartConfig} className="h-[300px] min-w-0 flex-1">
+                    <BarChart
+                        data={histogram}
+                        margin={{ top: 32, right: 8, bottom: 8, left: 4 }}
+                        barCategoryGap="10%"
+                    >
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                            dataKey="label"
+                            tickLine={false}
+                            axisLine={false}
                             label={{
-                                value: 'Median',
-                                position: 'top',
-                                fill: 'hsl(var(--chart-3))',
-                                offset: 4,
+                                value: 'Attempts to first AC',
+                                position: 'insideBottom',
+                                offset: -4,
                             }}
                         />
-                    )}
-                    <Bar
-                        dataKey="passed"
-                        fill="var(--color-passed)"
-                        stackId="a"
-                        radius={[0, 0, 4, 4]}
-                        name="Passed (AC)"
-                    />
-                    <Bar
-                        dataKey="neverPassed"
-                        fill="var(--color-neverPassed)"
-                        stackId="a"
-                        radius={[4, 4, 0, 0]}
-                        name="Did not pass"
-                    />
-                </BarChart>
-            </ChartContainer>
+                        <YAxis tickLine={false} axisLine={false} width={48} tickMargin={8} />
+                        <ChartTooltip
+                            content={
+                                <ChartTooltipContent
+                                    formatter={formatCount}
+                                    labelFormatter={(label) => `Attempts: ${label}`}
+                                />
+                            }
+                        />
+                        {medianAttempts != null && (
+                            <ReferenceLine
+                                x={String(medianAttempts)}
+                                stroke="hsl(var(--chart-3))"
+                                strokeWidth={2}
+                                strokeDasharray="4 4"
+                                label={{
+                                    value: 'Median',
+                                    position: 'top',
+                                    fill: 'hsl(var(--chart-3))',
+                                    offset: 4,
+                                }}
+                            />
+                        )}
+                        <Bar
+                            dataKey="passed"
+                            fill="var(--color-passed)"
+                            stackId="a"
+                            radius={[0, 0, 4, 4]}
+                            name="Passed (AC)"
+                        />
+                        <Bar
+                            dataKey="neverPassed"
+                            fill="var(--color-neverPassed)"
+                            stackId="a"
+                            radius={[4, 4, 0, 0]}
+                            name="Did not pass"
+                        />
+                    </BarChart>
+                </ChartContainer>
+            </div>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 {totalPassed > 0 && (
                     <>
@@ -1119,6 +1117,149 @@ function SubmissionsByLanguageChart({
     )
 }
 
+/** X-axis tick: logarithmic scale as 2^0, 2^1, 2^2, … (plus 0 and open-ended tail). */
+function formatPopularityBucketPowerLabel(b: ProblemPopularityBucketEntry): string {
+    const { bucket_min, bucket_max, log2_bucket } = b
+    const openEnded = bucket_max > 1e15 || bucket_max <= bucket_min
+    if (bucket_min === 0 && bucket_max <= 1) {
+        return '0'
+    }
+    if (openEnded) {
+        return `2^${log2_bucket}+`
+    }
+    return `2^${log2_bucket}`
+}
+
+/** Bucket row for chart (X = 2^k scale, Y = how many problems fall in that range). */
+function buildPopularityChartData(buckets: ProblemPopularityBucketEntry[]) {
+    return [...buckets]
+        .sort((a, b) => a.bucket_min - b.bucket_min)
+        .map((b) => ({
+            label: formatPopularityBucketPowerLabel(b),
+            problem_count: b.problem_count,
+        }))
+}
+
+/** Label of the bucket where this problem's submission count falls (half-open [min, max), last bucket inclusive). */
+function findPopularityBucketLabel(
+    buckets: ProblemPopularityBucketEntry[],
+    totalSubmissions: number,
+): string | null {
+    if (buckets.length === 0) return null
+    const sorted = [...buckets].sort((a, b) => a.bucket_min - b.bucket_min)
+    for (let i = 0; i < sorted.length; i++) {
+        const b = sorted[i]
+        const isLast = i === sorted.length - 1
+        if (isLast) {
+            if (totalSubmissions >= b.bucket_min) return formatPopularityBucketPowerLabel(b)
+        } else if (totalSubmissions >= b.bucket_min && totalSubmissions < b.bucket_max) {
+            return formatPopularityBucketPowerLabel(b)
+        }
+    }
+    if (totalSubmissions < sorted[0].bucket_min) {
+        return formatPopularityBucketPowerLabel(sorted[0])
+    }
+    return formatPopularityBucketPowerLabel(sorted[sorted.length - 1])
+}
+
+type ProblemPopularityChartProps = {
+    buckets: ProblemPopularityBucketEntry[]
+    problemTotalSubmissions: number
+}
+
+function ProblemPopularityChart({ buckets, problemTotalSubmissions }: ProblemPopularityChartProps) {
+    const chartData = useMemo(() => buildPopularityChartData(buckets), [buckets])
+    const markerLabel = useMemo(
+        () => findPopularityBucketLabel(buckets, problemTotalSubmissions),
+        [buckets, problemTotalSubmissions],
+    )
+    const chartConfig = {
+        label: { label: 'Submissions (per problem)', color: 'hsl(var(--muted-foreground))' },
+        problem_count: {
+            label: 'Problems in bucket',
+            color: 'hsl(221 83% 53%)',
+        },
+    }
+    const formatCount = (value: unknown) => [String(value), 'Problems'] as [string, string]
+
+    if (chartData.length === 0) {
+        return (
+            <div className="flex h-[220px] w-full items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+                No popularity data
+            </div>
+        )
+    }
+
+    return (
+        <>
+            <ChartContainer config={chartConfig} className="h-[350px] w-full aspect-auto">
+                <BarChart
+                    data={chartData}
+                    margin={{ top: 28, right: 12, bottom: 56, left: 48 }}
+                    barCategoryGap="12%"
+                >
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                    <XAxis
+                        dataKey="label"
+                        tickLine={false}
+                        axisLine={false}
+                        interval={0}
+                        tick={{ fontSize: 10 }}
+                        angle={-35}
+                        textAnchor="end"
+                        height={52}
+                        label={{
+                            value: 'Submissions per problem (2^k scale)',
+                            position: 'insideBottom',
+                            offset: -2,
+                            style: { fontSize: 11 },
+                        }}
+                    />
+                    <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        width={44}
+                        allowDecimals={false}
+                        label={{
+                            value: 'Number of problems',
+                            angle: -90,
+                            position: 'insideLeft',
+                            style: { textAnchor: 'middle' },
+                        }}
+                    />
+                    <ChartTooltip
+                        content={
+                            <ChartTooltipContent
+                                formatter={formatCount}
+                                labelFormatter={(label) => `Bucket starts at ${label}`}
+                            />
+                        }
+                    />
+                    {markerLabel != null && (
+                        <ReferenceLine
+                            x={markerLabel}
+                            stroke="hsl(var(--chart-3))"
+                            strokeWidth={2}
+                            label={{
+                                value: 'This problem',
+                                position: 'top',
+                                fill: 'hsl(var(--chart-3))',
+                                fontSize: 11,
+                            }}
+                        />
+                    )}
+                    <Bar
+                        dataKey="problem_count"
+                        fill="var(--color-problem_count)"
+                        radius={[4, 4, 0, 0]}
+                        name="Problems in bucket"
+                    />
+                </BarChart>
+            </ChartContainer>
+        </>
+    )
+}
+
 // -----------------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------------
@@ -1153,19 +1294,24 @@ function ProblemStatisticsView() {
     const [startDate, setStartDate] = useState<Date | null>(null)
     const [endDate, setEndDate] = useState<Date | null>(null)
     const [settingsOpen, setSettingsOpen] = useState(false)
+    const [popularityBuckets, setPopularityBuckets] = useState<
+        ProblemPopularityBucketEntry[] | null
+    >(null)
 
     useEffect(() => {
         async function fetchData() {
-            const [submissions, colorMap, languages, abstract] = await Promise.all([
+            const [submissions, colorMap, languages, abstract, buckets] = await Promise.all([
                 jutge.instructor.problems.getAnonymousSubmissions(problem_nm),
                 jutge.misc.getHexColors(),
                 jutge.tables.getLanguages(),
                 jutge.problems.getAbstractProblem(problem_nm),
+                jutge.instructor.problems.getProblemPopularityBuckets(),
             ])
             setStatistics({ submissions })
             setColors(colorMap)
             setLanguagesTable(languages)
             setAbstractProblem(abstract)
+            setPopularityBuckets(buckets)
             setSelectedProblemIds(
                 new Set(Object.values(abstract.problems).map((p) => p.problem_id)),
             )
@@ -1267,7 +1413,8 @@ function ProblemStatisticsView() {
         colors === null ||
         abstractProblem === null ||
         startDate === null ||
-        endDate === null
+        endDate === null ||
+        popularityBuckets === null
     ) {
         return <SimpleSpinner />
     }
@@ -1277,6 +1424,8 @@ function ProblemStatisticsView() {
         setStartDate(start)
         setEndDate(end)
     }
+
+    const problemTotalSubmissionsAllTime = statistics.submissions.length
 
     return (
         <div className="flex w-full flex-col gap-4">
@@ -1305,6 +1454,22 @@ function ProblemStatisticsView() {
                 </StatCard>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <Card className="w-full">
+                    <CardHeader className="p-4">
+                        <CardTitle>Problem popularity</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            The more to the right, the more submissions the problem has and more
+                            popular it is.
+                        </p>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                        <ProblemPopularityChart
+                            buckets={popularityBuckets}
+                            problemTotalSubmissions={problemTotalSubmissionsAllTime}
+                        />
+                    </CardContent>
+                </Card>
+
                 <Card className="w-full">
                     <CardHeader className="p-4">
                         <CardTitle>Attempts to solve</CardTitle>
