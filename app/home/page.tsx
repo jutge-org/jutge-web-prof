@@ -67,6 +67,7 @@ export default function HomePage() {
                             <b>News</b>
                         </div>
                         <ul className="ml-4 mt-4 list-disc list-outside space-y-2">
+                            <li>2026-03-18: Problem popularity charts added.</li>
                             <li>2026-03-18: Problem sharing via email added.</li>
                             <li>2026-03-18: Nicer tabs in the Problems section.</li>
                             <li>2026-03-03: Problem statistics available.</li>
