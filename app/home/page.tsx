@@ -2,13 +2,23 @@
 
 import { BotMessageSquareIcon, FileWarning, MessageSquareWarningIcon, RssIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Page from '../../components/layout/Page'
 import { useAuth } from '../../components/layout/lib/Auth'
 import { menus } from '../../lib/menus'
+import jutge from '@/lib/jutge'
 
 export default function HomePage() {
     const auth = useAuth()
+
+    useEffect(() => {
+        // we do not use this data here but we load it to cache it and have it ready for the other pages
+        async function load() {
+            const allAbstract = await jutge.problems.getAllAbstractProblems()
+            console.log(allAbstract)
+        }
+        load()
+    }, [])
 
     if (!auth.user) {
         return (
