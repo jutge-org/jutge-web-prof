@@ -83,9 +83,9 @@ export const menus: Record<string, Menu> = {
             icon2xl: <PuzzleIcon size={52} strokeWidth={0.8} />,
             shortcut: 'P',
         },
-        store: {
-            href: '/store',
-            name: 'Store',
+        finder: {
+            href: '/finder',
+            name: 'Finder',
             icon: <StoreIcon />,
             icon2xl: <StoreIcon size={52} strokeWidth={0.8} />,
         },
@@ -243,19 +243,19 @@ export const menus: Record<string, Menu> = {
         },
     },
 
-    store: {
+    finder: {
         search: {
-            href: '/store/search',
+            href: '/finder/search',
             name: 'Search',
         },
         up: {
-            href: '/store',
+            href: '/finder',
             name: 'Up',
             icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
         },
     },
 
-    storeProblem: {
+    finderProblem: {
         properties: {
             href: 'properties',
             name: 'Properties',
@@ -277,7 +277,7 @@ export const menus: Record<string, Menu> = {
             name: 'Statistics',
         },
         up: {
-            href: '/store',
+            href: '/finder',
             name: 'Up',
             icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
         },

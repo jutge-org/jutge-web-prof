@@ -10,11 +10,11 @@ export default function StoreProblemStatementPage() {
     return (
         <Page
             pageContext={{
-                title: `Store ❯ ${problem_nm}`,
+                title: `Finder ❯ ${problem_nm}`,
                 menu: 'user',
-                current: 'store',
-                subTitle: `Store ❯ ${problem_nm}`,
-                subMenu: 'storeProblem',
+                current: 'finder',
+                subTitle: `Finder ❯ ${problem_nm}`,
+                subMenu: 'finderProblem',
                 subCurrent: 'statement',
             }}
         >

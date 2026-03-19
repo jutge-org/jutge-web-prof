@@ -5,5 +5,5 @@ import { redirect } from 'next/navigation'
 
 export default function StoreProblemPage() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
-    redirect(`/store/${problem_nm}/properties`)
+    redirect(`/finder/${problem_nm}/properties`)
 }

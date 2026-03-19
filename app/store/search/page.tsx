@@ -82,10 +82,10 @@ export default function StoreSearchPage() {
         <Page
             pageContext={{
                 menu: 'user',
-                current: 'store',
-                title: 'Store',
-                subTitle: `Store ❯ Search`,
-                subMenu: 'store',
+                current: 'finder',
+                title: 'Finder',
+                subTitle: `Finder ❯ Search`,
+                subMenu: 'finder',
                 subCurrent: 'search',
             }}
         >
@@ -1011,7 +1011,7 @@ function Result(props: ResultProps) {
         <div className="border rounded-lg px-4 py-3 flex flex-col">
             <div className="mb-1 flex flex-row gap-2">
                 <Link
-                    href={`/store/${props.result.problem_nm}`}
+                    href={`/finder/${props.result.problem_nm}`}
                     className="font-bold text-primary hover:underline"
                 >
                     {props.result.problem_nm}
