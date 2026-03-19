@@ -12,7 +12,6 @@ import { mapmap } from '@/lib/utils'
 import { ICellRendererParams } from 'ag-grid-community'
 import {
     BotIcon,
-    BotMessageSquareIcon,
     CodeXmlIcon,
     FileCodeIcon,
     ListTodoIcon,
@@ -245,7 +244,6 @@ function FinderListView() {
         <>
             <AgTableFull rowData={rows} columnDefs={colDefs as any} loading={loading} />
             <div className="mt-4 flex flex-row gap-2 items-center">
-                <div className="flex-grow" />
                 <div className="text-xs text-gray-500">{rows.length} available problems</div>
                 <div className="flex-grow" />
                 <Input
