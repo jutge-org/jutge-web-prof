@@ -86,8 +86,8 @@ export const menus: Record<string, Menu> = {
         finder: {
             href: '/finder',
             name: 'Finder',
-            icon: <StoreIcon />,
-            icon2xl: <StoreIcon size={52} strokeWidth={0.8} />,
+            icon: <SearchIcon />,
+            icon2xl: <SearchIcon size={52} strokeWidth={0.8} />,
         },
         jutgeai: {
             href: '/jutgeai',

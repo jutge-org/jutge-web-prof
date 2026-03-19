@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { JSX, useEffect, useMemo, useRef, useState } from 'react'
 import {
     Area,
@@ -113,11 +114,15 @@ function SearchView(props: SearchViewProps) {
 
     const [semanticQuery, setSemanticQuery] = useState('')
     const [fullTextQuery, setFullTextQuery] = useState('')
+    const searchParams = useSearchParams()
+    const initialQuery = (searchParams.get('q') ?? '').trim()
+    const initialMode = searchParams.get('mode') === 'semantic' ? 'semantic' : 'fulltext'
+    const hasAutoSearchedRef = useRef(false)
 
-    async function semanticSearch() {
+    async function semanticSearch(queryOverride?: string) {
         if (searching) return
         setResults((old) => undefined)
-        const query = semanticQuery.trim()
+        const query = (queryOverride ?? semanticQuery).trim()
         setSemanticQuery((old) => query)
         if (query.length === 0) return
         setSearching((old) => true)
@@ -126,10 +131,10 @@ function SearchView(props: SearchViewProps) {
         setResults((old) => results)
     }
 
-    async function fullTextSearch() {
+    async function fullTextSearch(queryOverride?: string) {
         if (searching) return
         setResults((old) => undefined)
-        const query = fullTextQuery.trim()
+        const query = (queryOverride ?? fullTextQuery).trim()
         setFullTextQuery((old) => query)
         if (query.length === 0) return
         setSearching(true)
@@ -137,6 +142,17 @@ function SearchView(props: SearchViewProps) {
         setSearching((old) => false)
         setResults((old) => results)
     }
+
+    useEffect(() => {
+        if (hasAutoSearchedRef.current) return
+        if (initialQuery.length === 0) return
+        hasAutoSearchedRef.current = true
+        if (initialMode === 'semantic') {
+            void semanticSearch(initialQuery)
+        } else {
+            void fullTextSearch(initialQuery)
+        }
+    }, [initialMode, initialQuery, semanticSearch, fullTextSearch])
 
     return (
         <div>
@@ -147,6 +163,7 @@ function SearchView(props: SearchViewProps) {
                 setFullTextQuery={setFullTextQuery}
                 handleSemanticSearch={semanticSearch}
                 handleFullTextSearch={fullTextSearch}
+                defaultTab={initialMode}
             />
 
             {searching && <Searching />}
@@ -1213,13 +1230,14 @@ type SearchTabsComponentProps = {
     setFullTextQuery: (query: string) => void
     handleSemanticSearch: () => void
     handleFullTextSearch: () => void
+    defaultTab: 'semantic' | 'fulltext'
 }
 
 function SearchTabsComponent(props: SearchTabsComponentProps) {
     return (
         <div className="w-full border rounded-lg p-6 mb-4">
             <div className="w-full sm:w-3/4 mx-auto">
-                <Tabs defaultValue="semantic" className="w-full">
+                <Tabs defaultValue={props.defaultTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="semantic">
                             <BotIcon className="mr-2 -mt-1" size={16} />
