@@ -16,6 +16,7 @@ import {
     PuzzleIcon,
     SearchIcon,
     SquareCodeIcon,
+    StoreIcon,
     TableIcon,
     WrenchIcon,
 } from 'lucide-react'
@@ -82,12 +83,11 @@ export const menus: Record<string, Menu> = {
             icon2xl: <PuzzleIcon size={52} strokeWidth={0.8} />,
             shortcut: 'P',
         },
-        search: {
-            href: '/search',
-            name: 'Search',
-            icon: <SearchIcon />,
-            icon2xl: <SearchIcon size={52} strokeWidth={0.8} />,
-            shortcut: 'S',
+        store: {
+            href: '/store',
+            name: 'Store',
+            icon: <StoreIcon />,
+            icon2xl: <StoreIcon size={52} strokeWidth={0.8} />,
         },
         jutgeai: {
             href: '/jutgeai',
@@ -238,6 +238,46 @@ export const menus: Record<string, Menu> = {
     search: {
         up: {
             href: '.',
+            name: 'Up',
+            icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
+        },
+    },
+
+    store: {
+        search: {
+            href: '/store/search',
+            name: 'Search',
+        },
+        up: {
+            href: '/store',
+            name: 'Up',
+            icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
+        },
+    },
+
+    storeProblem: {
+        properties: {
+            href: 'properties',
+            name: 'Properties',
+        },
+        statement: {
+            href: 'statement',
+            name: 'Statement',
+        },
+        testcases: {
+            href: 'testcases',
+            name: 'Test cases',
+        },
+        solutions: {
+            href: 'solutions',
+            name: 'Solutions',
+        },
+        statistics: {
+            href: 'statistics',
+            name: 'Statistics',
+        },
+        up: {
+            href: '/store',
             name: 'Up',
             icon: <FolderUpIcon strokeWidth={1.5} size="1.5em" />,
         },

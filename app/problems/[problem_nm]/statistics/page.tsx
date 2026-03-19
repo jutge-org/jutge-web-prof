@@ -1282,7 +1282,7 @@ export default function ProblemStatisticsPage() {
     )
 }
 
-function ProblemStatisticsView() {
+export function ProblemStatisticsView() {
     const { problem_nm } = useParams<{ problem_nm: string }>()
     const [statistics, setStatistics] = useState<{
         submissions: ProblemAnonymousSubmission[]
