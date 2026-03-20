@@ -5,10 +5,14 @@ import { ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import {
     BotIcon,
+    CodeXmlIcon,
     FileBoxIcon,
     FileCodeIcon,
+    ListTodoIcon,
     LockIcon,
+    PenToolIcon,
     SquarePlusIcon,
+    SwordsIcon,
     UnlockIcon,
     WrenchIcon,
 } from 'lucide-react'
@@ -32,6 +36,8 @@ import { mapmap } from '../../lib/utils'
 type ProblemRow = {
     problem_nm: string
     title: string
+    type: string | null
+    compilers: string | null
     created_at: any // TODO
     updated_at: any // TODO
     deprecated: boolean
@@ -99,6 +105,8 @@ function ProblemsListView() {
                     return {
                         problem_nm,
                         title: buildTitle(abstractProblem.problem_nm),
+                        type: abstractProblem.type,
+                        compilers: abstractProblem.compilers,
                         created_at: abstractProblem.created_at,
                         updated_at: abstractProblem.updated_at,
                         deprecated: abstractProblem.deprecation !== null,
@@ -196,6 +204,55 @@ function ProblemsListView() {
                     )}
                 </div>
             ),
+        },
+        {
+            field: 'type',
+            headerName: 'Type',
+            width: 150,
+            filter: true,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            cellRenderer: (p: ICellRendererParams<ProblemRow>) => {
+                const type = p.data!.type ?? '—'
+                const compilers = p.data!.compilers?.trim()
+                const normalizedType = type.toLowerCase()
+                const Icon =
+                    normalizedType === 'graphic'
+                        ? PenToolIcon
+                        : normalizedType === 'game'
+                          ? SwordsIcon
+                          : normalizedType === 'classic' || normalizedType === 'std'
+                            ? FileCodeIcon
+                            : normalizedType === 'quiz'
+                              ? ListTodoIcon
+                              : CodeXmlIcon
+
+                return (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex w-full items-center gap-1">
+                                    <span title={type} aria-label={type}>
+                                        <Icon size={16} />
+                                    </span>
+                                    {compilers ? (
+                                        <Badge
+                                            variant="secondary"
+                                            className="max-w-24 truncate px-1 font-normal"
+                                            title={compilers}
+                                        >
+                                            {compilers}
+                                        </Badge>
+                                    ) : null}
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{type}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )
+            },
+            valueGetter: (p: ICellRendererParams<ProblemRow>) => p.data!.type ?? '—',
         },
         {
             field: 'languages',

@@ -120,7 +120,7 @@ function FinderListView() {
                                     {compilers ? (
                                         <Badge
                                             variant="secondary"
-                                            className="max-w-24 truncate px-1"
+                                            className="max-w-24 truncate px-1 font-normal"
                                             title={compilers}
                                         >
                                             {compilers}
