@@ -5,10 +5,8 @@ import { ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import {
     BotIcon,
-    BotMessageSquareIcon,
     FileBoxIcon,
     FileCodeIcon,
-    KeyRoundIcon,
     LockIcon,
     SquarePlusIcon,
     UnlockIcon,
@@ -83,7 +81,9 @@ function ProblemsListView() {
                 const ownProblems = await jutge.instructor.problems.getOwnProblems()
                 const ownProblemsSharingSettings =
                     await jutge.instructor.problems.getAllSharingSettings()
-                const abstractProblems = await jutge.problems.getAbstractProblems(ownProblems.join(','))
+                const abstractProblems = await jutge.problems.getAbstractProblems(
+                    ownProblems.join(','),
+                )
                 const sharingByProblem: Record<string, SharingSettings> = Object.fromEntries(
                     ownProblemsSharingSettings.map((s) => [s.problem_nm, s]),
                 )
@@ -211,8 +211,7 @@ function ProblemsListView() {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Badge variant="secondary" className="mr-1 px-2">
-                                            {language}{' '}
-                                            <BotMessageSquareIcon size={12} className="ml-1" />
+                                            {language}
                                         </Badge>
                                     </TooltipTrigger>
                                     <TooltipContent className="flex flex-col w-64 gap-2">
