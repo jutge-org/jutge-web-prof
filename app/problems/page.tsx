@@ -236,7 +236,7 @@ function ProblemsListView() {
                                     </span>
                                     {compilers ? (
                                         <Badge
-                                            variant="secondary"
+                                            variant="outline"
                                             className="max-w-24 truncate px-1 font-normal"
                                             title={compilers}
                                         >
@@ -267,7 +267,7 @@ function ProblemsListView() {
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Badge variant="secondary" className="mr-1 px-2">
+                                        <Badge variant="outline" className="mr-1 px-2">
                                             {language}
                                         </Badge>
                                     </TooltipTrigger>

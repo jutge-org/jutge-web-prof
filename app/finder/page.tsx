@@ -119,7 +119,7 @@ function FinderListView() {
                                     </span>
                                     {compilers ? (
                                         <Badge
-                                            variant="secondary"
+                                            variant="outline"
                                             className="max-w-24 truncate px-1 font-normal"
                                             title={compilers}
                                         >
@@ -141,61 +141,70 @@ function FinderListView() {
             field: 'languages',
             width: 150,
             filter: true,
-            cellStyle: { display: 'flex', justifyContent: 'flex-start', alignItems: 'center' },
-            cellRenderer: (p: ICellRendererParams<FinderProblemRow>) => {
-                const abstractProblem = p.data!.abstractProblems[p.data!.problem_nm]
-                return (
-                    <div className="flex flex-wrap justify-start gap-1">
-                        {p.data!.languages.map((language: string) => {
-                            const briefProblem = Object.values(
-                                abstractProblem?.problems ?? {},
-                            ).find((problem) => problem.language_id === language)
-                            return briefProblem?.summary ? (
-                                <TooltipProvider key={language}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Badge variant="secondary" className="px-1">
-                                                {language}
-                                            </Badge>
-                                        </TooltipTrigger>
-                                        <TooltipContent className="flex flex-col w-64 gap-2">
-                                            <p className="font-semibold">
-                                                {briefProblem.summary.summary_1s}
-                                            </p>
-                                            <p>{briefProblem.summary.summary_1p}</p>
-                                            <p>
-                                                {briefProblem.summary.keywords.replaceAll(
-                                                    ',',
-                                                    ', ',
-                                                )}
-                                            </p>
-                                            <p className="flex gap-1">
-                                                <BotIcon size={14} className="" />
-                                                {briefProblem.summary.model}
-                                            </p>
-                                            <hr />
-                                            <p>
-                                                {abstractProblem?.solution_tags?.tags.replaceAll(
-                                                    ',',
-                                                    ', ',
-                                                )}
-                                            </p>
-                                            <p className="flex gap-1">
-                                                <BotIcon size={14} className="" />
-                                                {abstractProblem?.solution_tags?.model}
-                                            </p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            ) : (
-                                <Badge key={language} variant="secondary" className="px-2">
-                                    {language}
-                                </Badge>
-                            )
-                        })}
+            cellRenderer: (p: ICellRendererParams<FinderProblemRow>) =>
+                p.data!.languages.map((language: string) => (
+                    <div key={language}>
+                        {p.data!.abstractProblems[p.data!.problem_nm]?.problems[
+                            `${p.data!.problem_nm}_${language}`
+                        ]?.summary ? (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge variant="outline" className="mr-1 px-2">
+                                            {language}
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="flex flex-col w-64 gap-2">
+                                        <p className="font-semibold">
+                                            {
+                                                p.data!.abstractProblems[p.data!.problem_nm]
+                                                    .problems[`${p.data!.problem_nm}_${language}`]
+                                                    ?.summary?.summary_1s
+                                            }
+                                        </p>
+                                        <p>
+                                            {
+                                                p.data!.abstractProblems[p.data!.problem_nm]
+                                                    .problems[`${p.data!.problem_nm}_${language}`]
+                                                    ?.summary?.summary_1p
+                                            }
+                                        </p>
+                                        <p>
+                                            {p.data!.abstractProblems[p.data!.problem_nm].problems[
+                                                `${p.data!.problem_nm}_${language}`
+                                            ]?.summary?.keywords.replaceAll(',', ', ')}
+                                        </p>
+                                        <p className="flex gap-1">
+                                            <BotIcon size={14} className="" />
+                                            {
+                                                p.data!.abstractProblems[p.data!.problem_nm]
+                                                    .problems[`${p.data!.problem_nm}_${language}`]
+                                                    ?.summary?.model
+                                            }
+                                        </p>
+                                        <hr />
+                                        <p>
+                                            {p.data!.abstractProblems[
+                                                p.data!.problem_nm
+                                            ].solution_tags?.tags.replaceAll(',', ', ')}
+                                        </p>
+                                        <p className="flex gap-1">
+                                            <BotIcon size={14} className="" />
+                                            {
+                                                p.data!.abstractProblems[p.data!.problem_nm]
+                                                    .solution_tags?.model
+                                            }
+                                        </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        ) : (
+                            <Badge variant="secondary" className="mr-1 px-2">
+                                {language}
+                            </Badge>
+                        )}
                     </div>
-                )
-            },
+                )),
             valueGetter: (p: ICellRendererParams<FinderProblemRow>) => p.data!.languages.join(', '),
         },
     ]
