@@ -33,6 +33,8 @@ export function AgTableFull(props: any) {
                 theme={mode === 'dark' ? myThemeDark : myThemeLight}
                 animateRows={false}
                 suppressColumnMoveAnimation={true}
+                enableCellTextSelection={true} // allows text selection in cells
+                ensureDomOrder={true} // recommended alongside the above
             />
         </div>
     )
@@ -47,6 +49,8 @@ export function AgTable(props: any) {
             theme={mode === 'dark' ? myThemeDark : myThemeLight}
             animateRows={false}
             suppressColumnMoveAnimation={true}
+            enableCellTextSelection={true} // allows text selection in cells
+            ensureDomOrder={true} // recommended alongside the above
         />
     )
 }
@@ -62,6 +66,8 @@ export function AgTableAutoHeight(props: any) {
                 domLayout="autoHeight"
                 animateRows={false}
                 suppressColumnMoveAnimation={true}
+                enableCellTextSelection={true} // allows text selection in cells
+                ensureDomOrder={true} // recommended alongside the above
             />
         </div>
     )
