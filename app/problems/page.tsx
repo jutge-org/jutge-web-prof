@@ -6,11 +6,15 @@ import dayjs from 'dayjs'
 import {
     BotIcon,
     BotMessageSquareIcon,
+    BugIcon,
     FileBoxIcon,
     FileCodeIcon,
     KeyRoundIcon,
     LockIcon,
+    SkullIcon,
     SquarePlusIcon,
+    ThumbsDownIcon,
+    ThumbsUpIcon,
     UnlockIcon,
     WrenchIcon,
 } from 'lucide-react'
@@ -42,6 +46,7 @@ type ProblemRow = {
     shared_testcases: boolean
     shared_solutions: boolean
     abstractProblems: Record<string, AbstractProblem>
+    checked: boolean
 }
 
 export default function ProblemsListPage() {
@@ -83,7 +88,9 @@ function ProblemsListView() {
                 const ownProblems = await jutge.instructor.problems.getOwnProblems()
                 const ownProblemsSharingSettings =
                     await jutge.instructor.problems.getAllSharingSettings()
-                const abstractProblems = await jutge.problems.getAbstractProblems(ownProblems.join(','))
+                const abstractProblems = await jutge.problems.getAbstractProblems(
+                    ownProblems.join(','),
+                )
                 const sharingByProblem: Record<string, SharingSettings> = Object.fromEntries(
                     ownProblemsSharingSettings.map((s) => [s.problem_nm, s]),
                 )
@@ -109,6 +116,9 @@ function ProblemsListView() {
                         passcode: sharing?.passcode === null,
                         shared_testcases: sharing?.shared_testcases ?? false,
                         shared_solutions: sharing?.shared_solutions ?? false,
+                        checked: Object.values(abstractProblem.problems).every(
+                            (problem) => problem.checked !== 0,
+                        ),
                         abstractProblems,
                     }
                 })
@@ -123,9 +133,9 @@ function ProblemsListView() {
         fetchProblems()
     }, [])
 
-    function showDeprecatedChange(checked: boolean) {
-        setShowDeprecated(checked)
-        if (checked) setProblemRows(problemRowsAll.filter((row) => row.deprecated))
+    function showDeprecatedChange(deprecationChecked: boolean) {
+        setShowDeprecated(deprecationChecked)
+        if (deprecationChecked) setProblemRows(problemRowsAll.filter((row) => row.deprecated))
         else setProblemRows(problemRowsAll.filter((row) => !row.deprecated))
     }
 
@@ -267,6 +277,27 @@ function ProblemsListView() {
                     </div>
                 )),
             valueGetter: (p: ICellRendererParams<ProblemRow>) => p.data!.languages.join(', '),
+        },
+        {
+            field: 'alerts',
+            headerName: 'Alerts',
+            width: 80,
+            filter: false,
+            sort: false,
+            cellRenderer: (p: ICellRendererParams<ProblemRow>) => (
+                <div className="flex flex-row gap-2 mt-3">
+                    {!p.data!.checked && (
+                        <span title="Check failed">
+                            <BugIcon size={14} className="text-red-800 animate-pulse" />
+                        </span>
+                    )}
+                    {p.data!.deprecated && (
+                        <span title="Deprecated">
+                            <SkullIcon size={14} className="text-red-800" />
+                        </span>
+                    )}
+                </div>
+            ),
         },
     ])
 

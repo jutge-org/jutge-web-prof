@@ -11,7 +11,7 @@ import { AbstractProblem } from '@/lib/jutge_api_client'
 import { mapmap, offerDownloadFile } from '@/lib/utils'
 import dayjs from 'dayjs'
 import LocalizedFormat from 'dayjs/plugin/localizedFormat'
-import { BotIcon, CloudDownloadIcon } from 'lucide-react'
+import { BotIcon, BugIcon, CloudDownloadIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -86,6 +86,7 @@ function ProblemPropertiesView() {
                             <TableRow>
                                 <TableCell className="font-bold">Problem</TableCell>
                                 <TableCell className="font-bold">Title</TableCell>
+                                <TableCell className="font-bold">Alerts</TableCell>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -97,6 +98,16 @@ function ProblemPropertiesView() {
                                         </Link>
                                     </TableCell>
                                     <TableCell>{problem.title}</TableCell>
+                                    <TableCell>
+                                        {problem.checked === 0 ? (
+                                            <span title="Check failed">
+                                                <BugIcon
+                                                    size={14}
+                                                    className="text-red-800 animate-pulse"
+                                                />
+                                            </span>
+                                        ) : null}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
