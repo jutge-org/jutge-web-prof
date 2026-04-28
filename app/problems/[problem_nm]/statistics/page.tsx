@@ -393,6 +393,7 @@ type DashboardStats = {
     passRatePct: number
     passedCount: number
     neverPassed: number
+    seCount: number
 }
 
 function StatisticsDashboardCard({ stats }: { stats: DashboardStats }) {
@@ -402,7 +403,7 @@ function StatisticsDashboardCard({ stats }: { stats: DashboardStats }) {
     return (
         <Card className="w-full overflow-hidden">
             <CardContent className="p-0">
-                <div className="grid grid-cols-2 md:grid-cols-5">
+                <div className="grid grid-cols-2 md:grid-cols-6">
                     <div className="flex flex-col gap-1 p-4 md:p-5">
                         <span className="text-xs font-medium uppercase tracking-wider ">
                             Submissions
@@ -434,6 +435,16 @@ function StatisticsDashboardCard({ stats }: { stats: DashboardStats }) {
                         <span className="text-4xl font-bold text-gray-500">
                             {stats.neverPassed}
                         </span>
+                    </div>
+                    <div className="flex flex-col gap-1 p-4 md:p-5">
+                        <span className="text-xs font-medium uppercase tracking-wider">
+                            <span
+                                className={stats.seCount > 4 ? 'text-red-600 font-bold' : undefined}
+                            >
+                                Setter errors
+                            </span>
+                        </span>
+                        <span className="text-4xl font-bold text-gray-500">{stats.seCount}</span>
                     </div>
                 </div>
             </CardContent>
@@ -1406,6 +1417,7 @@ function ProblemStatisticsView() {
         passRatePct: totalUsers > 0 ? (derived.usersOkKo.OK / totalUsers) * 100 : 0,
         passedCount: derived.usersOkKo.OK,
         neverPassed: derived.usersOkKo.KO,
+        seCount: filteredSubmissions.filter((s) => s.verdict === 'SE').length,
     }
 
     if (
