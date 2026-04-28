@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-03-18T15:09:19.880Z
+ * This file has been automatically generated at 2026-04-28T09:07:30.327Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -365,14 +365,40 @@ export type SubmissionSchema = {
 
 export type GetGameResultOut = {
     games: MatchSchema[]
-    problem: ProblemSchema
-    submission: SubmissionSchema
 }
 
 export type GetGameOutputIn = {
     problem_id: string
     submission_id: string
     game_id: number
+}
+
+export type CodeMetrics = {
+    comment_ratio: number
+    cyclomatic_complexity: number
+    fanout_external: number
+    fanout_internal: number
+    halstead_bugprop: number
+    halstead_difficulty: number
+    halstead_effort: number
+    halstead_timerequired: number
+    halstead_volume: number
+    loc: number
+    maintainability_index: number
+    operands_sum: number
+    operands_uniq: number
+    operators_sum: number
+    operators_uniq: number
+    pylint: number
+    tiobe: number
+    tiobe_compiler: number
+    tiobe_complexity: number
+    tiobe_coverage: number
+    tiobe_duplication: number
+    tiobe_fanout: number
+    tiobe_functional: number
+    tiobe_security: number
+    tiobe_standard: number
 }
 
 export type PublicProfile = {
@@ -812,6 +838,12 @@ export type SharingSettings = {
     shared_solutions: boolean
 }
 
+export type ProblemAlerts = {
+    problem_nm: string
+    se_count: number
+    ie_count: number
+}
+
 export type ProblemAnonymousSubmission = {
     time: string
     anonymous_user_id: string
@@ -895,13 +927,11 @@ export type SubmitMatchInput = {
 
 export type SubmitMatchOutput = NewSubmissionOut
 
-export type GetGameResultOutput = {
-    todo: string
-}
-
 export type GetMatchSubmissionInput = GetGameResultIn
 
-export type GetMatchSubmissionOutput = GetGameResultOutput
+export type GetMatchSubmissionOutput = {
+    todo: string
+}
 
 export type InstructorEntry = {
     username: string
@@ -2027,6 +2057,18 @@ class Module_problems {
         const [output, ofiles] = await this.root.execute("problems.fullTextSearch", data)
         return output
     }
+
+    /**
+     * Get solutions for a problem.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     * The keys are the proglangs and the values are the solutions in base64. Pemission is granted to admin, ownerof the problem and instructor when shared solutions are enabled.
+     */
+    async getSolutions(problem_id: string): Promise<Record<string, string>> {
+        const [output, ofiles] = await this.root.execute("problems.getSolutions", problem_id)
+        return output
+    }
 }
 
 /**
@@ -2449,13 +2491,13 @@ class Module_student_submissions {
     }
 
     /**
-     * Get code metrics for a submission as JSON.
+     * Get code metrics for a submission.
      *
      * 🔐 Authentication: user
-     * ❌ Warning: TODO: add more documentation
-     * See https://github.com/jutge-org/jutge-code-metrics for details.
+     * No warnings
+     *
      */
-    async getCodeMetrics(data: GetGameResultIn): Promise<any> {
+    async getCodeMetrics(data: GetGameResultIn): Promise<CodeMetrics | null> {
         const [output, ofiles] = await this.root.execute("student.submissions.getCodeMetrics", data)
         return output
     }
@@ -3541,6 +3583,30 @@ class Module_instructor_problems {
      */
     async getAllSharingSettings(): Promise<SharingSettings[]> {
         const [output, ofiles] = await this.root.execute("instructor.problems.getAllSharingSettings", null)
+        return output
+    }
+
+    /**
+     * Get alerts for one problem.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getAlerts(problem_nm: string): Promise<ProblemAlerts> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getAlerts", problem_nm)
+        return output
+    }
+
+    /**
+     * Get alerts for all problems.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getAllAlerts(): Promise<ProblemAlerts[]> {
+        const [output, ofiles] = await this.root.execute("instructor.problems.getAllAlerts", null)
         return output
     }
 

@@ -1,20 +1,19 @@
 'use client'
 
-import { AbstractProblem, SharingSettings } from '@/lib/jutge_api_client'
+import { AbstractProblem, ProblemAlerts, SharingSettings } from '@/lib/jutge_api_client'
 import { ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import {
+    AlertCircleIcon,
     BotIcon,
     BotMessageSquareIcon,
     BugIcon,
+    CatIcon,
     FileBoxIcon,
     FileCodeIcon,
-    KeyRoundIcon,
     LockIcon,
     SkullIcon,
     SquarePlusIcon,
-    ThumbsDownIcon,
-    ThumbsUpIcon,
     UnlockIcon,
     WrenchIcon,
 } from 'lucide-react'
@@ -47,6 +46,8 @@ type ProblemRow = {
     shared_solutions: boolean
     abstractProblems: Record<string, AbstractProblem>
     checked: boolean
+    se_count: number
+    ie_count: number
 }
 
 export default function ProblemsListPage() {
@@ -88,11 +89,15 @@ function ProblemsListView() {
                 const ownProblems = await jutge.instructor.problems.getOwnProblems()
                 const ownProblemsSharingSettings =
                     await jutge.instructor.problems.getAllSharingSettings()
+                const allAlerts = await jutge.instructor.problems.getAllAlerts()
                 const abstractProblems = await jutge.problems.getAbstractProblems(
                     ownProblems.join(','),
                 )
                 const sharingByProblem: Record<string, SharingSettings> = Object.fromEntries(
                     ownProblemsSharingSettings.map((s) => [s.problem_nm, s]),
+                )
+                const alertsByProblem: Record<string, ProblemAlerts> = Object.fromEntries(
+                    allAlerts.map((alerts) => [alerts.problem_nm, alerts]),
                 )
 
                 function buildTitle(problem_nm: string) {
@@ -103,6 +108,7 @@ function ProblemsListView() {
                 const rows = ownProblems.map((problem_nm) => {
                     const abstractProblem = abstractProblems[problem_nm]
                     const sharing = sharingByProblem[problem_nm]
+                    const alerts = alertsByProblem[problem_nm]
                     return {
                         problem_nm,
                         title: buildTitle(abstractProblem.problem_nm),
@@ -119,6 +125,8 @@ function ProblemsListView() {
                         checked: Object.values(abstractProblem.problems).every(
                             (problem) => problem.checked !== 0,
                         ),
+                        se_count: alerts?.se_count ?? 0,
+                        ie_count: alerts?.ie_count ?? 0,
                         abstractProblems,
                     }
                 })
@@ -281,23 +289,42 @@ function ProblemsListView() {
         {
             field: 'alerts',
             headerName: 'Alerts',
-            width: 80,
+            width: 90,
             filter: false,
             sort: false,
-            cellRenderer: (p: ICellRendererParams<ProblemRow>) => (
-                <div className="flex flex-row gap-2 mt-3">
-                    {!p.data!.checked && (
-                        <span title="Check failed">
-                            <BugIcon size={14} className="text-red-800 animate-pulse" />
-                        </span>
-                    )}
-                    {p.data!.deprecated && (
-                        <span title="Deprecated">
-                            <SkullIcon size={14} className="text-red-800" />
-                        </span>
-                    )}
-                </div>
-            ),
+            cellRenderer: (p: ICellRendererParams<ProblemRow>) => {
+                const totalAlerts = p.data!.se_count + p.data!.ie_count
+                return (
+                    <div className="flex flex-row gap-2 mt-3 items-center">
+                        {p.data!.deprecated && (
+                            <span title="Deprecated">
+                                <SkullIcon size={14} className="text-red-800" />
+                            </span>
+                        )}
+                        {!p.data!.checked && (
+                            <span title="Checks failed">
+                                <AlertCircleIcon size={14} className="text-red-800" />
+                            </span>
+                        )}
+                        {p.data!.se_count > 0 && (
+                            <span
+                                title={`${p.data!.se_count} setter errors`}
+                                className="flex items-center gap-1 text-xs text-gray-500"
+                            >
+                                <CatIcon size={14} className="text-red-800" />
+                            </span>
+                        )}
+                        {p.data!.ie_count > 0 && (
+                            <span
+                                title={`${p.data!.ie_count} internal errors`}
+                                className="flex items-center gap-1 text-xs text-gray-500"
+                            >
+                                <BugIcon size={14} className="text-red-800" />
+                            </span>
+                        )}
+                    </div>
+                )
+            },
         },
     ])
 
