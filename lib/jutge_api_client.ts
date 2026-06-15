@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-04-28T09:07:30.327Z
+ * This file has been automatically generated at 2026-06-15T12:14:07.847Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -314,6 +314,7 @@ export type NewSubmissionIn = {
     problem_id: string
     compiler_id: string
     annotation: string
+    extraSubmissionInfo: any
 }
 
 export type NewSubmissionOut = {
@@ -909,30 +910,6 @@ export type CreateImageInput = {
     size: string
 }
 
-export type SubmitPlayerInput = {
-    problem_id: string
-    annotation: string
-    source_code: string
-    callback_url: string
-}
-
-export type SubmitPlayerOutput = NewSubmissionOut
-
-export type SubmitMatchInput = {
-    problem_id: string
-    annotation: string
-    source_codes: string[]
-    callback_url: string
-}
-
-export type SubmitMatchOutput = NewSubmissionOut
-
-export type GetMatchSubmissionInput = GetGameResultIn
-
-export type GetMatchSubmissionOutput = {
-    todo: string
-}
-
 export type InstructorEntry = {
     username: string
     name: string
@@ -1121,6 +1098,7 @@ export type SomeType = {
 
 export interface Meta {
     readonly token: string
+    readonly user_uid: string
 }
 
 export interface Download {
@@ -1196,7 +1174,9 @@ export class JutgeApiClient {
     JUTGE_API_URL = process.env.JUTGE_API_URL || "https://api.jutge.org/api"
 
     /** Headers to include in the API requests */
-    headers: Record<string, string> = {}
+    headers: Record<string, string> = {
+        ...(process.env.JUTGE_DOMAIN ? { "x-forwarded-host": process.env.JUTGE_DOMAIN } : {}),
+    }
 
     /** Meta information */
     meta: Meta | null = null
@@ -1296,7 +1276,7 @@ export class JutgeApiClient {
     async login({ email, password }: { email: string; password: string }): Promise<CredentialsOut> {
         const [credentials, _] = await this.execute("auth.login", { email, password })
         if (credentials.error) throw new UnauthorizedError(credentials.error)
-        this.meta = { token: credentials.token }
+        this.meta = { token: credentials.token, user_uid: credentials.user_uid }
         return credentials
     }
 
@@ -1314,7 +1294,7 @@ export class JutgeApiClient {
     }): Promise<CredentialsOut> {
         const [credentials, _] = await this.execute("auth.loginExam", { email, password, exam, exam_password })
         if (credentials.error) throw new UnauthorizedError(credentials.error)
-        this.meta = { token: credentials.token }
+        this.meta = { token: credentials.token, user_uid: credentials.user_uid }
         return credentials
     }
 
@@ -1522,6 +1502,18 @@ class Module_auth {
      */
     async loginExam(data: ExamCredentialsIn): Promise<CredentialsOut> {
         const [output, ofiles] = await this.root.execute("auth.loginExam", data)
+        return output
+    }
+
+    /**
+     * Get list of ready exams for a user, given their credentials.
+     *
+     * 🔐 Authentication: any
+     * No warnings
+     * Validates user credentials and returns the list of ready exams. Does not create a session or return a token.
+     */
+    async getReadyExams(data: CredentialsIn): Promise<ReadyExam[]> {
+        const [output, ofiles] = await this.root.execute("auth.getReadyExams", data)
         return output
     }
 
@@ -2431,11 +2423,23 @@ class Module_student_submissions {
     }
 
     /**
+     * Get all submissions for a list of abstract problems.
+     *
+     * 🔐 Authentication: user
+     * No warnings
+     * Flat array of submissions from newer to older.
+     */
+    async getForAbstractProblems(problem_nms: string): Promise<Submission[]> {
+        const [output, ofiles] = await this.root.execute("student.submissions.getForAbstractProblems", problem_nms)
+        return output
+    }
+
+    /**
      * Get all submissions.
      *
      * 🔐 Authentication: user
      * No warnings
-     * Flat array of submissions in chronological order.
+     * Flat array of submissions from newer to older.
      */
     async getAll(): Promise<Submission[]> {
         const [output, ofiles] = await this.root.execute("student.submissions.getAll", null)
@@ -2704,7 +2708,7 @@ class Module_student_exam {
     /**
      * Get list of ready exams.
      *
-     * 🔐 Authentication: any
+     * 🔐 Authentication: user
      * No warnings
      * An exam is ready if the current time is between its expected start time minus two days and its expected end time plus two days. Exams are sorted by their distance to the current time and by title order in case of ties.
      */
@@ -3912,18 +3916,6 @@ class Module_games {
     async getViewer(problem_id: string): Promise<Download> {
         const [output, ofiles] = await this.root.execute("games.getViewer", problem_id)
         return ofiles[0]
-    }
-
-    /**
-     * Submit a match for a game.
-     *
-     * 🔐 Authentication: competitions
-     * No warnings
-     *
-     */
-    async submitMatch(data: SubmitMatchInput): Promise<NewSubmissionOut> {
-        const [output, ofiles] = await this.root.execute("games.submitMatch", data)
-        return output
     }
 }
 
