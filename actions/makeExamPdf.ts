@@ -25,7 +25,7 @@ export async function makeExamPdf(data: MakeExamPdfData): Promise<Blob> {
     zMakeExamPdfData.parse(data)
 
     const jutge = new JutgeApiClient()
-    jutge.meta = { token: data.token }
+    jutge.meta = { token: data.token, user_uid: 'NOT IMPORTANT' }
 
     const profile = await jutge.student.profile.get()
     if (!profile.instructor) throw new Error('You are not an instructor')

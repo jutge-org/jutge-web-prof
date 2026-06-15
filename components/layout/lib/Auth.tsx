@@ -39,7 +39,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             const expiration_date = dayjs(expiration)
             if (now.isAfter(expiration_date)) return false
 
-            jutge.meta = { token }
+            jutge.meta = { token, user_uid: 'NOT IMPORTANT' }
             const profile = await jutge.student.profile.get()
             if (!profile.instructor) return false
             setUser(profile)
