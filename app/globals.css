@@ -38,6 +38,41 @@ code {
     @apply bg-secondary p-1 rounded text-sm;
 }
 
+.w-md-editor.wmde-markdown-var,
+.w-md-editor.wmde-markdown-var[data-color-mode='dark'],
+.w-md-editor.wmde-markdown-var[data-color-mode='light'] {
+    --color-canvas-default: transparent;
+    --color-canvas-subtle: hsl(var(--muted));
+    --color-border-default: hsl(var(--input));
+    --color-fg-default: hsl(var(--foreground));
+    --color-fg-muted: hsl(var(--muted-foreground));
+    --md-editor-background-color: transparent;
+    --md-editor-box-shadow-color: hsl(var(--input));
+    background-color: transparent;
+    border-radius: calc(var(--radius) - 2px);
+    box-shadow: 0 0 0 1px hsl(var(--input));
+}
+
+.w-md-editor .wmde-markdown {
+    background-color: transparent;
+}
+
+.w-md-editor-toolbar {
+    background-color: transparent;
+    border-color: hsl(var(--input));
+}
+
+.w-md-editor-preview {
+    box-shadow: inset 1px 0 0 0 hsl(var(--input));
+}
+
+.w-md-editor code {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+}
+
 /* JutgeAI Audit table: total row */
 .ag-row.jutgeai-audit-total-row {
     font-weight: 700;

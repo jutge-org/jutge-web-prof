@@ -26,8 +26,18 @@ const defaultMode = availableModes[0]
 
 const defaultPalette = availablePalettes[0]
 
+type ResolvedMode = 'light' | 'dark'
+
+function getSystemDark() {
+    return (
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+    )
+}
+
 const initialState = {
     mode: defaultMode,
+    resolvedMode: 'light' as ResolvedMode,
     palette: defaultPalette,
     setMode: (palette: string) => {},
     setPalette: (palette: string) => {},
@@ -44,7 +54,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
     const [mode, setMode] = useState(defaultMode)
 
+    const [systemDark, setSystemDark] = useState(getSystemDark)
+
     const [palette, setPalette] = useState(defaultPalette)
+
+    const resolvedMode: ResolvedMode =
+        mode === 'dark' ? 'dark' : mode === 'light' ? 'light' : systemDark ? 'dark' : 'light'
 
     useEffect(() => {
         const storedMode = localStorage.getItem('theme-mode')
@@ -54,19 +69,18 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }, [])
 
     useEffect(() => {
-        const root = window.document.documentElement
+        const mq = window.matchMedia('(prefers-color-scheme: dark)')
+        const update = () => setSystemDark(mq.matches)
+        update()
+        mq.addEventListener('change', update)
+        return () => mq.removeEventListener('change', update)
+    }, [])
 
-        // Set mode classes
+    useEffect(() => {
+        const root = window.document.documentElement
         root.classList.remove('light', 'dark')
-        if (mode === 'system') {
-            const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'dark'
-                : 'light'
-            root.classList.add(systemMode)
-        } else {
-            root.classList.add(mode)
-        }
-    }, [mode])
+        root.classList.add(resolvedMode)
+    }, [resolvedMode])
 
     useEffect(() => {
         const root = window.document.documentElement
@@ -83,6 +97,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
     const value = {
         mode,
+        resolvedMode,
         palette,
         setMode,
         setPalette,

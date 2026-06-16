@@ -13,7 +13,6 @@ import {
     PenOffIcon,
     TrashIcon,
 } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import { sleep } from 'radash'
 import { Dispatch, JSX, SetStateAction, useState } from 'react'
 import Dropzone, { DropzoneState } from 'shadcn-dropzone'
@@ -39,6 +38,7 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Switch } from '../ui/switch'
 import { Textarea } from '../ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
+import { useTheme } from '../layout/lib/Theme'
 import HtmlEditor from '../wrappers/HtmlEditor'
 
 export type JFormInputField = {
@@ -645,12 +645,12 @@ interface JMarkdownComponentProps {
 }
 
 function JMarkdownComponent(props: JMarkdownComponentProps) {
-    const theme = useTheme()
+    const { resolvedMode } = useTheme()
 
     const content = (
         <MDEditor
-            className="mx-[1px]"
-            data-color-mode={theme.theme === 'dark' ? 'dark' : 'light'}
+            className="mx-[1px] wmde-markdown-var"
+            data-color-mode={resolvedMode}
             height={200}
             value={props.field.value}
             onChange={(v) => {

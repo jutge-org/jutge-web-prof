@@ -24,13 +24,13 @@ const myThemeDark = themeQuartz.withPart(colorSchemeDark).withParams({
 })
 
 export function AgTableFull(props: any) {
-    const { mode } = useTheme()
+    const { resolvedMode } = useTheme()
 
     return (
         <div className="h-[calc(100vh-200px)] w-full">
             <AgGridReact
                 {...props}
-                theme={mode === 'dark' ? myThemeDark : myThemeLight}
+                theme={resolvedMode === 'dark' ? myThemeDark : myThemeLight}
                 animateRows={false}
                 suppressColumnMoveAnimation={true}
                 enableCellTextSelection={true} // allows text selection in cells
@@ -41,12 +41,12 @@ export function AgTableFull(props: any) {
 }
 
 export function AgTable(props: any) {
-    const { mode } = useTheme()
+    const { resolvedMode } = useTheme()
 
     return (
         <AgGridReact
             {...props}
-            theme={mode === 'dark' ? myThemeDark : myThemeLight}
+            theme={resolvedMode === 'dark' ? myThemeDark : myThemeLight}
             animateRows={false}
             suppressColumnMoveAnimation={true}
             enableCellTextSelection={true} // allows text selection in cells
@@ -56,13 +56,13 @@ export function AgTable(props: any) {
 }
 
 export function AgTableAutoHeight(props: any) {
-    const { mode } = useTheme()
+    const { resolvedMode } = useTheme()
 
     return (
         <div className="w-full">
             <AgGridReact
                 {...props}
-                theme={mode === 'dark' ? myThemeDark : myThemeLight}
+                theme={resolvedMode === 'dark' ? myThemeDark : myThemeLight}
                 domLayout="autoHeight"
                 animateRows={false}
                 suppressColumnMoveAnimation={true}
