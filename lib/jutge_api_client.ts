@@ -1,5 +1,5 @@
 /**
- * This file has been automatically generated at 2026-06-15T12:14:07.847Z
+ * This file has been automatically generated at 2026-06-16T06:36:24.618Z
  *
  * Name:    Jutge API
  * Version: 2.0.0
@@ -535,6 +535,7 @@ export type Document = {
     document_nm: string
     title: string
     description: string
+    type: string
     created_at: string | string | string | number
     updated_at: string | string | string | number
 }
@@ -2911,7 +2912,7 @@ class Module_instructor_documents {
      *
      * 🔐 Authentication: instructor
      * No warnings
-     * The PDF file is not included in the response.
+     * The file content is not included in the response.
      */
     async get(document_nm: string): Promise<Document> {
         const [output, ofiles] = await this.root.execute("instructor.documents.get", document_nm)
@@ -2927,6 +2928,18 @@ class Module_instructor_documents {
      */
     async getPdf(document_nm: string): Promise<Download> {
         const [output, ofiles] = await this.root.execute("instructor.documents.getPdf", document_nm)
+        return ofiles[0]
+    }
+
+    /**
+     * Get ZIP of a document.
+     *
+     * 🔐 Authentication: instructor
+     * No warnings
+     *
+     */
+    async getZip(document_nm: string): Promise<Download> {
+        const [output, ofiles] = await this.root.execute("instructor.documents.getZip", document_nm)
         return ofiles[0]
     }
 

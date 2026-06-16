@@ -1,7 +1,7 @@
 'use client'
 
 import dayjs from 'dayjs'
-import { FileIcon, SquarePlusIcon } from 'lucide-react'
+import { SquarePlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Page from '../../components/layout/Page'
@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/button'
 import { AgTableFull } from '../../components/wrappers/AgTable'
 import { useIsMobile } from '../../hooks/use-mobile'
 import jutge from '../../lib/jutge'
+import { documentFileExtension, getDocumentFile, getDocumentFileIcon } from '../../lib/documents'
 import { Document } from '../../lib/jutge_api_client'
 import { offerDownloadFile } from '../../lib/utils'
 import { ICellRendererParams } from 'ag-grid-community'
@@ -64,28 +65,32 @@ function DocumentsListView() {
         },
         // { field: 'annotation', flex: 2, filter: true },
         {
-            field: 'pdf',
+            field: 'file',
+            headerName: 'File',
             width: 100,
             filter: false,
-            cellRenderer: (p: ICellRendererParams<Document>) => (
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                        downloadPdf(p.data!.document_nm)
-                        p.api.deselectAll() // no funciona
-                    }}
-                >
-                    <FileIcon />
-                </Button>
-            ),
+            cellRenderer: (p: ICellRendererParams<Document>) => {
+                const Icon = getDocumentFileIcon(p.data!.type)
+                return (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                            downloadFile(p.data!)
+                            p.api.deselectAll() // no funciona
+                        }}
+                    >
+                        <Icon />
+                    </Button>
+                )
+            },
         },
     ])
 
     useEffect(() => {
         if (isMobile)
             setColDefs((colDefs) =>
-                colDefs.filter((c) => c.field !== 'annotation' && c.field !== 'pdf'),
+                colDefs.filter((c) => c.field !== 'annotation' && c.field !== 'file'),
             )
     }, [isMobile])
 
@@ -101,9 +106,9 @@ function DocumentsListView() {
         fetchDocuments()
     }, [])
 
-    async function downloadPdf(document_nm: string) {
-        const download = await jutge.instructor.documents.getPdf(document_nm)
-        offerDownloadFile(download, `${document_nm}.pdf`)
+    async function downloadFile(document: Document) {
+        const download = await getDocumentFile(document)
+        offerDownloadFile(download, `${document.document_nm}${documentFileExtension(document)}`)
     }
 
     return (

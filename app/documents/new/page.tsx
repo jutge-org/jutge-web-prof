@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { JForm, JFormFields } from '@/components/formatters/JForm'
 import Page from '@/components/layout/Page'
 import jutge from '@/lib/jutge'
+import { documentFileAccept } from '@/lib/documents'
 import { showError } from '@/lib/utils'
 
 export default function DocumentsNewPage() {
@@ -60,10 +61,10 @@ function DocumentsNewView() {
         },
         file: {
             type: 'file',
-            label: 'PDF',
+            label: 'File',
             value: file,
             setValue: setFile,
-            accept: ['application/pdf'],
+            accept: documentFileAccept,
             //validator: z.number().min(1).max(1),
         },
         sep: { type: 'separator' },

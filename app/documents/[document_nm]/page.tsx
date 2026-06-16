@@ -1,7 +1,7 @@
 'use client'
 
 import dayjs from 'dayjs'
-import { FileIcon, SaveIcon, TrashIcon } from 'lucide-react'
+import { SaveIcon, TrashIcon } from 'lucide-react'
 import { redirect, useParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -13,6 +13,13 @@ import SimpleSpinner from '@/components/SimpleSpinner'
 import { Button } from '@/components/ui/button'
 import { useDynamic } from '@/hooks/use-dynamic'
 import jutge from '@/lib/jutge'
+import {
+    documentFileAcceptForType,
+    documentFileExtension,
+    documentTypeLabel,
+    getDocumentFile,
+    getDocumentFileIcon,
+} from '@/lib/documents'
 import { Document } from '@/lib/jutge_api_client'
 import { offerDownloadFile, showError } from '@/lib/utils'
 
@@ -80,6 +87,9 @@ function EditDocumentForm(props: DocumentFormProps) {
     const [description, setDescription] = useDynamic(props.document.description, [props.document])
     const [file, setFile] = useDynamic(null as File | null, [props.document])
 
+    const FileIcon = getDocumentFileIcon(props.document.type)
+    const typeLabel = documentTypeLabel(props.document)
+
     const fields: JFormFields = {
         title: {
             type: 'input',
@@ -108,9 +118,9 @@ function EditDocumentForm(props: DocumentFormProps) {
             setValue: setDescription,
             placeHolder: 'Document description',
         },
-        oldPdf: {
+        oldFile: {
             type: 'free',
-            label: 'Current PDF',
+            label: `Current ${typeLabel}`,
             content: (
                 <Button variant="outline" className="h-16 w-16 [&_svg]:size-12" onClick={download}>
                     <FileIcon strokeWidth={0.6} />
@@ -119,10 +129,10 @@ function EditDocumentForm(props: DocumentFormProps) {
         },
         file: {
             type: 'file',
-            label: 'New PDF',
+            label: `New ${typeLabel}`,
             value: file,
             setValue: setFile,
-            accept: ['application/pdf'],
+            accept: documentFileAcceptForType(props.document.type),
             //validator: z.number().min(1).max(1),
         },
         sep: { type: 'separator' },
@@ -143,8 +153,11 @@ function EditDocumentForm(props: DocumentFormProps) {
 
     async function download() {
         try {
-            const download = await jutge.instructor.documents.getPdf(props.document.document_nm)
-            offerDownloadFile(download, props.document.document_nm + '.pdf')
+            const download = await getDocumentFile(props.document)
+            offerDownloadFile(
+                download,
+                props.document.document_nm + documentFileExtension(props.document),
+            )
         } catch (error) {
             return showError(error)
         }
@@ -152,7 +165,7 @@ function EditDocumentForm(props: DocumentFormProps) {
 
     async function save() {
         try {
-            const download = await jutge.instructor.documents.getPdf(props.document.document_nm)
+            const download = await getDocumentFile(props.document)
             const newDocument = {
                 document_nm: document_nm,
                 title: title,
